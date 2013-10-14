@@ -4,7 +4,7 @@
 
 ;; Author: Chen Bin <chenbin.sh@gmail.com>
 ;; URL: http://github.com/redguardtoo/evil-matchit
-;; Version: 0.0.2
+;; Version: 0.0.3
 ;; Keywords: matchit vim evil
 ;;
 ;; This file is not part of GNU Emacs.
@@ -122,8 +122,11 @@
         )
     ;; just use evil-jump item
     (progn
-      (funcall fn (point))
-      (evil-jump-item NUM)
+      ;; evil has its own API, so normail Emacs API may not work
+      (if (eq fn 'evilmi--push-mark)
+          (evil-visual-char)
+          )
+      (evil-jump-item)
       )
     )
   )
