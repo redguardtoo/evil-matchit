@@ -1,14 +1,23 @@
-* evil-matchit (current version 0.0.1)
+* evil-matchit (current version 0.0.2)
 
-*Please note this program requires evil-mode!*
+Vim [[http://www.vim.org/scripts/script.php?script_id=39][matchit.vim]] by Benji Fisher ported into Emacs.
 
-Vim matchit.vim ported into Emacs.
+(require 'evil-matchit)
+(global-evil-matchit-mode 1)
+
+Alternatively, you can enable evil-matchit-mode along a major mode by adding `turn-on-evil-matchit-mode' to the mode hook.
+
+*This package uses Evil as its vi layer*!
 
 * Install
 evil-matchit is already uploaded to [[http://marmalade-repo.org/]]. So the best way to install it is using Emacs' package manager.
 
 * How to use
-Press % in evil-normal-mode.
+Press "%" to jump inside item(s) between tags in evil-normal-mode.
+
+Press ",si" to select item(s) wrapped by tags in evil-normal-mode.
+
+Press ",di" to delete item(s) wrapped by tags in evil-normal-mode.
 
 * Contact me
 You can report bugs at [[https://github.com/redguardtoo/evil-matchit]].

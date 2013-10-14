@@ -4,7 +4,7 @@
 
 ;; Author: Chen Bin <chenbin.sh@gmail.com>
 ;; URL: http://github.com/redguardtoo/evil-matchit
-;; Version: 0.0.1
+;; Version: 0.0.2
 ;; Keywords: matchit vim evil
 ;;
 ;; This file is not part of GNU Emacs.
@@ -176,9 +176,9 @@
   evil-matchit-mode turn-on-evil-matchit-mode
   "Global minor mode to emulate matchit.vim")
 
-(evil-define-key 'normal evil-matchit-mode-map "%" 'evilmi-jump-items)
-(evil-define-key 'normal evil-matchit-mode-map ",si" 'evilmi-select-items)
-(evil-define-key 'normal evil-matchit-mode-map ",di" 'evilmi-delete-items)
+(define-key evil-normal-state-map "%" 'evilmi-jump-items)
+(define-key evil-normal-state-map ",si" 'evilmi-select-items)
+(define-key evil-normal-state-map ",di" 'evilmi-delete-items)
 
 (provide 'evil-matchit)
 
