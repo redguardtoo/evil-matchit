@@ -1,4 +1,4 @@
-;;; evil-matchit --- Vim matchit ported into Emacs (requires EVIL)
+;;; evil-matchit --- Vim matchit ported to Evil
 
 ;; Copyright (C) 2013 Chen Bin
 
@@ -6,6 +6,7 @@
 ;; URL: http://github.com/redguardtoo/evil-matchit
 ;; Version: 0.0.3
 ;; Keywords: matchit vim evil
+;; Package-Requires: ((evil "1.0.7"))
 ;;
 ;; This file is not part of GNU Emacs.
 
