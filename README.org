@@ -2,8 +2,10 @@
 
 Vim [[http://www.vim.org/scripts/script.php?script_id=39][matchit.vim]] by Benji Fisher ported into Emacs.
 
+#+BEGIN_SRC lisp
 (require 'evil-matchit)
 (global-evil-matchit-mode 1)
+#+END_SRC
 
 Alternatively, you can enable evil-matchit-mode along a major mode by adding `turn-on-evil-matchit-mode' to the mode hook.
 
