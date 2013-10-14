@@ -1,0 +1,14 @@
+* evil-matchit (current version 0.0.1)
+
+*Please note this program requires evil-mode!*
+
+Vim matchit.vim ported into Emacs.
+
+* Install
+evil-matchit is already uploaded to [[http://marmalade-repo.org/]]. So the best way to install it is using Emacs' package manager.
+
+* How to use
+Press % in evil-normal-mode.
+
+* Contact me
+You can report bugs at [[https://github.com/redguardtoo/evil-matchit]].
