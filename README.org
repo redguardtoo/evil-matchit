@@ -1,4 +1,4 @@
-* evil-matchit (current version 0.0.3)
+* evil-matchit (current version 0.0.4)
 
 Vim [[http://www.vim.org/scripts/script.php?script_id=39][matchit.vim]] by Benji Fisher ported into Emacs.
 
@@ -14,12 +14,22 @@ Alternatively, you can enable evil-matchit-mode along a major mode by adding `tu
 * Install
 evil-matchit is already uploaded to [[http://marmalade-repo.org/]]. So the best way to install it is using Emacs' package manager.
 
-* How to use
+* How to use evil-matchit
 Press "%" to jump inside item(s) between tags in evil-normal-mode.
 
 Press ",si" to select item(s) wrapped by tags in evil-normal-mode.
 
 Press ",di" to delete item(s) wrapped by tags in evil-normal-mode.
+
+All the commands support numeric argument like "3%", "5,si" or "9,di"
+
+* Advanced set up
+html tags are automatically supported in nxml-mode, web-mode, html-mode and nxhtml-mode.
+
+Add below line into ~/.emacs to specify the major modes where to turn on html tag support:
+#+BEGIN_SRC elisp
+(setq evilmi-html-major-modes i'(nxml-mode web-mode html-mode nxhtml-mode php-mode jsp-mode))
+#+END_SRC
 
 * Contact me
 You can report bugs at [[https://github.com/redguardtoo/evil-matchit]].

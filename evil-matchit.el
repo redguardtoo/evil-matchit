@@ -4,7 +4,7 @@
 
 ;; Author: Chen Bin <chenbin.sh@gmail.com>
 ;; URL: http://github.com/redguardtoo/evil-matchit
-;; Version: 0.0.3
+;; Version: 0.0.4
 ;; Keywords: matchit vim evil
 ;; Package-Requires: ((evil "1.0.7"))
 ;;
@@ -47,18 +47,21 @@
     )
   "major modes containing html tags")
 
-;; {}()''""
+(defun evilmi--find-single-char-tag ()
+  )
+
+;; {}()
 ;; @return (list found_tag is_end_tag)
 (defun evilmi--at-single-char-tag ()
   (let ((char (following-char))
         (found_tag nil)
         (is_end_tag nil))
-    ;; '{'
-    (if (= char 123) (setq found_tag t) (setq is_end_tag nil))
-    (if (= char 125) (setq found_tag t) (setq is_end_tag t))
-    ;; '('
-    (if (= char 40) (setq found_tag t) (setq is_end_tag nil))
-    (if (= char 41) (setq found_tag t) (setq is_end_tag t))
+
+    (if (= char (string-to-char "{")) (setq found_tag t) (setq is_end_tag nil))
+    (if (= char (string-to-char "}")) (setq found_tag t) (setq is_end_tag t))
+    (if (= char (string-to-char "(")) (setq found_tag t) (setq is_end_tag nil))
+    (if (= char (string-to-char ")")) (setq found_tag t) (setq is_end_tag t))
+
     (list found_tag is_end_tag)
     )
   )
@@ -67,6 +70,7 @@
 (defun evilmi--find-lt-or-gt-char-at-current-line ()
   (let ((b (line-beginning-position))
         (e (line-end-position))
+        (html-tag-char (string-to-char "<"))
         (char (following-char))
         (p (point))
         (found_tag nil)
@@ -75,7 +79,7 @@
 
     (save-excursion
       ;; search backward
-      (if (not (= char 60))
+      (if (not (= char html-tag-char))
           (while (and (<= b (point)) (not (= char 60)))
             (setq char (following-char))
             (setq p (point))
@@ -83,7 +87,7 @@
             )
         )
       ;; search forward
-      (if (not (= char 60))
+      (if (not (= char html-tag-char))
           (save-excursion
             (while (and (>= e (point)) (not (= char 60)))
               (setq char (following-char))
@@ -94,7 +98,7 @@
         )
 
       ;; is end tag?
-      (when (and (= char 60) (< p e))
+      (when (and (= char html-tag-char) (< p e))
         (goto-char p)
         (forward-char)
         (if (= (following-char) 47)
@@ -117,12 +121,44 @@
     (list p found_tag is_end_tag)
     ))
 
+
+(defun evilmi--search-next-tag (NUM)
+  (let ((c (following-char))
+        )
+    (if (> NUM 0)
+        (cond
+         ((= c (string-to-char "}"))
+          (search-forward "{")
+          (backward-char)
+          (= (following-char) (string-to-char "{"))
+          )
+         ((= c (string-to-char "{"))
+          (search-backward "}")
+          (= (following-char) (string-to-char "}"))
+          )
+         ((= c (string-to-char ")"))
+          (search-forward "(")
+          (backward-char)
+          (= (following-char) (string-to-char "("))
+          )
+         ((= c (string-to-char "("))
+          (search-backward ")")
+          (= (following-char) (string-to-char ")"))
+          )
+         )
+      nil
+      )
+    )
+  )
+
 (defun evilmi--operate-on-item (NUM fn)
   (let ((rlt (evilmi--find-lt-or-gt-char-at-current-line))
-        (test_single_char_tag (evilmi--at-single-char-tag))
+        (test-single-char-tag (evilmi--at-single-char-tag))
+        (single-char-tag-exists-under-cursor)
         )
+    (setq single-char-tag-exists-under-cursor (nth 0 test-single-char-tag))
     (if (and (memq major-mode evilmi-html-major-modes)
-             (not (nth 0 test_single_char_tag))
+             (not single-char-tag-exists-under-cursor)
              )
         ;; prepare to jump
         (when (nth 1 rlt)
@@ -141,11 +177,18 @@
           )
       ;; just use evil-jump item
       (progn
-        ;; evil has its own API, so normail Emacs API may not work
+        ;; single character tag either in html file or not
+        ;; evil has its own API, so normal Emacs API may not work
         (if (eq fn 'evilmi--push-mark)
             (evil-visual-char)
           )
-        (evil-jump-item)
+        (while (and (> NUM 0) single-char-tag-exists-under-cursor)
+          (evil-jump-item)
+          (setq NUM (1- NUM))
+
+          ;; next action depends on current char under cursor
+          (setq single-char-tag-exists-under-cursor (evilmi--search-next-tag NUM))
+          )
         )
       )
     )
