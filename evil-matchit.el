@@ -47,9 +47,24 @@
     )
   "major modes containing html tags")
 
+;; {}()''""
+;; @return (list found_tag is_end_tag)
+(defun evilmi--at-single-char-tag ()
+  (let ((char (following-char))
+        (found_tag nil)
+        (is_end_tag nil))
+    ;; '{'
+    (if (= char 123) (setq found_tag t) (setq is_end_tag nil))
+    (if (= char 125) (setq found_tag t) (setq is_end_tag t))
+    ;; '('
+    (if (= char 40) (setq found_tag t) (setq is_end_tag nil))
+    (if (= char 41) (setq found_tag t) (setq is_end_tag t))
+    (list found_tag is_end_tag)
+    )
+  )
+
 ;; @return (list position_first_char found_tag is_end_tag)
 (defun evilmi--find-lt-or-gt-char-at-current-line ()
-  (interactive)
   (let ((b (line-beginning-position))
         (e (line-end-position))
         (char (following-char))
@@ -103,8 +118,12 @@
     ))
 
 (defun evilmi--operate-on-item (NUM fn)
-  (if (memq major-mode evilmi-html-major-modes)
-      (let ((rlt (evilmi--find-lt-or-gt-char-at-current-line)))
+  (let ((rlt (evilmi--find-lt-or-gt-char-at-current-line))
+        (test_single_char_tag (evilmi--at-single-char-tag))
+        )
+    (if (and (memq major-mode evilmi-html-major-modes)
+             (not (nth 0 test_single_char_tag))
+             )
         ;; prepare to jump
         (when (nth 1 rlt)
           (if (nth 2 rlt)
@@ -120,14 +139,14 @@
               )
             )
           )
-        )
-    ;; just use evil-jump item
-    (progn
-      ;; evil has its own API, so normail Emacs API may not work
-      (if (eq fn 'evilmi--push-mark)
-          (evil-visual-char)
+      ;; just use evil-jump item
+      (progn
+        ;; evil has its own API, so normail Emacs API may not work
+        (if (eq fn 'evilmi--push-mark)
+            (evil-visual-char)
           )
-      (evil-jump-item)
+        (evil-jump-item)
+        )
       )
     )
   )
