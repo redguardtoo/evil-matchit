@@ -1,4 +1,4 @@
-;;; evil-matchit --- Vim matchit ported to Evil
+;;; evil-matchit.el --- Vim matchit ported to Evil
 
 ;; Copyright (C) 2013 Chen Bin
 
