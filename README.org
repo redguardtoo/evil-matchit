@@ -28,7 +28,7 @@ html tags are automatically supported in nxml-mode, web-mode, html-mode and nxht
 
 Add below line into ~/.emacs to specify the major modes where to turn on html tag support:
 #+BEGIN_SRC elisp
-(setq evilmi-html-major-modes i'(nxml-mode web-mode html-mode nxhtml-mode php-mode jsp-mode))
+(setq evilmi-html-major-modes '(nxml-mode web-mode html-mode nxhtml-mode php-mode jsp-mode))
 #+END_SRC
 
 * Contact me
