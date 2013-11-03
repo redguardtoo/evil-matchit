@@ -242,11 +242,16 @@
   evil-matchit-mode turn-on-evil-matchit-mode
   "Global minor mode to emulate matchit.vim")
 
-(evil-define-key 'normal evil-matchit-mode-map
-  "%" 'evilmi-jump-items
-  ",si" 'evilmi-select-items
-  ",di" 'evilmi-delete-items
-  )
+;;;###autoload
+(defun evilmi-default-hotkeys ()
+  "Set the hotkeys of evil-matchit"
+  (interactive)
+  (eval-after-load 'evil
+    '(progn
+       (evil-define-key 'normal evil-matchit-mode-map
+         "%" 'evilmi-jump-items
+         ",si" 'evilmi-select-items
+         ",di" 'evilmi-delete-items))))
 
 (provide 'evil-matchit)
 
