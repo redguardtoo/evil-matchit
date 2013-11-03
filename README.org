@@ -14,6 +14,11 @@ Alternatively, you can enable evil-matchit-mode along a major mode by adding `tu
 * Install
 evil-matchit is already uploaded to [[http://marmalade-repo.org/]]. So the best way to install it is using Emacs' package manager.
 
+Default keybindings can be assigned for you by calling
+#+BEGIN_SRC lisp
+(evilmi-default-hotkeys)
+#+END_SRC
+
 * How to use evil-matchit
 Press "%" to jump inside item(s) between tags in evil-normal-mode whose command name is "evilmi-jump-items".
 
