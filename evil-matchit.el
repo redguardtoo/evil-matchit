@@ -4,7 +4,7 @@
 
 ;; Author: Chen Bin <chenbin.sh@gmail.com>
 ;; URL: http://github.com/redguardtoo/evil-matchit
-;; Version: 0.0.5
+;; Version: 0.0.6
 ;; Keywords: matchit vim evil
 ;; Package-Requires: ((evil "1.0.7"))
 ;;
@@ -224,6 +224,14 @@
 (define-minor-mode evil-matchit-mode
   "Buffer-local minor mode to emulate matchit.vim"
   :keymap (make-sparse-keymap)
+  (if (fboundp 'evilmi-customize-keybinding)
+      (evilmi-customize-keybinding)
+    (evil-define-key 'normal evil-matchit-mode-map
+      "%" 'evilmi-jump-items
+      ",si" 'evilmi-select-items
+      ",di" 'evilmi-delete-items
+      )
+    )
   (evil-normalize-keymaps)
   )
 
@@ -242,11 +250,7 @@
   evil-matchit-mode turn-on-evil-matchit-mode
   "Global minor mode to emulate matchit.vim")
 
-(evil-define-key 'normal evil-matchit-mode-map
-  "%" 'evilmi-jump-items
-  ",si" 'evilmi-select-items
-  ",di" 'evilmi-delete-items
-  )
+
 
 (provide 'evil-matchit)
 
