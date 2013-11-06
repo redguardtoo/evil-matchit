@@ -39,6 +39,9 @@
 
 (require 'evil)
 
+(autoload 'sgml-skip-tag-backward "sgml-mode" nil t)
+(autoload 'sgml-skip-tag-forward "sgml-mode" nil t)
+
 (defvar evilmi-html-major-modes
   '(nxml-mode
     web-mode
