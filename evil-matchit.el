@@ -4,7 +4,7 @@
 
 ;; Author: Chen Bin <chenbin.sh@gmail.com>
 ;; URL: http://github.com/redguardtoo/evil-matchit
-;; Version: 0.0.7
+;; Version: 1.0.0
 ;; Keywords: matchit vim evil
 ;; Package-Requires: ((evil "1.0.7"))
 ;;
@@ -38,187 +38,95 @@
 ;;; Code:
 
 (require 'evil)
-(require 'sgml-mode)
 
-(defvar evilmi-html-major-modes
-  '(nxml-mode
-    web-mode
-    html-mode
-    nxhtml-mode
-    )
-  "major modes containing html tags")
+(defvar evilmi-plugins '(emacs-lisp-mode
+                         ((evilmi-simple-get-tag evilmi-simple-jump))
+                         ))
 
-(defun evilmi--find-single-char-tag ()
-  )
-
-;; {}()
-;; @return (list found_tag is_end_tag)
-(defun evilmi--at-single-char-tag ()
-  (let ((char (following-char))
-        (found_tag nil)
-        (is_end_tag nil))
-
-    (if (= char (string-to-char "{")) (setq found_tag t) (setq is_end_tag nil))
-    (if (= char (string-to-char "}")) (setq found_tag t) (setq is_end_tag t))
-    (if (= char (string-to-char "(")) (setq found_tag t) (setq is_end_tag nil))
-    (if (= char (string-to-char ")")) (setq found_tag t) (setq is_end_tag t))
-
-    (list found_tag is_end_tag)
-    )
-  )
-
-;; @return (list position_first_char found_tag is_end_tag)
-(defun evilmi--find-lt-or-gt-char-at-current-line ()
-  (let ((b (line-beginning-position))
-        (e (line-end-position))
-        (html-tag-char (string-to-char "<"))
-        (char (following-char))
-        (p (point))
-        (found_tag nil)
-        (is_end_tag nil)
+(defun evilmi--operate-on-item (NUM &optional FUNC)
+  (let (plugin
+        rlt
+        (jumped nil)
+        where-to-jump-in-theory
         )
 
-    (save-excursion
-      ;; search backward
-      (if (not (= char html-tag-char))
-          (while (and (<= b (point)) (not (= char 60)))
-            (setq char (following-char))
-            (setq p (point))
-            (backward-char)
-            )
-        )
-      ;; search forward
-      (if (not (= char html-tag-char))
-          (save-excursion
-            (while (and (>= e (point)) (not (= char 60)))
-              (setq char (following-char))
-              (setq p (point))
-              (forward-char)
-              )
-            )
-        )
+    (setq plugin (plist-get evilmi-plugins major-mode))
 
-      ;; is end tag?
-      (when (and (= char html-tag-char) (< p e))
-        (goto-char p)
-        (forward-char)
-        (if (= (following-char) 47)
-            (progn
-              ;; </
-              (skip-chars-forward "^>")
-              (forward-char)
-              (setq p (point))
-              (setq found_tag t)
-              (setq is_end_tag t)
-              )
-          (progn
-            ;; < , looks fine
-            (backward-char)
-            (setq found_tag t)
-            )
-          )
-        )
-      )
-    (list p found_tag is_end_tag)
-    ))
-
-
-(defun evilmi--search-next-tag (NUM)
-  (let ((c (following-char))
-        )
-    (if (> NUM 0)
-        (cond
-         ((= c (string-to-char "}"))
-          (search-forward "{")
-          (backward-char)
-          (= (following-char) (string-to-char "{"))
-          )
-         ((= c (string-to-char "{"))
-          (search-backward "}")
-          (= (following-char) (string-to-char "}"))
-          )
-         ((= c (string-to-char ")"))
-          (search-forward "(")
-          (backward-char)
-          (= (following-char) (string-to-char "("))
-          )
-         ((= c (string-to-char "("))
-          (search-backward ")")
-          (= (following-char) (string-to-char ")"))
-          )
-         )
-      nil
-      )
-    )
-  )
-
-(defun evilmi--operate-on-item (NUM fn)
-  (let ((rlt (evilmi--find-lt-or-gt-char-at-current-line))
-        (test-single-char-tag (evilmi--at-single-char-tag))
-        (single-char-tag-exists-under-cursor)
-        )
-    (setq single-char-tag-exists-under-cursor (nth 0 test-single-char-tag))
-    (if (and (memq major-mode evilmi-html-major-modes)
-             (not single-char-tag-exists-under-cursor)
+    (if plugin
+        (mapc
+         (lambda (elem)
+           (setq rlt (funcall (nth 0 elem)))
+           (when (and rlt (not jumped))
+             ;; before jump, we may need some operation
+             (if FUNC (funcall FUNC rlt))
+             ;; jump now
+             (setq where-to-jump-in-theory (funcall (nth 1 elem) rlt NUM))
+             ;; jump only once if the jump is successful
+             (setq jumped t)
              )
-        ;; prepare to jump
-        (when (nth 1 rlt)
-          (if (nth 2 rlt)
-              ;; it's the end tag
-              (progn
-                (funcall fn (nth 0 rlt))
-                (sgml-skip-tag-backward NUM)
-                )
-            ;; open tag
-            (progn
-              (funcall fn (nth 0 rlt))
-              (sgml-skip-tag-forward NUM)
-              )
-            )
-          )
-      ;; just use evil-jump item
-      (progn
-        ;; single character tag either in html file or not
-        ;; evil has its own API, so normal Emacs API may not work
-        (if (eq fn 'evilmi--push-mark)
-            (evil-visual-char)
-          )
-        (while (and (> NUM 0) single-char-tag-exists-under-cursor)
-          (evil-jump-item)
-          (setq NUM (1- NUM))
-
-          ;; next action depends on current char under cursor
-          (setq single-char-tag-exists-under-cursor (evilmi--search-next-tag NUM))
-          )
-        )
+           )
+         plugin
+         )
       )
+    (if (not jumped)
+        (evilmi-simple-jump nil NUM)
+        )
+    where-to-jump-in-theory
     )
   )
 
-(defun evilmi--push-mark (p)
-  (push-mark p t t)
+(defun evilmi--push-mark (rlt)
+  (push-mark (nth 0 rlt) t t)
+  )
+
+(defun evilmi--init-plugins ()
+  ;; html
+  (autoload 'evilmi-html-get-tag "evil-matchit-html" nil t)
+  (autoload 'evilmi-html-jump "evil-matchit-html" nil t)
+  (mapc (lambda (mode)
+          (plist-put evilmi-plugins mode '((evilmi-simple-get-tag evilmi-simple-jump)
+                                           (evilmi-html-get-tag evilmi-html-jump)))
+          )
+        '(web-mode html-mode nxml-mode nxhtml-mode sgml-mode))
+
+  ;; latex
+  (autoload 'evilmi-latex-get-tag "evil-matchit-latex" nil t)
+  (autoload 'evilmi-latex-jump "evil-matchit-latex" nil t)
+  (plist-put evilmi-plugins 'latex-mode '((evilmi-latex-get-tag evilmi-latex-jump)))
+
+  ;; python
+  (autoload 'evilmi-python-get-tag "evil-matchit-python" nil t)
+  (autoload 'evilmi-python-jump "evil-matchit-python" nil t)
+  (plist-put evilmi-plugins 'python-mode '((evilmi-python-get-tag evilmi-python-jump)))
   )
 
 ;;;###autoload
 (defun evilmi-jump-items (&optional NUM)
   "jump between item/tag(s)"
   (interactive "p")
-  (evilmi--operate-on-item NUM 'goto-char)
+  (evilmi--operate-on-item NUM)
   )
 
 ;;;###autoload
 (defun evilmi-select-items (&optional NUM)
   "select item/tag(s)"
   (interactive "p")
-  (evilmi--operate-on-item NUM 'evilmi--push-mark)
+  (let (where-to-jump-in-theory )
+    (setq where-to-jump-in-theory (evilmi--operate-on-item NUM 'evilmi--push-mark))
+    (if where-to-jump-in-theory (goto-char where-to-jump-in-theory))
+    )
   )
 
 ;;;###autoload
 (defun evilmi-delete-items (&optional NUM)
   "delete item/tag(s)"
   (interactive "p")
-  (evilmi--operate-on-item NUM 'evilmi--push-mark)
-  (kill-region (region-beginning) (region-end))
+  (let (where-to-jump-in-theory )
+    (setq where-to-jump-in-theory (evilmi--operate-on-item NUM 'evilmi--push-mark))
+    (if where-to-jump-in-theory (goto-char where-to-jump-in-theory))
+    (kill-region (region-beginning) (region-end))
+    )
+  ;; need some hook here
   )
 
 ;;;###autoload
@@ -234,6 +142,7 @@
       )
     )
   (evil-normalize-keymaps)
+  (evilmi--init-plugins)
   )
 
 ;;;###autoload
@@ -251,7 +160,33 @@
   evil-matchit-mode turn-on-evil-matchit-mode
   "Global minor mode to emulate matchit.vim")
 
+;; @return (list position-first-char tag-type tag-keyword)
 
+;; {{ simple find/jump
+;; @return (list position-first-char tag-type tag-keyword) or nil
+(defun evilmi-simple-get-tag ()
+  (interactive)
+  (let ((char (following-char))
+        (tag-type -1)
+        (tag-keyword "")
+        (rlt nil)
+        )
+
+    (if (memq char (string-to-list "{[("))
+        (setq rlt (list (point) 0 (char-to-string char)))
+      )
+    (if (memq char (string-to-list "}])"))
+        (setq rlt (list (point) 1 (char-to-string char)))
+      )
+    rlt
+    )
+  )
+
+(defun evilmi-simple-jump (rlt NUM)
+  (interactive)
+  (evil-jump-item)
+  )
+;; }}
 
 (provide 'evil-matchit)
 
