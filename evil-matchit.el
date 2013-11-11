@@ -4,7 +4,7 @@
 
 ;; Author: Chen Bin <chenbin.sh@gmail.com>
 ;; URL: http://github.com/redguardtoo/evil-matchit
-;; Version: 0.0.6
+;; Version: 0.0.7
 ;; Keywords: matchit vim evil
 ;; Package-Requires: ((evil "1.0.7"))
 ;;
@@ -38,9 +38,7 @@
 ;;; Code:
 
 (require 'evil)
-
-(autoload 'sgml-skip-tag-backward "sgml-mode" nil t)
-(autoload 'sgml-skip-tag-forward "sgml-mode" nil t)
+(require 'sgml-mode)
 
 (defvar evilmi-html-major-modes
   '(nxml-mode

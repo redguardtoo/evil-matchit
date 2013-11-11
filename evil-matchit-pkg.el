@@ -1,2 +1,2 @@
-(define-package "evil-matchit" "0.0.6"
+(define-package "evil-matchit" "0.0.7"
                 "Vim matchit ported into Emacs (requires EVIL)")
