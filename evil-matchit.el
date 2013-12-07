@@ -4,7 +4,7 @@
 
 ;; Author: Chen Bin <chenbin.sh@gmail.com>
 ;; URL: http://github.com/redguardtoo/evil-matchit
-;; Version: 1.0.0
+;; Version: 1.0.1
 ;; Keywords: matchit vim evil
 ;; Package-Requires: ((evil "1.0.7"))
 ;;
@@ -80,6 +80,7 @@
   )
 
 (defun evilmi--init-plugins ()
+  (interactive)
   ;; html
   (autoload 'evilmi-html-get-tag "evil-matchit-html" nil t)
   (autoload 'evilmi-html-jump "evil-matchit-html" nil t)
@@ -99,6 +100,14 @@
   (autoload 'evilmi-python-jump "evil-matchit-python" nil t)
   (plist-put evilmi-plugins 'python-mode '((evilmi-simple-get-tag evilmi-simple-jump)
                                            (evilmi-python-get-tag evilmi-python-jump)))
+
+  ;; c like language (c/c++/perl/java/javascript)
+  (autoload 'evilmi-c-get-tag "evil-matchit-c" nil t)
+  (autoload 'evilmi-c-jump "evil-matchit-c" nil t)
+  (mapc (lambda (mode)
+          (plist-put evilmi-plugins mode '((evilmi-c-get-tag evilmi-c-jump)))
+          )
+        '(c-mode c++-mode java-mode js-mode js2-mode javascript-mode perl-mode cperl-mode))
   )
 
 ;;;###autoload
@@ -185,8 +194,6 @@
 
 (defun evilmi-simple-jump (rlt NUM)
   (interactive)
-  (message "evilmi-simple-jump called")
-
   (evil-jump-item)
   )
 ;; }}

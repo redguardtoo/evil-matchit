@@ -1,4 +1,4 @@
-* evil-matchit (current version 1.0.0)
+* evil-matchit (current version 1.0.1)
 
 Vim [[http://www.vim.org/scripts/script.php?script_id=39][matchit.vim]] by Benji Fisher ported into Emacs.
 
@@ -76,7 +76,7 @@ Here is a complete sample:
 ;; detect tag in current line and return the result in variable rlt
 ;; the rlt will be used by evilmi-mylanguage-jump as the first
 ;; parameter.
-;; if not tag found, the rlt SHOULD be nil
+;; if NO tag found, the rlt SHOULD be nil
 ;;
 ;; @return the data to be used by evilmi-mylanguage-jump
 (defun evilmi-mylanguage-find-tag ()
@@ -106,9 +106,9 @@ Place above code into your ~/.emacs, after the line "(global-evil-matchit-mode 1
 ** Share your code to the world
 Tweak your code a little bit to make it a plugin and ask me to merge it into main stream.
 
-Please check "evil-matchit-latext.el" for general guidance on naming convention and other tech details of plugin.
+Please check "evil-matchit-latext.el" for technical details about plugin.
 
-Here are some suggestions about quality of plugin:
+Key points about code quality of plugin:
 - minimum dependency. For example, if your plugin for html template files are just some web-mode API wrapper, it will break when user don't have web-mode
 - support emacs 23
 - performance is the first priority
