@@ -97,7 +97,8 @@
   ;; python
   (autoload 'evilmi-python-get-tag "evil-matchit-python" nil t)
   (autoload 'evilmi-python-jump "evil-matchit-python" nil t)
-  (plist-put evilmi-plugins 'python-mode '((evilmi-python-get-tag evilmi-python-jump)))
+  (plist-put evilmi-plugins 'python-mode '((evilmi-simple-get-tag evilmi-simple-jump)
+                                           (evilmi-python-get-tag evilmi-python-jump)))
   )
 
 ;;;###autoload
@@ -184,6 +185,8 @@
 
 (defun evilmi-simple-jump (rlt NUM)
   (interactive)
+  (message "evilmi-simple-jump called")
+
   (evil-jump-item)
   )
 ;; }}
