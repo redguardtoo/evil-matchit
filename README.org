@@ -13,7 +13,8 @@ Alternatively, you can enable evil-matchit-mode along a major mode by adding `tu
 
 * Why use evil-matchit 
 - No learning curve. You only need press "%" to jump between matched tags. That's all!
-- Powerful. For example, if you mix jsp, freemarker, html, jquery template or any wierd
+- Support any modern languages (html/java/c/c++/python/latex/javascript ...).
+- Powerful. For example, if you mix jsp, freemarker, html, jquery template or any wierd sytax into one file, evil-matchit still works!
 - Extendable. You can write a plugin for it in 5 minutes.
 - Many languages will be supported soon.
 - I will provide long term support for it (say next 10 years) because Emacs is my last editor.
