@@ -47,20 +47,25 @@
 
 ;;;###autoload
 (defun evilmi-c-get-tag ()
-  (let (rlt
+  (let (p
+        forward-line-num
+        rlt
         (cur-line (buffer-substring-no-properties
                    (line-beginning-position) (line-end-position)))
         )
 
     ;; only handle open tag
-    (when (and (not (memq (following-char) (string-to-list "{[(}}])")))
-               (setq rlt (evilmi--c-find-open-brace cur-line))
-               )
-      (when rlt
-        (forward-line (1- rlt))
-        (search-forward "{" nil nil)
-        (backward-char)
-        )
+    (if (not (memq (following-char) (string-to-list "{[(}}])")))
+        (if (setq forward-line-num (evilmi--c-find-open-brace cur-line))
+            (when forward-line-num
+              (setq p (line-beginning-position))
+              (forward-line (1- forward-line-num))
+              (search-forward "{" nil nil)
+              (backward-char)
+              (setq rlt (list p))
+              )
+          )
+      (setq rlt (list (point)))
       )
     rlt
     )
@@ -69,6 +74,7 @@
 ;;;###autoload
 (defun evilmi-c-jump (rlt NUM)
   (if rlt (evil-jump-item))
+  (1+ (point))
   )
 
 (provide 'evil-matchit-c)

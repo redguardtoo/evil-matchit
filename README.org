@@ -1,4 +1,4 @@
-* evil-matchit (current version 1.0.1)
+* evil-matchit (current version 1.0.2)
 
 Vim [[http://www.vim.org/scripts/script.php?script_id=39][matchit.vim]] by Benji Fisher ported into Emacs.
 
@@ -13,7 +13,7 @@ Alternatively, you can enable evil-matchit-mode along a major mode by adding `tu
 
 * Why use evil-matchit 
 - No learning curve. You only need press "%" to jump between matched tags. That's all!
-- Powerful. For example, if you mix jsp, freemarker, html, jquery template or any wierd syntax in one file. It still work perfectly.
+- Powerful. For example, if you mix jsp, freemarker, html, jquery template or any wierd
 - Extendable. You can write a plugin for it in 5 minutes.
 - Many languages will be supported soon.
 - I will provide long term support for it (say next 10 years) because Emacs is my last editor.
@@ -22,7 +22,7 @@ Alternatively, you can enable evil-matchit-mode along a major mode by adding `tu
 evil-matchit is already uploaded to [[http://marmalade-repo.org/]]. So the best way to install it is using Emacs' package manager.
 
 * How to use evil-matchit
-Press "%" to jump inside item(s) between tags in evil-normal-mode whose command name is "evilmi-jump-items".
+Press "%" to jump inside item(s) between tags in evil-normal-mode whose command name is "evilmi-jump-items". Please note that you *DO NOT* need move cursor above the tag before jumping, evil-matchit is smart enough to *detect the beginning of tag automatically*.
 
 Press ",si" to select item(s) wrapped by tags in evil-normal-mode whose command name is "evilmi-select-items".
 
@@ -78,10 +78,13 @@ Here is a complete sample:
 ;; parameter.
 ;; if NO tag found, the rlt SHOULD be nil
 ;;
-;; @return the data to be used by evilmi-mylanguage-jump
+;; @return the data to be used by evilmi-mylanguage-jump which should be a list
+;;         the first element of the list is the position of cursor before jump
+;;         we use it to select/delete tag. The other elements of the list could
+;;         be any data type
 (defun evilmi-mylanguage-find-tag ()
   (let (rlt )
-    (setq rlt '("anything-you-like" "anything-you-like" "anything-you-like")
+    (setq rlt '(position-of-open-end "anything-you-like" "anything-you-like")
     rlt
     )
   )
@@ -92,8 +95,15 @@ Here is a complete sample:
 ;;         selecting or deleting text between matching tags and tags
 (defun evilmi-mylanguage-jump (rlt NUM)
   (message "rlt=%s" rlt)
-  ;; just a sample, the data type of rlt is totally controlled by you
-  (goto-char (nth 0 rlt))
+  ;; if we need select region between tags (including tags itself)
+  ;; we get the beginning of region by reading the first element of
+  ;; rlt
+  (push-mark (nth 0 rlt) t t)
+  ;; say 999 is the where we jump to
+  (goto-char 999)
+  ;; If you need where is the end of the region, you need return it
+  ;; at the end of the function
+  888
   )
 
 ;; tell evil-matchit how to use above functions
@@ -109,7 +119,7 @@ Tweak your code a little bit to make it a plugin and ask me to merge it into mai
 Please check "evil-matchit-latext.el" for technical details about plugin.
 
 Key points about code quality of plugin:
-- minimum dependency. For example, if your plugin for html template files are just some web-mode API wrapper, it will break when user don't have web-mode
+- minimum dependency. For example, if your plugin for html template files is only some web-mode API wrapper, it will break when user don't have web-mode
 - support emacs 23
 - performance is the first priority
 * Contact me
