@@ -43,7 +43,7 @@ Let's say you want a new major-mode "my-mode" to do the html tag matching. Easy.
 (plist-put evilmi-plugins my-mode '((evilmi-html-get-tag evilmi-html-jump)))
 #+END_SRC
 
-Further explanation: "evilmi-html-get-tag" and "evilmi-html-jump" are existing APIs which are defined in evil-matchit-python.el. The above line means that in my-mode, use "evilmi-html-get-tag" to find open/closed tag in current line and use "evilmi-html-jump" to jump to matched closed/open tag.
+Further explanation: "evilmi-html-get-tag" and "evilmi-html-jump" are existing APIs which are defined in evil-matchit-html.el. The above line means that in my-mode, use "evilmi-html-get-tag" to find open/closed tag in current line and use "evilmi-html-jump" to jump to matched closed/open tag.
 
 ** mixed languages in one html template file can be supported
 Say you embed python language in a html file. You can match both html tags and python statement by inserting below code into your ~/.emacs:
