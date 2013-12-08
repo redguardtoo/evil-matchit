@@ -2,14 +2,11 @@
 
 Vim [[http://www.vim.org/scripts/script.php?script_id=39][matchit.vim]] by Benji Fisher ported into Emacs.
 
-#+BEGIN_SRC lisp
-(require 'evil-matchit)
-(global-evil-matchit-mode 1)
-#+END_SRC
+When it's installed, you can press "%" to jump between matched tags in Emacs.
 
-Alternatively, you can enable evil-matchit-mode along a major mode by adding `turn-on-evil-matchit-mode' to the mode hook.
+Most modern languages are supported. htm, python, java,c++, c, javascript, perl, latex, just to name a few.
 
-*This package uses Evil as its vi layer*!
+This package uses Evil as its vi layer!
 
 * Why use evil-matchit 
 - No learning curve. You only need press "%" to jump between matched tags. That's all!
@@ -19,10 +16,22 @@ Alternatively, you can enable evil-matchit-mode along a major mode by adding `tu
 - Many languages will be supported soon.
 - I will provide long term support for it (say next 10 years) because Emacs is my last editor.
 
+Here is screen cast for python:
+[[file:screencast.gif]]
+
 * Install
 evil-matchit is already uploaded to [[http://marmalade-repo.org/]]. So the best way to install it is using Emacs' package manager.
 
-* How to use evil-matchit
+* Set up
+Insert below code into your ~/.emacs:
+#+BEGIN_SRC lisp
+(require 'evil-matchit)
+(global-evil-matchit-mode 1)
+#+END_SRC
+
+Alternatively, you can enable evil-matchit-mode along a major mode by adding `turn-on-evil-matchit-mode' to the mode hook.
+
+* Usage
 Press "%" to jump inside item(s) between tags in evil-normal-mode whose command name is "evilmi-jump-items". Please note that you *DO NOT* need move cursor above the tag before jumping, evil-matchit is smart enough to *detect the beginning of tag automatically*.
 
 Press ",si" to select item(s) wrapped by tags in evil-normal-mode whose command name is "evilmi-select-items".
@@ -31,7 +40,7 @@ Press ",di" to delete item(s) wrapped by tags in evil-normal-mode whose command 
 
 All commands support numeric argument like "3%", "5,si" or "9,di"
 
-* Advanced set up
+* Advanced tips
 ** Support more major modes
 Let's use html tag matching as an example.
 
