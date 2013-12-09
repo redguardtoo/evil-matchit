@@ -4,7 +4,7 @@
 
 ;; Author: Chen Bin <chenbin.sh@gmail.com>
 ;; URL: http://github.com/redguardtoo/evil-matchit
-;; Version: 1.0.2
+;; Version: 1.1.0
 ;; Keywords: matchit vim evil
 ;; Package-Requires: ((evil "1.0.7"))
 ;;
@@ -43,6 +43,27 @@
                          ((evilmi-simple-get-tag evilmi-simple-jump))
                          ))
 
+(defun evilmi--member (k l)
+  (let (rlt)
+    (cond
+     ((not l) nil)
+     ((stringp (car l))
+      (if (string= k (car l)) t
+        (evilmi--member k (cdr l))
+        )
+      )
+     ((listp (car l))
+      (setq rlt (evilmi--member k (car l)))
+      (if rlt rlt (evilmi--member k (cdr l)))
+      )
+     (t
+      ;; just ignore first element
+      (evilmi--member k (cdr l))
+      )
+     )
+    )
+  )
+
 (defun evilmi--operate-on-item (NUM &optional FUNC)
   (let (plugin
         rlt
@@ -79,7 +100,7 @@
     (push-mark (nth 0 rlt) t t)
   )
 
-(defun evilmi--init-plugins ()
+(defun evilmi-init-plugins ()
   (interactive)
   ;; html
   (autoload 'evilmi-html-get-tag "evil-matchit-html" nil t)
@@ -108,6 +129,15 @@
           (plist-put evilmi-plugins mode '((evilmi-c-get-tag evilmi-c-jump)))
           )
         '(c-mode c++-mode java-mode js-mode js2-mode javascript-mode perl-mode cperl-mode))
+
+  ;; script language (bash/lua/ruby)
+  (autoload 'evilmi-script-get-tag "evil-matchit-script" nil t)
+  (autoload 'evilmi-script-jump "evil-matchit-script" nil t)
+  (mapc (lambda (mode)
+          (plist-put evilmi-plugins mode '((evilmi-simple-get-tag evilmi-simple-jump)
+                                           (evilmi-script-get-tag evilmi-script-jump)))
+          )
+        '(lua-mode sh-mode ruby-mode vimrc-mode))
   )
 
 ;;;###autoload
@@ -152,7 +182,7 @@
       )
     )
   (evil-normalize-keymaps)
-  (evilmi--init-plugins)
+  (evilmi-init-plugins)
   )
 
 ;;;###autoload
