@@ -164,7 +164,7 @@ The third column contains the closed tags(s).
 Simple, eh?
 
 Basically you just need:
-- copy the content of evil-matchit-script.el to you ~/.emacs
+- copy the content of evil-matchit-script.el to your ~/.emacs
 - Search and replace the string "_script" with "_mylanguage" to respect the name space
 - Update the value of evilmi--mylanguage-match-tags
 - Notify the evil-matchit about support for new commands (check previous section for details)
