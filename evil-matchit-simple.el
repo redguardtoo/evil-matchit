@@ -30,7 +30,7 @@
 
 (defun evilmi--simple-find-open-brace (cur-line)
   (let (rlt)
-    (if (string-match "^[ \t]*[a-zA-Z0-9]+.*{ *$" cur-line)
+    (if (string-match "^[ \t]*\(?[a-zA-Z0-9]+.*{ *$" cur-line)
         (setq rlt 1)
       (save-excursion
         (forward-line)
@@ -73,8 +73,19 @@
 
 ;;;###autoload
 (defun evilmi-simple-jump (rlt NUM)
-  (if rlt (evil-jump-item))
-  (1+ (point))
-  )
+  (let (cur-line)
+    (when rlt
+      (evil-jump-item)
+
+      (setq cur-line (buffer-substring-no-properties
+                      (line-beginning-position)
+                      (line-end-position)))
+      ;; hack for javascript
+      (if (string-match "^[ \t]*})(.*)\; *$" cur-line)
+          (line-end-position)
+        (1+ (point))
+        )
+      )
+    ))
 
 (provide 'evil-matchit-simple)

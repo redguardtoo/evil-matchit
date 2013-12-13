@@ -1,4 +1,4 @@
-;;; evil-matchit-c.el ---c like language (c/c++/perl/java/javascript) plugin of evil-matchit
+;;; evil-matchit-c.el --c like language (c/c++/perl/java/javascript) plugin of evil-matchit
 
 ;; Copyright (C) 2013  Chen Bin <chenbin.sh@gmail.com>
 
@@ -25,56 +25,39 @@
 
 
 ;;; Code:
+(require 'evil-matchit-sdk)
 
-(require 'evil-matchit)
-
-(defun evilmi--c-find-open-brace (cur-line)
-  (let (rlt)
-    (if (string-match "^[ \t]* [a-zA-Z0-9]+.*[{] *$" cur-line)
-        (setq rlt 1)
-      (save-excursion
-        (forward-line)
-        (setq cur-line (buffer-substring-no-properties
-                        (line-beginning-position) (line-end-position)))
-        (if (string-match "^[ \t]*{ *$" cur-line)
-            (setq rlt 2)
-          )
-        )
-      )
-    rlt
+;; ruby/bash/lua/vimrc
+(defvar evilmi-c-match-tags
+  '((("#ifdef" "#ifndef" "#if") ("#elif" "#else")  "#endif")
     )
+  "The table we look up match tags. This is a three column table.
+The first column contains the open tag(s).
+The second column contains the middle tag(s).
+The third column contains the closed tags(s).
+"
+  )
+
+(defvar evilmi-c-extract-keyword-howtos
+  '(("^[ \t]*\\(#[a-z]+\\)\\( .*\\| *\\)$" 1)
+    )
+
+  "The list of HOWTO on extracting keyword from current line.
+Each howto is actually a pair. The first element of pair is the regular
+expression to match the current line. The second is the index of sub-matches
+to extract the keyword which starts from one. The sub-match is the match defined
+between '\\(' and '\\)' in regular expression.
+"
   )
 
 ;;;###autoload
 (defun evilmi-c-get-tag ()
-  (let (p
-        forward-line-num
-        rlt
-        (cur-line (buffer-substring-no-properties
-                   (line-beginning-position) (line-end-position)))
-        )
-
-    ;; only handle open tag
-    (if (not (memq (following-char) (string-to-list "{[(}}])")))
-        (if (setq forward-line-num (evilmi--c-find-open-brace cur-line))
-            (when forward-line-num
-              (setq p (line-beginning-position))
-              (forward-line (1- forward-line-num))
-              (search-forward "{" nil nil)
-              (backward-char)
-              (setq rlt (list p))
-              )
-          )
-      (setq rlt (list (point)))
-      )
-    rlt
-    )
+  (evilmi-sdk-get-tag evilmi-c-match-tags evilmi-c-extract-keyword-howtos)
   )
 
 ;;;###autoload
 (defun evilmi-c-jump (rlt NUM)
-  (if rlt (evil-jump-item))
-  (1+ (point))
+  (evilmi-sdk-jump rlt NUM evilmi-c-match-tags evilmi-c-extract-keyword-howtos)
   )
 
 (provide 'evil-matchit-c)

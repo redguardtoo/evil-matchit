@@ -32,7 +32,7 @@
 (require 'evil-matchit-sdk)
 
 ;; ruby/bash/lua/vimrc
-(defvar evilmi--script-match-tags
+(defvar evilmi-script-match-tags
   '((("unless" "if") ("elif" "elsif" "elseif" "else") ( "end" "fi" "endif"))
     ("begin" ("rescue" "ensure") "end")
     ("case" ("when" "else") ("esac" "end"))
@@ -48,12 +48,12 @@ The third column contains the closed tags(s).
 
 ;;;###autoload
 (defun evilmi-script-get-tag ()
-  (evilmi-sdk-get-tag evilmi--script-match-tags evilmi-sdk-extract-keyword-howtos)
+  (evilmi-sdk-get-tag evilmi-script-match-tags evilmi-sdk-extract-keyword-howtos)
   )
 
 ;;;###autoload
 (defun evilmi-script-jump (rlt NUM)
-  (evilmi-sdk-jump rlt NUM evilmi--script-match-tags evilmi-sdk-extract-keyword-howtos)
+  (evilmi-sdk-jump rlt NUM evilmi-script-match-tags evilmi-sdk-extract-keyword-howtos)
   )
 
 (provide 'evil-matchit-script)
