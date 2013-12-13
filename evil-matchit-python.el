@@ -130,7 +130,7 @@
                         (line-end-position)))
 
         (when (= cur-indent (evilmi--python-calculate-indent cur-line))
-          (if (string-match regexp cur-line)
+          (if (and regexp (string-match regexp cur-line))
               (setq where-to-go (line-beginning-position))
             )
           (setq out-of-loop t)
@@ -282,7 +282,6 @@
 
       (if where-to-jump-in-theory (goto-char where-to-jump-in-theory))
 
-      ;; TODO move the cursor to the next line started with keyword
       (evilmi--python-move-to-next-open-tag keyword cur-indent)
       )
      )
