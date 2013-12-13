@@ -26,8 +26,6 @@
 
 ;;; Code:
 
-(require 'evil-matchit)
-
 (autoload 'LaTeX-find-matching-begin "latex-mode" nil t)
 (autoload 'LaTeX-find-matching-end "latex-mode" nil t)
 

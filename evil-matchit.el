@@ -43,26 +43,7 @@
                          ((evilmi-simple-get-tag evilmi-simple-jump))
                          ))
 
-(defun evilmi--member (k l)
-  (let (rlt)
-    (cond
-     ((not l) nil)
-     ((stringp (car l))
-      (if (string= k (car l)) t
-        (evilmi--member k (cdr l))
-        )
-      )
-     ((listp (car l))
-      (setq rlt (evilmi--member k (car l)))
-      (if rlt rlt (evilmi--member k (cdr l)))
-      )
-     (t
-      ;; just ignore first element
-      (evilmi--member k (cdr l))
-      )
-     )
-    )
-  )
+
 
 (defun evilmi--operate-on-item (NUM &optional FUNC)
   (let (plugin
