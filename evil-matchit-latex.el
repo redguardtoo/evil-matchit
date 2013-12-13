@@ -34,7 +34,6 @@
   (let (rlt
         (regexp (concat (regexp-quote "\\") "\\(begin\\|end\\)\\b"))
         keyword
-        p
         )
     (skip-chars-backward "a-zA-Z \t{}")
     ;; move cursor to the beginning of tag
@@ -43,14 +42,15 @@
       )
     (re-search-forward regexp (line-end-position) t)
     (setq keyword (match-string 1))
-    (setq rlt (list p
-                    (if (string= keyword "begin")
-                        0
-                      (if (string= keyword "end")
-                          1
-                        -1))
-                    )
+    (if keyword
+        (cond
+         ((string= keyword "begin")
+          (setq rlt (list (line-beginning-position) 0))
           )
+         ((string= keyword "end")
+          (setq rlt (list (line-end-position) 2))
+          )
+         ))
     rlt
     )
   )
@@ -59,9 +59,18 @@
 (defun evilmi-latex-jump (rlt NUM)
   (let ((p (nth 0 rlt))
         (tag-type (nth 1 rlt))
+        where-to-jump-in-theory
         )
-    (if (=  1 tag-type) (LaTeX-find-matching-begin))
-    (if (=  0 tag-type) (LaTeX-find-matching-end))
+    (cond
+     ((=  2 tag-type)
+      (LaTeX-find-matching-begin)
+      (setq where-to-jump-in-theory (line-beginning-position))
+      )
+     ((=  0 tag-type)
+      (LaTeX-find-matching-end)
+      (setq where-to-jump-in-theory (line-end-position))
+      )
+     )
     )
   )
 
