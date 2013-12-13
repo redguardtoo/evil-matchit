@@ -111,8 +111,9 @@ Here is a complete sample:
   (push-mark (nth 0 rlt) t t)
   ;; say 999 is the where we jump to
   (goto-char 999)
-  ;; If you need where is the end of the region, you need return it
-  ;; at the end of the function
+  ;; If you need know where is the end of the region for region operation,
+  ;; you need return the end of region at the end of function
+  ;; region operation means selection/deletion of region.
   888
   )
 

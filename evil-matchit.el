@@ -111,6 +111,10 @@
           )
         '(web-mode html-mode nxml-mode nxhtml-mode sgml-mode))
 
+  ;; simple matching for languages containing "{(["
+  (autoload 'evilmi-simple-get-tag "evil-matchit-simple" nil t)
+  (autoload 'evilmi-simple-jump "evil-matchit-simple" nil t)
+
   ;; latex
   (autoload 'evilmi-latex-get-tag "evil-matchit-latex" nil t)
   (autoload 'evilmi-latex-jump "evil-matchit-latex" nil t)
@@ -199,34 +203,6 @@
 (define-globalized-minor-mode global-evil-matchit-mode
   evil-matchit-mode turn-on-evil-matchit-mode
   "Global minor mode to emulate matchit.vim")
-
-;; @return (list position-first-char tag-type tag-keyword)
-
-;; {{ simple find/jump
-;; @return (list position-first-char tag-type tag-keyword) or nil
-(defun evilmi-simple-get-tag ()
-  (interactive)
-  (let ((char (following-char))
-        (tag-type -1)
-        (tag-keyword "")
-        (rlt nil)
-        )
-
-    (if (memq char (string-to-list "{[("))
-        (setq rlt (list (point) 0 (char-to-string char)))
-      )
-    (if (memq char (string-to-list "}])"))
-        (setq rlt (list (point) 1 (char-to-string char)))
-      )
-    rlt
-    )
-  )
-
-(defun evilmi-simple-jump (rlt NUM)
-  (interactive)
-  (evil-jump-item)
-  )
-;; }}
 
 (provide 'evil-matchit)
 
