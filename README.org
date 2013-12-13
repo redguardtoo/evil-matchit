@@ -1,4 +1,4 @@
-* evil-matchit (current version 1.1.0)
+* evil-matchit (current version 1.2.1)
 
 Vim [[http://www.vim.org/scripts/script.php?script_id=39][matchit.vim]] by Benji Fisher ported into Emacs.
 
@@ -78,7 +78,7 @@ All you need to do is define function evilmi-customize-keybinding before turning
 #+END_SRC
 
 * Developer guide
-** Writing elisp code to support a new language
+** Write elisp code to support a new language
 Simple. All you need to is define two functions and tell evil-matchit in which major-mode they should be used.
 
 Here is a complete sample:
@@ -124,6 +124,51 @@ Here is a complete sample:
 #+END_SRC
 
 Place above code into your ~/.emacs, after the line "(global-evil-matchit-mode 1)"
+** Use SDK
+Please note SDK is totally *OPTIONAL*! You don't need SDK to write a plugin for evil-matchit.
+
+You can check the evil-matchit-script.el for the sample on how to use SDK.
+
+I attached the full content of evil-matchit-script.el here:
+#+BEGIN_SRC elisp
+(require 'evil-matchit-sdk)
+
+;; ruby/bash/lua/vimrc
+(defvar evilmi--script-match-tags
+  '((("unless" "if") ("elif" "elsif" "elseif" "else") ( "end" "fi" "endif"))
+    ("begin" ("rescue" "ensure") "end")
+    ("case" ("when" "else") ("esac" "end"))
+    (("fun!" "function!" "class" "def" "while" "function" "do") () ("end" "endfun" "endfunction"))
+    ("repeat" ()  "until")
+    )
+  "The table we look up match tags. This is a three column table.
+The first column contains the open tag(s).
+The second column contains the middle tag(s).
+The third column contains the closed tags(s).
+"
+  )
+
+;;;###autoload
+(defun evilmi-script-get-tag ()
+  (evilmi-sdk-get-tag evilmi--script-match-tags evilmi-sdk-extract-keyword-howtos)
+  )
+
+;;;###autoload
+(defun evilmi-script-jump (rlt NUM)
+  (evilmi-sdk-jump rlt NUM evilmi--script-match-tags evilmi-sdk-extract-keyword-howtos)
+  )
+
+(provide 'evil-matchit-script)
+#+END_SRC
+
+Simple, eh?
+
+Basically you just need:
+- copy the content of evil-matchit-script.el to you ~/.emacs
+- Search and replace the string "_script" with "_mylanguage" to respect the name space
+- Update the value of evilmi--mylanguage-match-tags
+- Notify the evil-matchit about support for new commands (check previous section for details)
+
 ** Share your code to the world
 Tweak your code a little bit to make it a plugin and ask me to merge it into main stream.
 
