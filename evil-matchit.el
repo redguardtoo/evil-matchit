@@ -4,7 +4,7 @@
 
 ;; Author: Chen Bin <chenbin.sh@gmail.com>
 ;; URL: http://github.com/redguardtoo/evil-matchit
-;; Version: 1.2.2
+;; Version: 1.2.3
 ;; Keywords: matchit vim evil
 ;; Package-Requires: ((evil "1.0.7"))
 ;;
@@ -70,9 +70,12 @@
          plugin
          )
       )
-    (if (not jumped)
-        (evilmi-simple-jump nil NUM)
-        )
+
+    (when (not jumped)
+      (if FUNC (funcall FUNC (list (point))))
+      (evil-jump-item)
+      (setq where-to-jump-in-theory (point))
+      )
     where-to-jump-in-theory
     )
   )
@@ -155,7 +158,7 @@
   (let (where-to-jump-in-theory )
     (setq where-to-jump-in-theory (evilmi--operate-on-item NUM 'evilmi--push-mark))
     (if where-to-jump-in-theory (goto-char where-to-jump-in-theory))
-    (kill-region (region-beginning) (region-end))
+    (kill-region (region-beginning) (1+ (region-end)))
     )
   ;; need some hook here
   )

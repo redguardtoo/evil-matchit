@@ -96,6 +96,7 @@
 
     (if (=  1 tag-type) (sgml-skip-tag-backward NUM))
     (if (=  0 tag-type) (sgml-skip-tag-forward NUM))
+    (point)
     )
   )
 
