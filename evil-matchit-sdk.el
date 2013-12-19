@@ -10,29 +10,28 @@ between '\\(' and '\\)' in regular expression.
 "
   )
 
-(defun evilmi--sdk-member (KEYWORD LIST)
+
+;;;###autoload
+(defun evilmi-sdk-member (KEYWORD LIST)
   "check if KEYWORD exist in LIST"
   (let (rlt)
     (cond
+     ((not KEYWORD) nil)
      ((not LIST) nil)
      ((stringp (car LIST))
-      (if (string= KEYWORD (car LIST)) t
-        (evilmi--sdk-member KEYWORD (cdr LIST))
-        )
+      (if (string-match (concat "^" (car LIST) "$") KEYWORD) t
+        (evilmi-sdk-member KEYWORD (cdr LIST)))
       )
      ((listp (car LIST))
-      (setq rlt (evilmi--sdk-member KEYWORD (car LIST)))
-      (if rlt rlt (evilmi--sdk-member KEYWORD (cdr LIST)))
-      )
+      (setq rlt (evilmi-sdk-member KEYWORD (car LIST)))
+      (if rlt rlt (evilmi-sdk-member KEYWORD (cdr LIST))))
      (t
       ;; just ignore first element
-      (evilmi--sdk-member KEYWORD (cdr LIST))
-      )
-     )
-    )
-  )
+      (evilmi-sdk-member KEYWORD (cdr LIST))))))
 
-(defun evilmi--sdk-get-tag-info (tag match-tags)
+
+;;;###autoload
+(defun evilmi-sdk-get-tag-info (tag match-tags)
   "return (row column)"
   (let (rlt elems elem tag-type
         found i j)
@@ -45,11 +44,11 @@ between '\\(' and '\\)' in regular expression.
         (setq elem (nth j elems))
         (cond
          ((stringp elem)
-          (if (string= tag elem)
+          (if (string-match (concat "^" elem "$") tag)
               (setq found t)
             ))
          ((listp elem)
-          (if (member tag elem)
+          (if (evilmi-sdk-member tag elem)
               (setq found t)
             ))
          )
@@ -57,9 +56,7 @@ between '\\(' and '\\)' in regular expression.
         )
       (if (not found) (setq i (1+ i)))
       )
-    (if found
-        (setq rlt (list i j))
-      )
+    (if found (setq rlt (list i j)))
     rlt
     )
   )
@@ -75,7 +72,7 @@ between '\\(' and '\\)' in regular expression.
         (setq keyword (match-string (nth 1 howto) cur-line))
 
         ;; keep search keyword by using next howto (regex and match-string index)
-        (if (not (evilmi--sdk-member keyword match-tags)) (setq keyword nil))
+        (if (not (evilmi-sdk-member keyword match-tags)) (setq keyword nil))
         )
       (setq i (1+ i))
       )
@@ -94,7 +91,7 @@ between '\\(' and '\\)' in regular expression.
     (when (setq keyword (evilmi--sdk-extract-keyword cur-line match-tags howtos))
       ;; since we mixed ruby and lua mode here
       ;; maybe we should be strict at the keyword
-      (if (setq tag-info (evilmi--sdk-get-tag-info keyword match-tags))
+      (if (setq tag-info (evilmi-sdk-get-tag-info keyword match-tags))
           ;; 0 - open tag; 1 - middle tag; 2 - close tag;
           (setq rlt (list
                      (if (= 2 (nth 1 tag-info))
@@ -111,7 +108,9 @@ between '\\(' and '\\)' in regular expression.
 ;;;###autoload
 (defun evilmi-sdk-jump (rlt NUM match-tags howtos)
   (let ((orig-tag-type (nth 1 (nth 1 rlt)))
+        (orig-tag-info (nth 1 rlt))
         cur-tag-type
+        cur-tag-info
         (level 1)
         (cur-line (buffer-substring-no-properties
                    (line-beginning-position)
@@ -130,7 +129,10 @@ between '\\(' and '\\)' in regular expression.
 
       (setq keyword (evilmi--sdk-extract-keyword cur-line match-tags howtos))
       (when keyword
-        (setq cur-tag-type (nth 1 (evilmi--sdk-get-tag-info keyword match-tags)))
+        (setq cur-tag-info (evilmi-sdk-get-tag-info keyword match-tags))
+        (setq cur-tag-type (nth 1 cur-tag-info))
+
+        ;; (message "cur-tag-info=%s orig-tag-info=%s keyword=%s" cur-tag-info orig-tag-info keyword)
 
         ;; key algorithm
         (cond
@@ -146,6 +148,7 @@ between '\\(' and '\\)' in regular expression.
          ;; open (0) -> closed (2) found when level is zero, level--
          ((and (= orig-tag-type 0) (= cur-tag-type 2))
           (setq level (1- level))
+
           (when (= 0 level)
             (goto-char (line-end-position))
             (setq where-to-jump-in-theory (line-end-position))
@@ -200,6 +203,7 @@ between '\\(' and '\\)' in regular expression.
           )
          (t (message "why here?"))
          )
+
         )
 
       ;; we will stop at end or beginning of buffer anyway

@@ -4,7 +4,7 @@
 
 ;; Author: Chen Bin <chenbin.sh@gmail.com>
 ;; URL: http://github.com/redguardtoo/evil-matchit
-;; Version: 1.2.3
+;; Version: 1.2.4
 ;; Keywords: matchit vim evil
 ;; Package-Requires: ((evil "1.0.7"))
 ;;
@@ -42,8 +42,6 @@
 (defvar evilmi-plugins '(emacs-lisp-mode
                          ((evilmi-simple-get-tag evilmi-simple-jump))
                          ))
-
-
 
 (defun evilmi--operate-on-item (NUM &optional FUNC)
   (let (plugin
