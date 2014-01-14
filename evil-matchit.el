@@ -1,10 +1,10 @@
 ;;; evil-matchit.el --- Vim matchit ported to Evil
 
-;; Copyright (C) 2013 Chen Bin
+;; Copyright (C) 2014 Chen Bin
 
 ;; Author: Chen Bin <chenbin.sh@gmail.com>
 ;; URL: http://github.com/redguardtoo/evil-matchit
-;; Version: 1.2.4
+;; Version: 1.2.5
 ;; Keywords: matchit vim evil
 ;; Package-Requires: ((evil "1.0.7"))
 ;;
@@ -86,16 +86,16 @@
   (interactive)
 
   ;; simple matching for languages containing "{(["
-  (autoload 'evilmi-simple-get-tag "evil-matchit-simple" nil t)
-  (autoload 'evilmi-simple-jump "evil-matchit-simple" nil t)
+  (autoload 'evilmi-simple-get-tag "evil-matchit-simple" nil)
+  (autoload 'evilmi-simple-jump "evil-matchit-simple" nil)
   (mapc (lambda (mode)
           (plist-put evilmi-plugins mode '((evilmi-simple-get-tag evilmi-simple-jump)))
           )
         '(java-mode js-mode js2-mode javascript-mode perl-mode cperl-mode))
 
   ;; Html
-  (autoload 'evilmi-html-get-tag "evil-matchit-html" nil t)
-  (autoload 'evilmi-html-jump "evil-matchit-html" nil t)
+  (autoload 'evilmi-html-get-tag "evil-matchit-html" nil)
+  (autoload 'evilmi-html-jump "evil-matchit-html" nil)
   (mapc (lambda (mode)
           (plist-put evilmi-plugins mode '((evilmi-simple-get-tag evilmi-simple-jump)
                                            (evilmi-html-get-tag evilmi-html-jump)))
@@ -103,28 +103,33 @@
         '(web-mode html-mode nxml-mode nxhtml-mode sgml-mode))
 
   ;; Latex
-  (autoload 'evilmi-latex-get-tag "evil-matchit-latex" nil t)
+  (autoload 'evilmi-latex-get-tag "evil-matchit-latex" nil)
   (autoload 'evilmi-latex-jump "evil-matchit-latex" nil t)
   (plist-put evilmi-plugins 'latex-mode '((evilmi-latex-get-tag evilmi-latex-jump)))
 
   ;; Python
-  (autoload 'evilmi-python-get-tag "evil-matchit-python" nil t)
-  (autoload 'evilmi-python-jump "evil-matchit-python" nil t)
+  (autoload 'evilmi-python-get-tag "evil-matchit-python" nil)
+  (autoload 'evilmi-python-jump "evil-matchit-python" nil)
   (plist-put evilmi-plugins 'python-mode '((evilmi-simple-get-tag evilmi-simple-jump)
                                            (evilmi-python-get-tag evilmi-python-jump)))
 
   ;; C/C++
-  (autoload 'evilmi-c-get-tag "evil-matchit-c" nil t)
-  (autoload 'evilmi-c-jump "evil-matchit-c" nil t)
+  (autoload 'evilmi-c-get-tag "evil-matchit-c" nil)
+  (autoload 'evilmi-c-jump "evil-matchit-c" nil)
   (mapc (lambda (mode)
           (plist-put evilmi-plugins mode '((evilmi-simple-get-tag evilmi-simple-jump)
                                            (evilmi-c-get-tag evilmi-c-jump)))
           )
         '(c-mode c++-mode))
 
+  ;; CMake (http://www.cmake.org)
+  (autoload 'evilmi-cmake-get-tag "evil-matchit-cmake" nil)
+  (autoload 'evilmi-cmake-jump "evil-matchit-cmake" nil)
+  (plist-put evilmi-plugins 'cmake-mode '((evilmi-cmake-get-tag evilmi-cmake-jump)))
+
   ;; Bash/Lua/Ruby ... any normal script languages
-  (autoload 'evilmi-script-get-tag "evil-matchit-script" nil t)
-  (autoload 'evilmi-script-jump "evil-matchit-script" nil t)
+  (autoload 'evilmi-script-get-tag "evil-matchit-script" nil)
+  (autoload 'evilmi-script-jump "evil-matchit-script" nil)
   (mapc (lambda (mode)
           (plist-put evilmi-plugins mode '((evilmi-simple-get-tag evilmi-simple-jump)
                                            (evilmi-script-get-tag evilmi-script-jump)))

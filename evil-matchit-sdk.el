@@ -128,6 +128,7 @@ between '\\(' and '\\)' in regular expression.
             )
 
       (setq keyword (evilmi--sdk-extract-keyword cur-line match-tags howtos))
+
       (when keyword
         (setq cur-tag-info (evilmi-sdk-get-tag-info keyword match-tags))
         (setq cur-tag-type (nth 1 cur-tag-info))

@@ -1,4 +1,4 @@
-* evil-matchit (current version 1.2.4)
+* evil-matchit (version 1.2.5)
 
 Vim [[http://www.vim.org/scripts/script.php?script_id=39][matchit.vim]] by Benji Fisher ported into Emacs.
 
@@ -84,26 +84,25 @@ Simple. All you need to is define two functions and tell evil-matchit in which m
 Here is a complete sample:
 #+BEGIN_SRC elisp
 ;; detect tag in current line and return the result in variable rlt
-;; the rlt will be used by evilmi-mylanguage-jump as the first
-;; parameter.
+;; the rlt will be used by evilmi-mylang-jump as the first parameter.
 ;; if NO tag found, the rlt SHOULD be nil
 ;;
-;; @return the data to be used by evilmi-mylanguage-jump which should be a list
+;; @return the data to be used by evilmi-mylang-jump which should be a list
 ;;         the first element of the list is the position of cursor before jump
 ;;         we use it to select/delete tag. The other elements of the list could
 ;;         be any data type
-(defun evilmi-mylanguage-find-tag ()
+(defun evilmi-mylang-find-tag ()
   (let (rlt )
     (setq rlt '(position-of-open-end "anything-you-like" "anything-you-like")
     rlt
     )
   )
 
-;; @parama rlt result from evilmi-mylanguage-find-tag
+;; @parama rlt result from evilmi-mylang-find-tag
 ;; @param NUM numeric argument when user press "%" to match tag
 ;; @return the matching tag position in theory, useful only for
 ;;         selecting or deleting text between matching tags and tags
-(defun evilmi-mylanguage-jump (rlt NUM)
+(defun evilmi-mylang-jump (rlt NUM)
   (message "rlt=%s" rlt)
   ;; if we need select region between tags (including tags itself)
   ;; we get the beginning of region by reading the first element of
@@ -117,10 +116,8 @@ Here is a complete sample:
   888
   )
 
-;; tell evil-matchit how to use above functions
-(plist-put evilmi-plugins mylanguage-mode
-           '((evilmi-mylanguage-get-tag evilmi-mylanguage-jump)
-             ))
+;; notify evil-matchit how to use above functions
+(plist-put evilmi-plugins mylang-mode '((evilmi-mylang-get-tag evilmi-mylang-jump)))
 #+END_SRC
 
 Place above code into your ~/.emacs, after the line "(global-evil-matchit-mode 1)"
@@ -165,12 +162,16 @@ Simple, eh?
 
 Basically you just need:
 - copy the content of evil-matchit-script.el to your ~/.emacs
-- Search and replace the string "_script" with "_mylanguage" to respect the name space
-- Update the value of evilmi--mylanguage-match-tags
-- Notify the evil-matchit about support for new commands (check previous section for details)
+- Search and replace the string "_script" with "_mylang" to respect the name space
+- Update the value of evilmi--mylan-match-tags
+- Notify the evil-matchit about support for new commands. As I mentioned before, it's just one line code in ~/.emacs
+
+#+BEGIN_SRC lisp
+(plist-put evilmi-plugins mylang-mode '((evilmi-mylang-get-tag evilmi-mylang-jump)))
+#+END_SRC
 
 ** Share your code to the world
-Tweak your code a little bit to make it a plugin and ask me to merge it into main stream.
+Tweak your code a little bit to make it a plugin and ask me to merge it into upstream.
 
 Please check "evil-matchit-latext.el" for technical details about plugin.
 

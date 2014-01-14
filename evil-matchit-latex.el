@@ -1,6 +1,6 @@
 ;;; evil-matchit-latex.el ---latex plugin of evil-matchit
 
-;; Copyright (C) 2013  Chen Bin <chenbin.sh@gmail.com>
+;; Copyright (C) 2014  Chen Bin <chenbin.sh@gmail.com>
 
 ;; Author: Chen Bin <chenbin.sh@gmail.com>
 
@@ -150,7 +150,7 @@ The third column contains the closed tags(s).")
                ;; now handle closed tag
                ;; closed (2) -> mid (1) ignore,impossible
                ((and (= orig-tag-type 2) (= cur-tag-type 1))
-                (message "impossible to be here")
+                (message "impossible to be here (latex-mode)")
                 )
                ;; closed (2) -> closed (2) level++
                ((and (= orig-tag-type 2) (= cur-tag-type 2))
