@@ -30,7 +30,10 @@
 
 (defun evilmi--simple-find-open-brace (cur-line)
   (let (rlt)
-    (if (string-match "^[ \t]*\(?[a-zA-Z0-9]+.*{ *$" cur-line)
+    ;; javascript code line "(function(...) { ..."
+    ;; C code line "} else {"
+    (if (or (string-match "^[ \t]*[\(\}]?[a-zA-Z0-9]+.*{ *\\(\/\/.*\\)?$" cur-line)
+            (string-match "^[ \t]*[\(\}]?[a-zA-Z0-9]+.*{ *\\(\/\*[^/]*\*\/\\)?$" cur-line))
         (setq rlt 1)
       (save-excursion
         (forward-line)
