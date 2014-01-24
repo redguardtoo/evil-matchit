@@ -1,10 +1,23 @@
-* evil-matchit (version 1.2.6)
+* evil-matchit (version 1.2.7)
 
 Vim [[http://www.vim.org/scripts/script.php?script_id=39][matchit.vim]] by Benji Fisher ported into Emacs.
 
 When it's installed, you can press "%" to jump between matched tags in Emacs.
 
-Most modern languages are supported. htm, python, java,c++, c, javascript, perl, latex, just to name a few.
+Most modern languages are supported:
+- HTML
+- Python
+- Java
+- C++/C
+- Javascript
+- Perl
+- Latex
+- CMake
+- Org-mode (match tag of org-mode and tags of other languages embedded in org file)
+- Ruby
+- Bash
+- Lua
+- Vim script
 
 This package uses Evil as its vi layer!
 
