@@ -103,7 +103,6 @@ The third column contains the closed tags(s).")
             (setq cur-tag-type (nth 1 cur-tag-info))
             ;; we need more strict tag match strategy because tex is really wierd
             (when (= (car cur-tag-info) (car orig-tag-info))
-              ;; (message "orig-tag-type=%d cur-tag-type=%d keyword=%s" orig-tag-type cur-tag-type keyword)
               (cond
                ;; handle open tag
                ;; open (0) -> mid (1)  found when level is one else ignore

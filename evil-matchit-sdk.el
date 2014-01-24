@@ -67,7 +67,6 @@ between '\\(' and '\\)' in regular expression.
     (setq i 0)
     (while (and (not keyword) (< i (length howtos)))
       (setq howto (nth i howtos))
-
       (when (string-match (nth 0 howto) cur-line)
         (setq keyword (match-string (nth 1 howto) cur-line))
 
@@ -82,13 +81,17 @@ between '\\(' and '\\)' in regular expression.
 
 ;;;###autoload
 (defun evilmi-sdk-get-tag (match-tags howtos)
+  "return '(start-point tag-info)
+"
   (let (rlt
         keyword
         (cur-line (buffer-substring-no-properties
                    (line-beginning-position)
                    (line-end-position)))
         tag-info)
+
     (when (setq keyword (evilmi--sdk-extract-keyword cur-line match-tags howtos))
+
       ;; since we mixed ruby and lua mode here
       ;; maybe we should be strict at the keyword
       (if (setq tag-info (evilmi-sdk-get-tag-info keyword match-tags))
@@ -132,8 +135,6 @@ between '\\(' and '\\)' in regular expression.
       (when keyword
         (setq cur-tag-info (evilmi-sdk-get-tag-info keyword match-tags))
         (setq cur-tag-type (nth 1 cur-tag-info))
-
-        ;; (message "cur-tag-info=%s orig-tag-info=%s keyword=%s" cur-tag-info orig-tag-info keyword)
 
         ;; key algorithm
         (cond
@@ -187,7 +188,6 @@ between '\\(' and '\\)' in regular expression.
          ;; now handle closed tag
          ;; closed (2) -> mid (1) ignore,impossible
          ((and (= orig-tag-type 2) (= cur-tag-type 1))
-          (message "impossible to be here")
           )
          ;; closed (2) -> closed (2) level++
          ((and (= orig-tag-type 2) (= cur-tag-type 2))

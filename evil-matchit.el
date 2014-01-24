@@ -46,7 +46,7 @@
 (defun evilmi--operate-on-item (NUM &optional FUNC)
   (let (plugin
         rlt
-        (jumped nil)
+        jumped
         where-to-jump-in-theory
         )
 
@@ -63,11 +63,9 @@
              (setq where-to-jump-in-theory (funcall (nth 1 elem) rlt NUM))
              ;; jump only once if the jump is successful
              (setq jumped t)
-             )
-           )
+             ))
          plugin
-         )
-      )
+         ))
 
     (when (not jumped)
       (if FUNC (funcall FUNC (list (point))))
@@ -101,6 +99,11 @@
                                            (evilmi-html-get-tag evilmi-html-jump)))
           )
         '(web-mode html-mode nxml-mode nxhtml-mode sgml-mode))
+
+  ;; Emacs Org-mode
+  (autoload 'evilmi-org-get-tag "evil-matchit-org" nil)
+  (autoload 'evilmi-org-jump "evil-matchit-org" nil t)
+  (plist-put evilmi-plugins 'org-mode '((evilmi-org-get-tag evilmi-org-jump)))
 
   ;; Latex
   (autoload 'evilmi-latex-get-tag "evil-matchit-latex" nil)
