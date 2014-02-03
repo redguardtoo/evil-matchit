@@ -23,6 +23,7 @@ This package uses Evil as its vi layer!
 
 * Why use evil-matchit 
 - No learning curve. You only need press "%" to jump between matched tags. That's all!
+- Stable! The ONLY dependency is evil-mode which I use minimum of its APIs. So it should work in any major modes (web-mode, html-mode ...).
 - Support any modern languages (html/java/c/c++/python/latex/javascript ...).
 - Powerful. For example, if you mix jsp, freemarker, html, jquery template or any wierd sytax into one file, evil-matchit still works!
 - Extendable. You can write a plugin for it in 5 minutes.
