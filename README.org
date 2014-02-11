@@ -1,4 +1,4 @@
-* evil-matchit (version 1.2.7)
+* evil-matchit (version 1.2.8)
 
 Vim [[http://www.vim.org/scripts/script.php?script_id=39][matchit.vim]] by Benji Fisher ported into Emacs.
 

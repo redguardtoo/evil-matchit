@@ -43,6 +43,7 @@
 The first column contains the open tag(s).
 The second column contains the middle tag(s).
 The third column contains the closed tags(s).
+The forth column is optional, t means the tags could be function exit
 "
   )
 

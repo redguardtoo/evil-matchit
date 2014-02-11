@@ -4,7 +4,7 @@
 
 ;; Author: Chen Bin <chenbin.sh@gmail.com>
 ;; URL: http://github.com/redguardtoo/evil-matchit
-;; Version: 1.2.7
+;; Version: 1.2.8
 ;; Keywords: matchit vim evil
 ;; Package-Requires: ((evil "1.0.7"))
 ;;
@@ -120,8 +120,8 @@
   (autoload 'evilmi-c-get-tag "evil-matchit-c" nil)
   (autoload 'evilmi-c-jump "evil-matchit-c" nil)
   (mapc (lambda (mode)
-          (plist-put evilmi-plugins mode '((evilmi-simple-get-tag evilmi-simple-jump)
-                                           (evilmi-c-get-tag evilmi-c-jump)))
+          (plist-put evilmi-plugins mode '((evilmi-c-get-tag evilmi-c-jump)
+                                           (evilmi-simple-get-tag evilmi-simple-jump)))
           )
         '(c-mode c++-mode))
 
@@ -130,14 +130,19 @@
   (autoload 'evilmi-cmake-jump "evil-matchit-cmake" nil)
   (plist-put evilmi-plugins 'cmake-mode '((evilmi-cmake-get-tag evilmi-cmake-jump)))
 
-  ;; Bash/Lua/Ruby ... any normal script languages
+  ;; sh-mode
+  (autoload 'evilmi-sh-get-tag "evil-matchit-sh" nil)
+  (autoload 'evilmi-sh-jump "evil-matchit-sh" nil)
+  (plist-put evilmi-plugins 'sh-mode '((evilmi-sh-get-tag evilmi-sh-jump)))
+
+  ;; Lua/Ruby ... any normal script languages
   (autoload 'evilmi-script-get-tag "evil-matchit-script" nil)
   (autoload 'evilmi-script-jump "evil-matchit-script" nil)
   (mapc (lambda (mode)
           (plist-put evilmi-plugins mode '((evilmi-simple-get-tag evilmi-simple-jump)
                                            (evilmi-script-get-tag evilmi-script-jump)))
           )
-        '(lua-mode sh-mode ruby-mode vimrc-mode))
+        '(lua-mode ruby-mode vimrc-mode))
   )
 
 ;;;###autoload

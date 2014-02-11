@@ -11,6 +11,14 @@ between '\\(' and '\\)' in regular expression.
   )
 
 
+(defun evilmi-sdk-tags-match (level orig-tag-info cur-tag-info)
+  (let (rlt)
+    (when (nth 2 cur-tag-info) ;; handle function exit point
+      (setq level 1)
+      )
+    (setq rlt (and (= 1 level) (= (nth 0 orig-tag-info) (nth 0 cur-tag-info))))
+    ))
+
 ;;;###autoload
 (defun evilmi-sdk-member (KEYWORD LIST)
   "check if KEYWORD exist in LIST"
@@ -32,9 +40,12 @@ between '\\(' and '\\)' in regular expression.
 
 ;;;###autoload
 (defun evilmi-sdk-get-tag-info (tag match-tags)
-  "return (row column)"
+  "return (row column is-function-exit-point),
+the row and column marked position in evilmi-mylang-match-tags
+is-function-exit-point could be t or nil
+"
   (let (rlt elems elem tag-type
-        found i j)
+            found i j)
 
     (setq i 0)
     (while (and (< i (length match-tags)) (not found))
@@ -56,10 +67,13 @@ between '\\(' and '\\)' in regular expression.
         )
       (if (not found) (setq i (1+ i)))
       )
-    (if found (setq rlt (list i j)))
+    (when found
+      (if (nth 3 (nth i match-tags))
+          (setq rlt (list i j t))
+        (setq rlt (list i j))
+        ))
     rlt
-    )
-  )
+    ))
 
 (defun evilmi--sdk-extract-keyword (cur-line match-tags howtos)
   "extract keyword from cur-line. keyword should be defined in match-tags"
@@ -69,7 +83,6 @@ between '\\(' and '\\)' in regular expression.
       (setq howto (nth i howtos))
       (when (string-match (nth 0 howto) cur-line)
         (setq keyword (match-string (nth 1 howto) cur-line))
-
         ;; keep search keyword by using next howto (regex and match-string index)
         (if (not (evilmi-sdk-member keyword match-tags)) (setq keyword nil))
         )
@@ -107,7 +120,6 @@ between '\\(' and '\\)' in regular expression.
     )
   )
 
-
 ;;;###autoload
 (defun evilmi-sdk-jump (rlt NUM match-tags howtos)
   (let ((orig-tag-type (nth 1 (nth 1 rlt)))
@@ -131,8 +143,10 @@ between '\\(' and '\\)' in regular expression.
             )
 
       (setq keyword (evilmi--sdk-extract-keyword cur-line match-tags howtos))
+      ;; (message "keyword=%s cur-line=%s" keyword cur-line)
 
       (when keyword
+
         (setq cur-tag-info (evilmi-sdk-get-tag-info keyword match-tags))
         (setq cur-tag-type (nth 1 cur-tag-info))
 
@@ -141,7 +155,7 @@ between '\\(' and '\\)' in regular expression.
          ;; handle open tag
          ;; open (0) -> mid (1)  found when level is one else ignore
          ((and (= orig-tag-type 0) (= cur-tag-type 1))
-          (when (= 1 level)
+          (when (evilmi-sdk-tags-match level orig-tag-info cur-tag-info)
             (back-to-indentation)
             (setq where-to-jump-in-theory (1- (line-beginning-position)))
             (setq found t)
@@ -149,13 +163,12 @@ between '\\(' and '\\)' in regular expression.
           )
          ;; open (0) -> closed (2) found when level is zero, level--
          ((and (= orig-tag-type 0) (= cur-tag-type 2))
-          (setq level (1- level))
-
-          (when (= 0 level)
+          (when (evilmi-sdk-tags-match level orig-tag-info cur-tag-info)
             (goto-char (line-end-position))
             (setq where-to-jump-in-theory (line-end-position))
             (setq found t)
             )
+          (setq level (1- level))
           )
          ;; open (0) -> open (0) level++
          ((and (= orig-tag-type 0) (= cur-tag-type 0))
@@ -163,9 +176,14 @@ between '\\(' and '\\)' in regular expression.
           )
 
          ;; now handle mid tag
-         ;; mid (1) -> mid (1) found when level is zero else ignore
+         ;; mid (1) -> mid (1) found if:
+         ;;   1. level is one
+         ;;   2. the open tag and middle tag are in the same row in evilmi-mylang-match-tags
+         ;; else: just ignore
+         ;; level is one means we are not in some embedded loop/conditional statements
          ((and (= orig-tag-type 1) (= cur-tag-type 1))
-          (when (= 1 level)
+
+          (when (evilmi-sdk-tags-match level orig-tag-info cur-tag-info)
             (back-to-indentation)
             (setq where-to-jump-in-theory (1- (line-beginning-position)))
             (setq found t)
@@ -173,12 +191,12 @@ between '\\(' and '\\)' in regular expression.
           )
          ;; mid (1) -> closed (2) found when level is zero, level --
          ((and (= orig-tag-type 1) (= cur-tag-type 2))
-          (setq level (1- level))
-          (when (= 0 level)
+          (when (evilmi-sdk-tags-match level orig-tag-info cur-tag-info)
             (goto-char (line-end-position))
             (setq where-to-jump-in-theory (line-end-position))
             (setq found t)
             )
+          (setq level (1- level))
           )
          ;; mid (1) -> open (0) level++
          ((and (= orig-tag-type 1) (= cur-tag-type 0))
@@ -195,12 +213,12 @@ between '\\(' and '\\)' in regular expression.
           )
          ;; closed (2) -> open (0) found when level is zero, level--
          ((and (= orig-tag-type 2) (= cur-tag-type 0))
-          (setq level (1- level))
-          (when (= 0 level)
+          (when (evilmi-sdk-tags-match level orig-tag-info cur-tag-info)
             (setq where-to-jump-in-theory (line-beginning-position))
             (back-to-indentation)
             (setq found t)
             )
+          (setq level (1- level))
           )
          (t (message "why here?"))
          )

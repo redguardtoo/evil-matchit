@@ -1,4 +1,4 @@
-;;; evil-matchit-c.el --c like language (c/c++/perl/java/javascript) plugin of evil-matchit
+;;; evil-matchit-sh.el ---sh (bash/zsh) plugin of evil-matchit
 
 ;; Copyright (C) 2014  Chen Bin <chenbin.sh@gmail.com>
 
@@ -25,12 +25,19 @@
 
 
 ;;; Code:
+
+;; OPTIONAL, you don't need SDK to write a plugin for evil-matchit
+;; but SDK don make you write less code, isn't it?
+;; All you need to do is just define the match-tags for SDK algorithm to lookup.
 (require 'evil-matchit-sdk)
 
 ;; ruby/bash/lua/vimrc
-(defvar evilmi-c-match-tags
-  '((("#ifdef" "#ifndef" "#if") ("#elif" "#else")  "#endif")
-    ("switch" "case" "default"))
+(defvar evilmi-sh-match-tags
+  '((("if") ("elif" "else") ("fi"))
+    ("case" (";;") ("esac"))
+    ("function" ("exit") ("\}") t)
+    (("for" "do" "while" "until") () ("done"))
+    )
   "The table we look up match tags. This is a three column table.
 The first column contains the open tag(s).
 The second column contains the middle tag(s).
@@ -38,25 +45,20 @@ The third column contains the closed tags(s).
 "
   )
 
-(defvar evilmi-c-extract-keyword-howtos
-  '(("^[ \t]*\\(#[a-z]+\\)\\( .*\\| *\\)$" 1)
-    ("^[ \t]*\\([a-z]+\\)\\([ (:].*\\| *\\)$" 1))
-  "The list of HOWTO on extracting keyword from current line.
-Each howto is actually a pair. The first element of pair is the regular
-expression to match the current line. The second is the index of sub-matches
-to extract the keyword which starts from one. The sub-match is the match defined
-between '\\(' and '\\)' in regular expression.
-"
+(defvar evilmi-sh-extract-keyword-howtos
+  '(("^[ \t]*\\([a-z]+\\)\\( .*\\| *\\)$" 1)
+    ("^.*\\(;;\\) *$" 1)
+    ("^\\(\} *\\)" 1)
+    ))
+
+;;;###autoload
+(defun evilmi-sh-get-tag ()
+  (evilmi-sdk-get-tag evilmi-sh-match-tags evilmi-sh-extract-keyword-howtos)
   )
 
 ;;;###autoload
-(defun evilmi-c-get-tag ()
-  (evilmi-sdk-get-tag evilmi-c-match-tags evilmi-c-extract-keyword-howtos)
+(defun evilmi-sh-jump (rlt NUM)
+  (evilmi-sdk-jump rlt NUM evilmi-sh-match-tags evilmi-sh-extract-keyword-howtos)
   )
 
-;;;###autoload
-(defun evilmi-c-jump (rlt NUM)
-  (evilmi-sdk-jump rlt NUM evilmi-c-match-tags evilmi-c-extract-keyword-howtos)
-  )
-
-(provide 'evil-matchit-c)
+(provide 'evil-matchit-sh)
