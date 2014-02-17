@@ -29,7 +29,7 @@
 
 ;; ruby/bash/lua/vimrc
 (defvar evilmi-c-match-tags
-  '((("#ifdef" "#ifndef" "#if") ("#elif" "#else")  "#endif")
+  '((("ifdef" "ifndef" "if") ("elif" "else")  "endif")
     ("switch" "case" "default"))
   "The table we look up match tags. This is a three column table.
 The first column contains the open tag(s).
@@ -39,7 +39,7 @@ The third column contains the closed tags(s).
   )
 
 (defvar evilmi-c-extract-keyword-howtos
-  '(("^[ \t]*\\(#[a-z]+\\)\\( .*\\| *\\)$" 1)
+  '(("^[ \t]*#[ \t]*\\([a-z]+\\)\\( .*\\| *\\)$" 1)
     ("^[ \t]*\\([a-z]+\\)\\([ (:].*\\| *\\)$" 1))
   "The list of HOWTO on extracting keyword from current line.
 Each howto is actually a pair. The first element of pair is the regular
