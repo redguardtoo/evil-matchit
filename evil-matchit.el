@@ -4,7 +4,7 @@
 
 ;; Author: Chen Bin <chenbin.sh@gmail.com>
 ;; URL: http://github.com/redguardtoo/evil-matchit
-;; Version: 1.2.8
+;; Version: 1.2.9
 ;; Keywords: matchit vim evil
 ;; Package-Requires: ((evil "1.0.7"))
 ;;
@@ -170,10 +170,17 @@
   (let (where-to-jump-in-theory )
     (setq where-to-jump-in-theory (evilmi--operate-on-item NUM 'evilmi--push-mark))
     (if where-to-jump-in-theory (goto-char where-to-jump-in-theory))
-    (kill-region (region-beginning) (1+ (region-end)))
-    )
-  ;; need some hook here
-  )
+    (save-excursion
+      (let ((b (region-beginning))
+            (e (region-end)))
+        (goto-char b)
+        (when (string-match "[ \t]*" (buffer-substring-no-properties (line-beginning-position) b))
+          (setq b (line-beginning-position))
+          ;; 1+ because the line feed
+          (kill-region b (1+ e))
+          )))
+    ;; need some hook here
+    ))
 
 ;;;###autoload
 (define-minor-mode evil-matchit-mode
