@@ -36,6 +36,7 @@ Here is screen cast for python:
 * Install
 evil-matchit is already uploaded to [[http://marmalade-repo.org/]]. So the best way to install it is using Emacs' package manager.
 
+Or you can download the package from https://dl.dropboxusercontent.com/u/858862/myelpa/index.html and manually install it by “M-x package-install-file”.
 * Set up
 Insert below code into your ~/.emacs:
 #+BEGIN_SRC lisp
