@@ -44,13 +44,12 @@
                          ))
 
 (defun evilmi--operate-on-item (NUM &optional FUNC)
-  (let (plugin
+  (let ((plugin (plist-get evilmi-plugins major-mode))
         rlt
         jumped
-        where-to-jump-in-theory
-        )
+        where-to-jump-in-theory)
 
-    (setq plugin (plist-get evilmi-plugins major-mode))
+    (if (not NUM) (setq NUM 1))
 
     (if plugin
         (mapc
@@ -148,9 +147,11 @@
 ;;;###autoload
 (defun evilmi-jump-items (&optional NUM)
   "jump between item/tag(s)"
-  (interactive "p")
-  (evilmi--operate-on-item NUM)
-  )
+  (interactive "P")
+  (cond
+   (NUM (evil-jump-item NUM))
+   (t (evilmi--operate-on-item NUM))
+   ))
 
 ;;;###autoload
 (defun evilmi-select-items (&optional NUM)
