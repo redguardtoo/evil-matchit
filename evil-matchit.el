@@ -4,7 +4,7 @@
 
 ;; Author: Chen Bin <chenbin.sh@gmail.com>
 ;; URL: http://github.com/redguardtoo/evil-matchit
-;; Version: 1.2.9
+;; Version: 1.3.0
 ;; Keywords: matchit vim evil
 ;; Package-Requires: ((evil "1.0.7"))
 ;;
@@ -97,7 +97,7 @@
           (plist-put evilmi-plugins mode '((evilmi-simple-get-tag evilmi-simple-jump)
                                            (evilmi-html-get-tag evilmi-html-jump)))
           )
-        '(web-mode html-mode nxml-mode nxhtml-mode sgml-mode))
+        '(web-mode html-mode nxml-mode nxhtml-mode sgml-mode message-mode))
 
   ;; Emacs Org-mode
   (autoload 'evilmi-org-get-tag "evil-matchit-org" nil)
