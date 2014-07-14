@@ -88,11 +88,7 @@ All you need to do is to define function evilmi-customize-keybinding before turn
 #+BEGIN_SRC elisp
 (defun evilmi-customize-keybinding ()
   (evil-define-key 'normal evil-matchit-mode-map
-    "%" 'evilmi-jump-items
-    ",si" 'evilmi-select-items
-    ",di" 'evilmi-delete-items
-    )
-  )
+    "%" 'evilmi-jump-items))
 (global-evil-matchit-mode 1)
 #+END_SRC
 
