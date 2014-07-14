@@ -153,7 +153,7 @@
   )
 
 (evil-define-text-object evilmi-text-object (&optional NUM begin end type)
-  "text object describling the region selected when you press % from evil-matchit"
+  "text object describing the region selected when you press % from evil-matchit"
   :type line
   (let (where-to-jump-in-theory b e)
     (save-excursion
