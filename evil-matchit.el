@@ -4,7 +4,7 @@
 
 ;; Author: Chen Bin <chenbin.sh@gmail.com>
 ;; URL: http://github.com/redguardtoo/evil-matchit
-;; Version: 1.3.1
+;; Version: 1.3.2
 ;; Keywords: matchit vim evil
 ;; Package-Requires: ((evil "1.0.7"))
 ;;
@@ -152,6 +152,25 @@
         '(lua-mode ruby-mode vimrc-mode))
   )
 
+(evil-define-text-object evilmi-text-object (&optional NUM begin end type)
+  "text object describling the region selected when you press % from evil-matchit"
+  :type line
+  (let (where-to-jump-in-theory b e)
+    (save-excursion
+      (setq where-to-jump-in-theory (evilmi--operate-on-item NUM 'evilmi--push-mark))
+      (if where-to-jump-in-theory (goto-char where-to-jump-in-theory))
+      (setq b (region-beginning))
+      (setq e (region-end))
+      (goto-char b)
+      (when (string-match "[ \t]*" (buffer-substring-no-properties (line-beginning-position) b))
+        (setq b (line-beginning-position))
+        ;; 1+ because the line feed
+        ))
+    (evil-range b e 'line)))
+
+(define-key evil-inner-text-objects-map "%" 'evilmi-text-object)
+(define-key evil-outer-text-objects-map "%" 'evilmi-text-object)
+
 ;;;###autoload
 (defun evilmi-jump-items (&optional NUM)
   "jump between item/tag(s)"
@@ -162,36 +181,7 @@
    ))
 
 ;;;###autoload
-(defun evilmi-select-items (&optional NUM)
-  "select item/tag(s)"
-  (interactive "p")
-  (let (where-to-jump-in-theory )
-    (setq where-to-jump-in-theory (evilmi--operate-on-item NUM 'evilmi--push-mark))
-    (if where-to-jump-in-theory (goto-char where-to-jump-in-theory))
-    )
-  )
-
-;;;###autoload
-(defun evilmi-delete-items (&optional NUM)
-  "delete item/tag(s)"
-  (interactive "p")
-  (let (where-to-jump-in-theory )
-    (setq where-to-jump-in-theory (evilmi--operate-on-item NUM 'evilmi--push-mark))
-    (if where-to-jump-in-theory (goto-char where-to-jump-in-theory))
-    (save-excursion
-      (let ((b (region-beginning))
-            (e (region-end)))
-        (goto-char b)
-        (when (string-match "[ \t]*" (buffer-substring-no-properties (line-beginning-position) b))
-          (setq b (line-beginning-position))
-          ;; 1+ because the line feed
-          (kill-region b (1+ e))
-          )))
-    ;; need some hook here
-    ))
-
-;;;###autoload
-(defun evilmi-version() (interactive) (message "1.3.1"))
+(defun evilmi-version() (interactive) (message "1.3.2"))
 
 ;;;###autoload
 (define-minor-mode evil-matchit-mode
@@ -200,14 +190,10 @@
   (if (fboundp 'evilmi-customize-keybinding)
       (evilmi-customize-keybinding)
     (evil-define-key 'normal evil-matchit-mode-map
-      "%" 'evilmi-jump-items
-      ",si" 'evilmi-select-items
-      ",di" 'evilmi-delete-items
-      )
+      "%" 'evilmi-jump-items)
     )
   (evil-normalize-keymaps)
-  (evilmi-init-plugins)
-  )
+  (evilmi-init-plugins))
 
 ;;;###autoload
 (defun turn-on-evil-matchit-mode ()
