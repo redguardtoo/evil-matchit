@@ -4,7 +4,7 @@
 
 ;; Author: Chen Bin <chenbin.sh@gmail.com>
 ;; URL: http://github.com/redguardtoo/evil-matchit
-;; Version: 1.3.2
+;; Version: 1.3.3
 ;; Keywords: matchit vim evil
 ;; Package-Requires: ((evil "1.0.7"))
 ;;
@@ -86,16 +86,14 @@
   (autoload 'evilmi-simple-get-tag "evil-matchit-simple" nil)
   (autoload 'evilmi-simple-jump "evil-matchit-simple" nil)
   (mapc (lambda (mode)
-          (plist-put evilmi-plugins mode '((evilmi-simple-get-tag evilmi-simple-jump)))
-          )
+          (plist-put evilmi-plugins mode '((evilmi-simple-get-tag evilmi-simple-jump))))
         '(java-mode perl-mode cperl-mode go-mode))
 
   ;; Javascript
   (autoload 'evilmi-javascript-get-tag "evil-matchit-javascript" nil)
   (autoload 'evilmi-javascript-jump "evil-matchit-javascript" nil)
   (mapc (lambda (mode)
-          (plist-put evilmi-plugins mode '((evilmi-javascript-get-tag evilmi-javascript-jump)))
-          )
+          (plist-put evilmi-plugins mode '((evilmi-javascript-get-tag evilmi-javascript-jump))))
         '(js-mode js2-mode js3-mode javascript-mode))
 
   ;; Html
@@ -147,9 +145,15 @@
   (autoload 'evilmi-script-jump "evil-matchit-script" nil)
   (mapc (lambda (mode)
           (plist-put evilmi-plugins mode '((evilmi-simple-get-tag evilmi-simple-jump)
-                                           (evilmi-script-get-tag evilmi-script-jump)))
-          )
-        '(lua-mode ruby-mode vimrc-mode))
+                                           (evilmi-script-get-tag evilmi-script-jump))))
+        '(lua-mode vimrc-mode))
+
+  (autoload 'evilmi-ruby-get-tag "evil-matchit-ruby" nil)
+  (autoload 'evilmi-ruby-jump "evil-matchit-ruby" nil)
+  (mapc (lambda (mode)
+          (plist-put evilmi-plugins mode '((evilmi-simple-get-tag evilmi-simple-jump)
+                                           (evilmi-ruby-get-tag evilmi-ruby-jump))))
+        '(ruby-mode))
   )
 
 (evil-define-text-object evilmi-text-object (&optional NUM begin end type)
@@ -181,7 +185,7 @@
    ))
 
 ;;;###autoload
-(defun evilmi-version() (interactive) (message "1.3.2"))
+(defun evilmi-version() (interactive) (message "1.3.3"))
 
 ;;;###autoload
 (define-minor-mode evil-matchit-mode
