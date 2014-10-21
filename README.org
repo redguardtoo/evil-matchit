@@ -9,7 +9,7 @@ Most modern languages are supported:
 - Python
 - Java
 - C++/C
-- Javascript
+- Javascript, JSON
 - Perl
 - Latex
 - CMake
