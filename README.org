@@ -1,4 +1,4 @@
-* evil-matchit (v1.4.0)
+* evil-matchit (v1.4.1)
 
 Vim [[http://www.vim.org/scripts/script.php?script_id=39][matchit.vim]] by Benji Fisher ported into Emacs.
 
@@ -18,6 +18,7 @@ Many modern languages are supported:
 - Bash
 - Lua
 - PHP
+- Laravel Blade Templating
 - Vim script
 - Emacs email (mesage-mode)
 

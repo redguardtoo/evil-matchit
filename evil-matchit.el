@@ -4,7 +4,7 @@
 
 ;; Author: Chen Bin <chenbin.sh@gmail.com>
 ;; URL: http://github.com/redguardtoo/evil-matchit
-;; Version: 1.4.0
+;; Version: 1.4.1
 ;; Keywords: matchit vim evil
 ;; Package-Requires: ((evil "1.0.7"))
 ;;
@@ -188,7 +188,7 @@
    ))
 
 ;;;###autoload
-(defun evilmi-version() (interactive) (message "1.4.0"))
+(defun evilmi-version() (interactive) (message "1.4.1"))
 
 ;;;###autoload
 (define-minor-mode evil-matchit-mode
