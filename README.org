@@ -97,6 +97,9 @@ All you need to do is to define function evilmi-customize-keybinding before turn
 (global-evil-matchit-mode 1)
 #+END_SRC
 
+** Match case sensitive tags?
+It's decided by the Emacs global variable "case-fold-search". You need not care about it because the major mode will set this flag automatically.
+
 * Developer guide
 ** Write Emacs Lisp to support new language
 Simple. You only need define two functions and tell evil-matchit in which major-mode they should be used.
