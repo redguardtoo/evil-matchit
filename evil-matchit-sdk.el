@@ -78,20 +78,11 @@ is-function-exit-point could be 'FN_EXIT' or other status"
       (setq j 0)
       (while (and (not found) (< j (length elems)))
         (setq elem (nth j elems))
-        (cond
-         ((stringp elem)
-          (if (string-match (concat "^" elem "$") KEYWORD)
-              (setq found t)
-            ))
-         ((listp elem)
-          (if (evilmi-sdk-member KEYWORD elem)
-              (setq found t)
-            ))
-         )
+        (setq found (and (or (stringp elem) (listp elem))
+                         (evilmi-sdk-member KEYWORD elem)))
         (if (not found) (setq j (1+ j)))
         )
-      (if (not found) (setq i (1+ i)))
-      )
+      (if (not found) (setq i (1+ i))))
     (when found
       ;; function exit point maybe?
       (if (nth 3 (nth i match-tags))
