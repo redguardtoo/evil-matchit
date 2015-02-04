@@ -137,6 +137,13 @@ If this flag is nil, then 50 means jump 50 times.")
           )
         '(c-mode c++-mode))
 
+  ;; Fortran
+  (autoload 'evilmi-fortran-get-tag "evil-matchit-fortran" nil)
+  (autoload 'evilmi-fortran-jump "evil-matchit-fortran" nil)
+  (mapc (lambda (mode)
+          (plist-put evilmi-plugins mode '((evilmi-fortran-get-tag evilmi-fortran-jump))))
+        '(f90-mode fortran-mode))
+
   ;; CMake (http://www.cmake.org)
   (autoload 'evilmi-cmake-get-tag "evil-matchit-cmake" nil)
   (autoload 'evilmi-cmake-jump "evil-matchit-cmake" nil)
