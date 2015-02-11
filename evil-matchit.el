@@ -128,6 +128,12 @@ If this flag is nil, then 50 means jump 50 times.")
   (plist-put evilmi-plugins 'python-mode '((evilmi-simple-get-tag evilmi-simple-jump)
                                            (evilmi-python-get-tag evilmi-python-jump)))
 
+  ;; SQL
+  (autoload 'evilmi-sql-get-tag "evil-matchit-sql" nil)
+  (autoload 'evilmi-sql-jump "evil-matchit-sql" nil)
+  (plist-put evilmi-plugins 'sql-mode '((evilmi-simple-get-tag evilmi-simple-jump)
+                                           (evilmi-sql-get-tag evilmi-sql-jump)))
+
   ;; C/C++
   (autoload 'evilmi-c-get-tag "evil-matchit-c" nil)
   (autoload 'evilmi-c-jump "evil-matchit-c" nil)
