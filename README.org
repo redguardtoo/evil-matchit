@@ -41,7 +41,7 @@ Screen cast for python:
 [[file:screencast.gif]]
 
 * Install
-It's already uploaded to [[http://melpa.milkbox.net/]].
+It's already uploaded to [[http://melpa.org/]].
 
 * Set up
 Insert below code into your ~/.emacs:
