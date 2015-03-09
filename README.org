@@ -1,4 +1,4 @@
-* evil-matchit (v1.4.3)
+* evil-matchit (v1.5.0)
 
 Vim [[http://www.vim.org/scripts/script.php?script_id=39][matchit.vim]] by Benji Fisher ported into Emacs.
 
@@ -9,7 +9,8 @@ Many modern languages are supported:
 - Python
 - Java
 - C++/C
-- Javascript, JSON
+- Javascript
+- JSON
 - Perl
 - Latex
 - CMake
@@ -18,6 +19,8 @@ Many modern languages are supported:
 - Bash
 - Lua
 - PHP
+- Fortran
+- SQL
 - Laravel Blade Templating
 - Vim script
 - Emacs email (mesage-mode)
@@ -52,13 +55,11 @@ Alternatively, you can enable evil-matchit-mode along a major mode by adding `tu
 * Usage
 Press "%" to jump inside between tags in evil-normal-mode. Please note evil-matchit is smart enough to *detect the beginning of tag automatically*.
 
-Text object "%" is also created. It roughly equal the region when you press "%" from  evil-matchit.
+Inner/outer text object "%" is also created. It roughly equal the region when you press "%" from evil-matchit.
 
-Inner text object or outer object is the same thing in evil-matchit.
+Press "va%" to select line(s) wrapped by tags including tags themselves. `M-x evilmi-select-items` does the same thing.
 
-Press "va%" or "vi%" to select line(s) wrapped by tags. `M-x evilmi-select-items` does the same thing.
-
-Press "da%" or "di%" to delete line(s) wrapped by tags. `M-x evilmi-delete-items` does the same thing.
+Press "da%" to delete line(s) wrapped by tags including tags themselves. `M-x evilmi-delete-items` does the same thing.
 
 All commands support numeric argument like "3%", "5va%" or "9da%"
 
