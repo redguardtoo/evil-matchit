@@ -68,12 +68,36 @@ All commands support numeric argument like "3%", "5va%" or "9da%"
 Please note "3%"  will jump to a line *3 percentage down the file*. It's the default behavior in original evil-mode . You can `(setq evilmi-may-jump-by-percentage nil)` to turn off this feature. Then "3%" will *jump 3 times*.
 
 * Advanced tips
+** Add new tags into existing languages
+I use ruby as an example.
+
+If you want to add more tags into ruby, you can do two thing:
+- You need define the regular expression to extract keyword
+- You need define the open/middle/closed tags
+
+Open evil-matchit-ruby.el whole structure is like,
+#+begin_src elisp
+(defvar evilmi-ruby-extract-keyword-howtos '())
+(defvar evilmi-ruby-match-tags '())
+;; more code here ...
+(provide 'evil-matchit-ruby)
+#+end_src
+
+So you setup in ~/.emacs is as below:
+#+begin_src elisp
+(eval-after-load 'evil-matchit-ruby
+  '(progn
+     (add-to-list 'evilmi-ruby-extract-keywords-howtos '("^[ \t]*\\([a-z]+\\)\\( .*\\| *\\)$" 1))
+     (add-to-list 'evilmi-ruby-match-tags '(("unless" "if") ("elsif" "else") "end"))
+     ))
+#+end_src
+
 ** Support more major modes
 Let's use html tag matching as an example.
 
 html tags are automatically supported in sgml-mode, nxml-mode, web-mode, html-mode and nxhtml-mode,.
 
-Let's say you want a new major-mode "my-mode" to do the html tag matching. Easy. Please add below line into your ~/.emacs:
+You want a new major-mode "my-mode" to do the html tag matching? Easy. Please add below line into your ~/.emacs:
 
 #+BEGIN_SRC elisp
 (plist-put evilmi-plugins my-mode '((evilmi-html-get-tag evilmi-html-jump)))
@@ -103,7 +127,7 @@ All you need to do is to define function evilmi-customize-keybinding before turn
 ** Jump between the two end of the "string"
 Please note the definition of "string" could be *customized* by user.
 
-For example, in C code, the comment is wrapped by "/". So we could regard C comment as some kind of string.
+For example, we could treat C comment as string wrapper by "/".
 
 Here is the setup to jump between the two ends of the C comment:
 #+begin_src elisp
