@@ -1,4 +1,4 @@
-* evil-matchit (v2.0)
+* evil-matchit (v2.0.1)
 
 Vim [[http://www.vim.org/scripts/script.php?script_id=39][matchit.vim]] by Benji Fisher ported into Emacs.
 
@@ -31,10 +31,10 @@ Tested on Emacs 23.4, 24.3, 24.4
 
 * Why use evil-matchit
 - No learning curve. Press "%" to jump. That's all!
-- Stable! The ONLY dependency is evil-mode. It works in any major modes (web-mode, html-mode ...).
-- Support any modern languages (html/java/c/c++/python/latex/javascript ...).
+- Stable! Though it's dependent on evil-mode, NO evil-mode API is used
+- Support any modern languages (html/java/c/c++/python/latex/javascript ...)
 - Powerful. If you mix jsp, freemarker, html, jquery template or any weird syntax into one file, it still works!
-- Extendable. Write a plugin for it takes only 5 minutes.
+- Extendable. Write a plugin for it takes only 5 minutes
 - Long term support
 
 Screen cast for python:
@@ -68,6 +68,10 @@ All commands support numeric argument like "3%", "5va%" or "9da%"
 Please note "3%"  will jump to a line *3 percentage down the file*. It's the default behavior in original evil-mode . You can `(setq evilmi-may-jump-by-percentage nil)` to turn off this feature. Then "3%" will *jump 3 times*.
 
 * Advanced tips
+** Use evilmi-select-items instead press '%' in evil-visual-state
+evilmi-select-items is more robust and provides more functionality. It works even when evil-mode is not loaded. 
+
+So you'd better stick to evilmi-select-items if possible.
 ** Add new tags into existing languages
 I use ruby as an example.
 
@@ -97,14 +101,18 @@ Let's use html tag matching as an example.
 
 html tags are automatically supported in sgml-mode, nxml-mode, web-mode, html-mode and nxhtml-mode,.
 
-You want a new major-mode "my-mode" to do the html tag matching? Easy. Please add below line into your ~/.emacs:
+You want a new major-mode "my-mode" to do the html tag matching? Easy. Please add below code into your ~/.emacs:
 
 #+BEGIN_SRC elisp
-(plist-put evilmi-plugins my-mode '((evilmi-html-get-tag evilmi-html-jump)))
+(plist-put evilmi-plugins my-mode '((evilmi-simple-get-tag evilmi-simple-jump)
+                                    (evilmi-html-get-tag evilmi-html-jump)))
 #+END_SRC
 
-Further explanation: "evilmi-html-get-tag" and "evilmi-html-jump" are existing APIs which are defined in evil-matchit-html.el. The above line means that in my-mode, use "evilmi-html-get-tag" to find open/closed tag in current line and use "evilmi-html-jump" to jump to matched closed/open tag.
+Further explanation: "evilmi-html-get-tag" and "evilmi-html-jump" are existing APIs which are defined in evil-matchit-html.el.
 
+The above line means that use "evilmi-html-get-tag" to find open/closed tag in current line and use "evilmi-html-jump" to jump to matched closed/open tag.
+
+"evilmi-simple-get-tag" and "evilmi-simple-jump" provide generic rules shared by most major modes. For example, jumping between two end of the string, between brackets, etc.
 ** Mixed languages in one html template file is supported
 If you embed python language in a html file. You can match both html tags and python statement by inserting below code into your ~/.emacs:
 #+BEGIN_SRC elisp
