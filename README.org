@@ -91,7 +91,7 @@ So you setup in ~/.emacs is as below:
 #+begin_src elisp
 (eval-after-load 'evil-matchit-ruby
   '(progn
-     (add-to-list 'evilmi-ruby-extract-keywords-howtos '("^[ \t]*\\([a-z]+\\)\\( .*\\| *\\)$" 1))
+     (add-to-list 'evilmi-ruby-extract-keyword-howtos '("^[ \t]*\\([a-z]+\\)\\( .*\\| *\\)$" 1))
      (add-to-list 'evilmi-ruby-match-tags '(("unless" "if") ("elsif" "else") "end"))
      ))
 #+end_src
