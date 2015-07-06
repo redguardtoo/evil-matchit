@@ -53,7 +53,7 @@ Insert below code into your ~/.emacs:
 Alternatively, you can enable evil-matchit-mode along a major mode by adding `turn-on-evil-matchit-mode' to the mode hook.
 
 * Usage
-Press "%" to jump inside between tag pair in normal mode or visual mode. Please note evil-matchit is smart enough to *detect the beginning of tag automatically*.
+Press "%" to jump inside between tag pair in normal mode or visual mode (you press "v" to switch to visual mode). Please note evil-matchit is smart enough to *detect the tag automatically*.
 
 Tag pair could be open/closed html tag, or character pair like "{}" "[]" "()", or the single/double quote(s) at the two ends of the string.
 
@@ -65,13 +65,13 @@ Press "da%" to delete line(s) wrapped by tags including tags themselves. `M-x ev
 
 All commands support numeric argument like "3%", "5va%" or "9da%"
 
-"3%"  will jump to a line *3 percentage down the file*. It's the default behavior in original evil-mode . You can `(setq evilmi-may-jump-by-percentage nil)` to turn off this feature. Then "3%" will *jump 3 times*.
+"3%"  will jump to a line 3 percentage down the file. It's the default behavior in original evil-mode . You can `(setq evilmi-may-jump-by-percentage nil)` to turn off this feature. Then "3%" will jump 3 times.
 
-Please note *only* "evil-visual-state" and "evil-normal-state" are officially supported.
+Please note *only "evil-visual-state" and "evil-normal-state" are officially supported*.
 
-If you need visually select lines, I highly recommend *using "evilmi-selelct-items" instead*.
+If you need visually select lines, I strongly recommend *using "evilmi-select-items" instead*.
 
-This is actually *an advantage* of Emacs, you can tweak the select region without go into visual state at all.
+This is actually an advantage of Emacs, you can tweak the select region without go into visual state at all.
 
 * Advanced tips
 ** Use evilmi-select-items instead press '%' in evil-visual-state
