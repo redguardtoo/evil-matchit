@@ -61,18 +61,17 @@
         )
 
     ;; extract keyword from current line
-    (if (string-match "^[ \t]*\\([a-z]+\\) *.*:$" cur-line)
+    (if (string-match "^[ \t]*\\([a-z]+\\) *.*:\s*\\(#.*\\)?$" cur-line)
         (setq keyword (match-string 1 cur-line))
       )
 
     (cond
      ((string= keyword "else")
-      (setq regexp "^[ \t]*\\(if\\) *.*:$")
+      (setq regexp "^[ \t]*\\(if\\) *.*:\s*\\(#.*\\)?$")
       )
      ((or (string= keyword "finally") (string= keyword "except"))
-       (setq regexp "^[ \t]*\\(try\\) *.*:$")
-       )
-     )
+       (setq regexp "^[ \t]*\\(try\\) *.*:\s*\\(#.*\\)?$")
+       ))
 
     (when regexp
       (save-excursion
@@ -111,13 +110,13 @@
         )
     (cond
      ((string= keyword "try")
-      (setq regexp "^[ \t]*\\(except\\) *.*:$")
+      (setq regexp "^[ \t]*\\(except\\) *.*:\s*\\(#.*\\)?$")
       )
      ((string= keyword "except")
-      (setq regexp "^[ \t]*\\(except\\|finally\\) *.*:$")
+      (setq regexp "^[ \t]*\\(except\\|finally\\) *.*:\s*\\(#.*\\)?$")
       )
      ( (or (string= keyword "elif") (string= keyword "if"))
-       (setq regexp "^[ \t]*\\(elif\\|else\\) *.*:$")
+       (setq regexp "^[ \t]*\\(elif\\|else\\) *.*:\s*\\(#.*\\)?$")
        )
      )
 
@@ -150,7 +149,7 @@
 ;;;###autoload
 (defun evilmi-python-get-tag ()
   (let (rlt
-        (regexp "^[ \t]*\\([a-z]+\\) *.*:$")
+        (regexp "^[ \t]*\\([a-z]+\\) *.*:\s*\\(#.*\\)?$")
         (cur-line (buffer-substring-no-properties
                    (line-beginning-position)
                    (line-end-position)))
