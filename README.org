@@ -1,4 +1,4 @@
-* evil-matchit (v2.0.1)
+* evil-matchit (v2.0.2)
 
 Vim [[http://www.vim.org/scripts/script.php?script_id=39][matchit.vim]] by Benji Fisher ported into Emacs.
 
@@ -65,7 +65,13 @@ Press "da%" to delete line(s) wrapped by tags including tags themselves. `M-x ev
 
 All commands support numeric argument like "3%", "5va%" or "9da%"
 
-Please note "3%"  will jump to a line *3 percentage down the file*. It's the default behavior in original evil-mode . You can `(setq evilmi-may-jump-by-percentage nil)` to turn off this feature. Then "3%" will *jump 3 times*.
+"3%"  will jump to a line *3 percentage down the file*. It's the default behavior in original evil-mode . You can `(setq evilmi-may-jump-by-percentage nil)` to turn off this feature. Then "3%" will *jump 3 times*.
+
+Please note *only* "evil-visual-state" and "evil-normal-state" are officially supported.
+
+If you need visually select lines, I highly recommend *using "evilmi-selelct-items" instead*.
+
+This is actually *an advantage* of Emacs, you can tweak the select region without go into visual state at all.
 
 * Advanced tips
 ** Use evilmi-select-items instead press '%' in evil-visual-state
@@ -124,7 +130,7 @@ If you embed python language in a html file. You can match both html tags and py
 ** Re-define keybinding
 You can define your own key bindings instead using evil-matchit default key binding.
 
-All you need to do is to define function evilmi-customize-keybinding before turning on evil-mathcit-mode:
+All you need to do is to define function evilmi-customize-keybinding before turning on evil-match-mode:
 #+BEGIN_SRC elisp
 (defun evilmi-customize-keybinding ()
   (evil-define-key 'normal evil-matchit-mode-map

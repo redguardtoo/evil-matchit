@@ -209,9 +209,8 @@
       )
 
     (setq rlt (list p tag-type keyword))
-    rlt
-    )
-  )
+    (if (and evilmi-debug rlt) (message "evilmi-python-get-tag called. rlt=%s" rlt))
+    rlt))
 
 ;;;###autoload
 (defun evilmi-python-jump (rlt NUM)
@@ -223,10 +222,11 @@
                    (line-end-position)))
         cur-indent
         dendent
-        where-to-jump-in-theory
-        )
+        where-to-jump-in-theory)
+
     (setq cur-indent (evilmi--python-calculate-indent cur-line))
 
+    (if evilmi-debug (message "evilmi-python-jump called. tag-type=%d p=%d" tag-type p))
     ;; start from closed tag
     (cond
      ((=  1 tag-type)
@@ -249,8 +249,7 @@
                 (evilmi--python-move-to-first-open-tag (1- cur-indent))
                 (setq where-to-jump-in-theory (point))
                 )
-            )
-          )
+            ))
         )
       )
 
@@ -281,8 +280,7 @@
       (if where-to-jump-in-theory (goto-char where-to-jump-in-theory))
 
       (evilmi--python-move-to-next-open-tag keyword cur-indent)
-      )
-     )
+      ))
     where-to-jump-in-theory))
 
 (provide 'evil-matchit-python)
