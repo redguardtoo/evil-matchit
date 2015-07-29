@@ -1,4 +1,4 @@
-* evil-matchit (v2.0.2)
+* evil-matchit (v2.1)
 
 Vim [[http://www.vim.org/scripts/script.php?script_id=39][matchit.vim]] by Benji Fisher ported into Emacs.
 
@@ -31,7 +31,8 @@ Tested on Emacs 23.4, 24.3, 24.4
 
 * Why use evil-matchit
 - No learning curve. Press "%" to jump. That's all!
-- Stable! Though it's dependent on evil-mode, NO evil-mode API is used
+- Stable. Usage of  Evil API is minimized
+- Perfect integration with Evil
 - Support any modern languages (html/java/c/c++/python/latex/javascript ...)
 - Powerful. If you mix jsp, freemarker, html, jquery template or any weird syntax into one file, it still works!
 - Extendable. Write a plugin for it takes only 5 minutes
@@ -248,7 +249,7 @@ Basically you just need:
 #+END_SRC
 
 ** Share your code to the world
-Tweak your code a little bit to make it a plugin and ask me to merge it into upstream.
+Convert your code to a plugin and ask me to merge it into upstream.
 
 Please check "evil-matchit-latex.el" for technical details about plugin.
 
