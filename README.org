@@ -1,5 +1,7 @@
 * evil-matchit (v2.1.1)
 
+[[http://melpa.org/#/evil-matchit][file:http://melpa.org/packages/evil-matchit-badge.svg]]
+
 Vim [[http://www.vim.org/scripts/script.php?script_id=39][matchit.vim]] by Benji Fisher ported into Emacs.
 
 Press "%" to jump between matched tags in Emacs. For example, in HTML "<div>" and "</div>" are a pair of tags.
