@@ -2,6 +2,8 @@
 
 [[http://melpa.org/#/evil-matchit][file:http://melpa.org/packages/evil-matchit-badge.svg]]
 
+[[http://stable.melpa.org/#/evil-matchit][file:http://stable.melpa.org/packages/evil-matchit-badge.svg]]
+
 Vim [[http://www.vim.org/scripts/script.php?script_id=39][matchit.vim]] by Benji Fisher ported into Emacs.
 
 Press "%" to jump between matched tags in Emacs. For example, in HTML "<div>" and "</div>" are a pair of tags.
@@ -29,7 +31,7 @@ Many modern languages are supported:
 
 This package uses Evil as its vi layer!
 
-Tested on Emacs 23.4, 24.3, 24.4
+Tested on Emacs 23.4, 24.3, 24.4, 24.5
 
 * Why use evil-matchit
 - No learning curve. Press "%" to jump. That's all!
