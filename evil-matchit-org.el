@@ -49,17 +49,9 @@ between '\\(' and '\\)' in regular expression.
     ))
 
 (defun evilmi--get-embedded-language-major-mode ()
-  (let ((info (org-edit-src-find-region-and-lang))
-        lang
-        lang-f)
-    (if info
-        (progn
-          (setq lang (or (cdr (assoc (nth 2 info) org-src-lang-modes))
-                         (nth 2 info)))
-          (setq lang (if (symbolp lang) (symbol-name lang) lang))
-          (setq lang-f (intern (concat lang "-mode")))
-          ))
-    lang-f))
+  (let ((lang (org-element-property :language (org-element-at-point))))
+    (when lang
+      (intern (concat lang "-mode")))))
 
 ;;;###autoload
 (defun evilmi-org-get-tag ()
