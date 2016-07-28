@@ -26,20 +26,17 @@
 
 ;;; Code:
 
-(defun evilmi--cur-line ()
-  (buffer-substring-no-properties
-   (line-beginning-position)
-   (line-end-position)))
+(require 'evil-matchit-sdk)
 
 (defun evilmi-diff-guess-final-pos ()
   (let* ((final-pos (point)))
     (save-excursion
       (let* (tmp-line)
         (forward-line -1)
-        (setq tmp-line (evilmi--cur-line))
+        (setq tmp-line (evilmi-sdk-curline))
         (if (string-match-p "^index [0-9a-z]+\\.+[0-9a-z]+ [0-9]+$" tmp-line)
             (forward-line -1))
-        (setq tmp-line (evilmi--cur-line))
+        (setq tmp-line (evilmi-sdk-curline))
         (if (string-match-p "^diff [^ ]" tmp-line)
             (forward-line -1))
         (setq final-pos (line-end-position))))
@@ -48,7 +45,7 @@
 ;;;###autoload
 (defun evilmi-diff-get-tag ()
   ;; do nothing
-  (let* ((cur-line (evilmi--cur-line))
+  (let* ((cur-line (evilmi-sdk-curline))
          (final-pos (point)))
     (if (string-match-p "^--- " cur-line)
         (save-excursion
@@ -57,7 +54,7 @@
 
 ;;;###autoload
 (defun evilmi-diff-jump (rlt NUM)
-  (let* ((cur-line (evilmi--cur-line))
+  (let* ((cur-line (evilmi-sdk-curline))
          (final-pos (point)))
     (cond
      ((string-match-p "^\\+\\+\\+ " cur-line)
