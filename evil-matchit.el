@@ -280,7 +280,8 @@ If font-face-under-cursor is NOT nil, the quoted string is being processed"
   ;; Latex
   (autoload 'evilmi-latex-get-tag "evil-matchit-latex" nil)
   (autoload 'evilmi-latex-jump "evil-matchit-latex" nil t)
-  (plist-put evilmi-plugins 'latex-mode '((evilmi-latex-get-tag evilmi-latex-jump)))
+  (plist-put evilmi-plugins 'latex-mode '((evilmi-latex-get-tag evilmi-latex-jump)
+                                          (evilmi-simple-get-tag evilmi-simple-jump)))
 
   ;; Python
   (autoload 'evilmi-python-get-tag "evil-matchit-python" nil)
