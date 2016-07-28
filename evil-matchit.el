@@ -220,17 +220,19 @@ If font-face-under-cursor is NOT nil, the quoted string is being processed"
     (if plugin
         (mapc
          (lambda (elem)
+           ;; excute evilmi-xxxx-get-tag
            (setq rlt (funcall (nth 0 elem)))
            (when (and rlt (not jumped))
              ;; before jump, we may need some operation
              (if FUNC (funcall FUNC rlt))
-             ;; jump now
+             ;; jump now, execute evilmi-xxxx-jump
              (setq where-to-jump-in-theory (funcall (nth 1 elem) rlt NUM))
              ;; jump only once if the jump is successful
              (setq jumped t)
              ))
          plugin))
 
+    ;; give `evilmi--simple-jump' a chance
     (when (not jumped)
       (if FUNC (funcall FUNC (list (point))))
       (evilmi--simple-jump)
@@ -300,10 +302,16 @@ If font-face-under-cursor is NOT nil, the quoted string is being processed"
   (autoload 'evilmi-c-jump "evil-matchit-c" nil)
   (mapc (lambda (mode)
           (plist-put evilmi-plugins mode '((evilmi-c-get-tag evilmi-c-jump)
-                                           (evilmi-simple-get-tag evilmi-simple-jump)))
-          )
+                                           (evilmi-simple-get-tag evilmi-simple-jump))))
         '(c-mode c++-mode))
 
+  ;; diff/patch
+  (autoload 'evilmi-diff-get-tag "evil-matchit-diff" nil)
+  (autoload 'evilmi-diff-jump "evil-matchit-diff" nil)
+  (mapc (lambda (mode)
+          (plist-put evilmi-plugins mode '((evilmi-simple-get-tag evilmi-simple-jump)
+                                           (evilmi-diff-get-tag evilmi-diff-jump))))
+        '(diff-mode ffip-diff-mode magit-diff-mode))
   ;; Fortran
   (autoload 'evilmi-fortran-get-tag "evil-matchit-fortran" nil)
   (autoload 'evilmi-fortran-jump "evil-matchit-fortran" nil)
