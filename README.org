@@ -1,4 +1,4 @@
-* evil-matchit (v2.1.3)
+* evil-matchit (v2.1.4)
 
 [[http://melpa.org/#/evil-matchit][file:http://melpa.org/packages/evil-matchit-badge.svg]] [[http://stable.melpa.org/#/evil-matchit][file:http://stable.melpa.org/packages/evil-matchit-badge.svg]]
 
@@ -150,11 +150,6 @@ Here is the setup to jump between the two ends of the C comment:
 #+begin_src elisp
 (setq evilmi-quote-chars (string-to-list "'\"/"))
 #+end_src
-** Don't ignore the comments when jumping
-#+begin_src elisp
-(setq evilmi-ignore-comments nil)
-#+end_src
-
 ** Match case sensitive tags?
 It's decided by the Emacs global variable "case-fold-search". You need not care about it because the major mode will set this flag automatically.
 * Developer guide
@@ -227,13 +222,15 @@ The forth *optional* column defines the relationship between open and close tags
 
 ;;;###autoload
 (defun evilmi-script-get-tag ()
-  (evilmi-sdk-get-tag evilmi-script-match-tags evilmi-sdk-extract-keyword-howtos)
-  )
+  (evilmi-sdk-get-tag evilmi-script-match-tags
+                      evilmi-sdk-extract-keyword-howtos))
 
 ;;;###autoload
-(defun evilmi-script-jump (rlt NUM)
-  (evilmi-sdk-jump rlt NUM evilmi-script-match-tags evilmi-sdk-extract-keyword-howtos)
-  )
+(defun evilmi-script-jump (rlt num)
+  (evilmi-sdk-jump rlt
+                   num
+                   evilmi-script-match-tags
+                   evilmi-sdk-extract-keyword-howtos))
 
 (provide 'evil-matchit-script)
 #+END_SRC

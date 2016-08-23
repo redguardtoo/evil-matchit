@@ -4,7 +4,7 @@
 
 ;; Author: Chen Bin <chenbin.sh@gmail.com>
 ;; URL: http://github.com/redguardtoo/evil-matchit
-;; Version: 2.1.3
+;; Version: 2.1.4
 ;; Keywords: matchit vim evil
 ;; Package-Requires: ((evil "1.0.7"))
 ;;
@@ -45,11 +45,9 @@
   "The table to define which algorithm to use and when to jump items")
 
 (defvar evilmi-may-jump-by-percentage t
-  "Simulate evil-jump-item behaviour. For example, press 50% to jump to 50 percentage in buffer.
-If this flag is nil, then 50 means jump 50 times.")
-
-
-(defvar evilmi-ignore-comments t "Ignore comments when mathing")
+  "Simulate evil-jump-item behaviour.
+For example,press 50% to jump to 50 percentage in buffer.
+If nil, presing '50 %' means jump 50 times.")
 
 (defvar evilmi-forward-chars (string-to-list "[{("))
 (defvar evilmi-backward-chars (string-to-list "]})"))
@@ -108,12 +106,61 @@ If font-face-under-cursor is NOT nil, the quoted string is being processed"
     (if evilmi-debug (message "evilmi--is-jump-forward return (%s %s %s)" rlt ff (string ch)))
     (list rlt ff ch)))
 
+(defun evilmi--in-comment-p (pos)
+  "Check the code at POS is comment by comparing font face."
+  (let* ((fontfaces (get-text-property pos 'face)))
+    (when (not (listp fontfaces))
+      (setf fontfaces (list fontfaces)))
+    (delq nil
+          (mapcar #'(lambda (f)
+                      ;; learn this trick from flyspell
+                      (or (eq f 'font-lock-comment-face)
+                          (eq f 'font-lock-comment-delimiter-face)))
+                  fontfaces))))
+
 (defun evilmi--scan-sexps (is-forward)
   (let* ((start-pos (if is-forward (point) (+ 1 (point))))
          (arg (if is-forward 1 -1))
-         (rlt (scan-sexps start-pos arg)))
-    ;; normal state and other state
-    (if evilmi-debug (message "evilmi--scan-sexps called. Return: %s" rlt))
+         (limit (if is-forward (point-max) (point-min)))
+         (lvl 1)
+         (b (following-char))
+         (e (cond
+             ;; {}
+             ((= b 123) 125)
+             ((= b 125) 123)
+             ;; ()
+             ((= b 40) 41)
+             ((= b 41) 40)
+             ;; []
+             ((= b 91) 93)
+             ((= b 93) 91)))
+         (rlt start-pos))
+    (cond
+     ((evilmi--in-comment-p (point))
+      ;; Matching tag in comment.
+      ;; Use own algorithm instead of `scan-sexps'
+      ;; because `scan-sexps' not work in some major-mode
+      (save-excursion
+        (setq start-pos (point))
+        (while (and (not (= start-pos limit))
+                    (> lvl 0))
+          (setq start-pos (+ start-pos arg))
+          (goto-char start-pos)
+          (if (evilmi--in-comment-p start-pos)
+              (cond
+               ((= (following-char) b)
+                (setq lvl (1+ lvl)))
+               ((= (following-char) e)
+                (setq lvl (1- lvl))))))
+        (if (= lvl 0)
+            (setq rlt (+ start-pos (if is-forward 1 0))))))
+     (t
+      ;; not comment
+      ;; search but ignore comments
+      (let* ((parse-sexp-ignore-comments t))
+        (setq rlt (scan-sexps start-pos arg)))))
+
+    (if evilmi-debug (message "evilmi--scan-sexps called => rlt=%s lvl=%s" rlt lvl))
     rlt))
 
 (defun evilmi--adjust-quote-jumpto (is-forward pos)
@@ -157,7 +204,7 @@ If font-face-under-cursor is NOT nil, the quoted string is being processed"
     (if evilmi-debug (message "evilmi--find-position-to-jump return %s" (evilmi--adjust-jumpto is-forward rlt)))
     (evilmi--adjust-jumpto is-forward rlt)))
 
-(defun evilmi--tweak-selected-region-finally (ff jump-forward)
+(defun evilmi--tweak-selected-region (ff jump-forward)
   ;; visual-state hack!
   (if (and jump-forward (eq evil-state 'visual) (not ff))
       ;; if ff is non-nil, I control the jump flow from character level,
@@ -166,25 +213,15 @@ If font-face-under-cursor is NOT nil, the quoted string is being processed"
 
 (defun evilmi--simple-jump ()
   "Alternative for evil-jump-item."
-  ;; parse-sexp-ignore-comments is used
   (interactive)
-  (let* ((old-flag parse-sexp-ignore-comments)
-         (tmp (evilmi--is-jump-forward))
+  (let* ((tmp (evilmi--is-jump-forward))
          (jump-forward (car tmp))
          ;; if ff is not nil, it's jump between quotes
          ;; so we should not use (scan-sexps)
          (ff (nth 1 tmp))
          (ch (nth 2 tmp)))
-
-    (unless evilmi-ignore-comments
-      (setq parse-sexp-ignore-comments nil))
-
-    ;; need pass the char
     (goto-char (evilmi--find-position-to-jump ff jump-forward ch))
-    (evilmi--tweak-selected-region-finally ff jump-forward)
-
-    (unless evilmi-ignore-comments
-      (setq parse-sexp-ignore-comments old-flag))))
+    (evilmi--tweak-selected-region ff jump-forward)))
 
 (defun evilmi--operate-on-item (NUM &optional FUNC)
   (let ((plugin (plist-get evilmi-plugins major-mode))
@@ -412,7 +449,7 @@ If font-face-under-cursor is NOT nil, the quoted string is being processed"
     (evilmi--operate-on-item NUM))))
 
 ;;;###autoload
-(defun evilmi-version() (interactive) (message "2.1.3"))
+(defun evilmi-version() (interactive) (message "2.1.4"))
 
 ;;;###autoload
 (define-minor-mode evil-matchit-mode
