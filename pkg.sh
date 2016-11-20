@@ -1,5 +1,5 @@
 #!/bin/bash
-pkg=evil-matchit-2.1.6
+pkg=evil-matchit-2.1.7
 mkdir $pkg
 cp README.org $pkg
 cp *.el $pkg
