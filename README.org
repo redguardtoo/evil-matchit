@@ -1,4 +1,4 @@
-* evil-matchit (v2.1.7)
+* evil-matchit (v2.1.8)
 
 [[http://melpa.org/#/evil-matchit][file:http://melpa.org/packages/evil-matchit-badge.svg]] [[http://stable.melpa.org/#/evil-matchit][file:http://stable.melpa.org/packages/evil-matchit-badge.svg]]
 
@@ -26,6 +26,7 @@ Many modern languages are supported:
 - SQL
 - Laravel Blade Templating
 - Vim script
+- Verilog
 - Emacs email (mesage-mode)
 
 This package uses Evil as its vi layer!
