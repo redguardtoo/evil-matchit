@@ -65,13 +65,7 @@
 (defvar evilmi-verilog-extract-keyword-howtos
   '(("^[ \t]*\\(while\\|module\\|primitive\\|case\\|function\\|specify\\|table\\)" 1)
     ("^[ \t]*\\(endmodule\\|endprimitive\\|endcase\\|endfunction\\|endspecify\\|endtable\\)" 1)
-    ("^[ \t]*\\(if\\) .*[^; ][ \t]*$" 1) ; if ...; is one complete statement
-    ("\\(begin\\)[ \t]*\\(//.*\\)?[ \t]*$$" 1)
-    ("\\(begin\\):" 1)
-    ("^[ \t]*\\(else *\\(if\\)?\\).*" 1)
-    ("^[ \t]*end \\(else *\\(if\\)?\\).*" 1)
-    ("^[ \t]*\\(end\\|begin\\)[ \t]*\\(//.*\\)?[ \t]*$" 1)
-    ))
+    ("\\([^a-z]\\|^\\)\\(begin\\|end\\)\\([^a-z]\\|$\\)" 2)))
 
 (defvar evilmi-verilog-match-tags
   '(("module" () "endmodule" "MONOGAMY")
@@ -80,19 +74,38 @@
     ("function" () "endfunction" "MONOGAMY")
     ("table" () "endtable" "MONOGAMY")
     ("specify" () "endspecify" "MONOGAMY")
-    ("if" ("else" "else if") "end")
-    (("while" "begin") () "end")
-    ))
-
+    ("begin" () "end")))
 
 ;;;###autoload
 (defun evilmi-verilog-get-tag ()
-  (let* ((rlt (evilmi-sdk-get-tag evilmi-verilog-match-tags evilmi-verilog-extract-keyword-howtos)))
-    rlt))
+  (let* ((orig-info (evilmi-sdk-get-tag evilmi-verilog-match-tags
+                                        evilmi-verilog-extract-keyword-howtos)))
+    (if evilmi-debug (message "evilmi-verilog-get-tag called => %s" orig-info))
+    ;; hack if current line is `if' or `else if'
+    (unless orig-info
+      (let* ((cur-line (evilmi-sdk-curline))
+             next-line
+             (pos (line-beginning-position)))
+        (when (string-match "^[ \t]*\\(if\\|else\\( if\\)?\\).*" cur-line)
+          ;; second change for if else statement
+          (save-excursion
+            (forward-line 1)
+            (setq orig-info (evilmi-sdk-get-tag evilmi-verilog-match-tags
+                                                evilmi-verilog-extract-keyword-howtos)))
+          ;; move to the next line now. maybe there exist end statement
+          (when orig-info
+            (forward-line 1)
+            (setq orig-info (cons pos (cdr orig-info)))))))
+    orig-info))
 
 ;;;###autoload
-(defun evilmi-verilog-jump (rlt NUM)
-  (evilmi-sdk-jump rlt NUM evilmi-verilog-match-tags evilmi-verilog-extract-keyword-howtos))
+(defun evilmi-verilog-jump (orig-info num)
+  (let* ((orig-keyword (evilmi-sdk-keyword (cadr orig-info))))
+    (if evilmi-debug (message "evilmi-verilog-jump called => %s" orig-info))
+    (evilmi-sdk-jump orig-info
+                     num
+                     evilmi-verilog-match-tags
+                     evilmi-verilog-extract-keyword-howtos)))
 
 (provide 'evil-matchit-verilog)
 ;;; evil-matchit-verilog.el ends here

@@ -1,4 +1,4 @@
-* evil-matchit (v2.1.8)
+* evil-matchit (v2.1.9)
 
 [[http://melpa.org/#/evil-matchit][file:http://melpa.org/packages/evil-matchit-badge.svg]] [[http://stable.melpa.org/#/evil-matchit][file:http://stable.melpa.org/packages/evil-matchit-badge.svg]]
 
@@ -169,11 +169,9 @@ Here is a complete sample:
 ;;         we use it to select/delete tag. The other elements of the list could
 ;;         be any data type
 (defun evilmi-mylang-find-tag ()
-  (let (rlt )
+  (let (rlt)
     (setq rlt '(position-of-open-end "anything-you-like" "anything-you-like")
-    rlt
-    )
-  )
+    rlt))
 
 ;; @parama rlt result from evilmi-mylang-find-tag
 ;; @param NUM numeric argument when user press "%" to match tag
@@ -219,7 +217,7 @@ I attached the full content of evil-matchit-script.el here:
 The first column contains the open tag(s).
 The second column contains the middle tag(s).
 The third column contains the closed tags(s).
-The forth *optional* column defines the relationship between open and close tags. It could be FN_EXIT or MONOGAMY
+The forth *optional* column defines the relationship between open and close tags. It could be MONOGAMY
 ")
 
 ;;;###autoload
