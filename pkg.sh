@@ -1,8 +1,14 @@
 #!/bin/bash
-pkg=evil-matchit-2.1.9
+name=evil-matchit
+version=2.2.0
+pkg=$name-$version
 mkdir $pkg
 cp README.org $pkg
 cp *.el $pkg
+cat << EOF > $pkg/$name-pkg.el
+(define-package "$name" "$version" "Vim matchit ported into Emacs (requires EVIL)")
+EOF
+
 if [[ `uname -s` == *Darwin* ]]; then
    COPYFILE_DISABLE="" tar cvf $pkg.tar $pkg/
 else
