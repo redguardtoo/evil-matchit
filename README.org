@@ -1,4 +1,4 @@
-* evil-matchit (v2.2.0)
+* evil-matchit (v2.2.1)
 
 [[http://melpa.org/#/evil-matchit][file:http://melpa.org/packages/evil-matchit-badge.svg]] [[http://stable.melpa.org/#/evil-matchit][file:http://stable.melpa.org/packages/evil-matchit-badge.svg]]
 
@@ -154,6 +154,12 @@ Here is the setup to jump between the two ends of the C comment:
 #+end_src
 ** Match case sensitive tags?
 It's decided by the Emacs global variable "case-fold-search". You need not care about it because the major mode will set this flag automatically.
+** Python
+You can turn on =evilmi-always-simple-jump= to match brackets at first.
+
+Thus you disable our *advanced algorithm* which I highly recommend.
+
+Some people may prefer simpler algorithm in =python-mode.
 * Developer guide
 ** Write Emacs Lisp to support new language
 Simple. You only need define two functions and tell evil-matchit in which major-mode they should be used.
