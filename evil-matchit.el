@@ -309,6 +309,12 @@ If font-face-under-cursor is NOT nil, the quoted string is being processed."
   (plist-put evilmi-plugins 'latex-mode '((evilmi-latex-get-tag evilmi-latex-jump)
                                           (evilmi-simple-get-tag evilmi-simple-jump)))
 
+  ;; ocaml
+  (autoload 'evilmi-ocaml-get-tag "evil-matchit-ocaml" nil)
+  (autoload 'evilmi-ocaml-jump "evil-matchit-ocaml" nil t)
+  (plist-put evilmi-plugins 'tuareg-mode '((evilmi-ocaml-get-tag evilmi-ocaml-jump)
+                                          (evilmi-simple-get-tag evilmi-simple-jump)))
+
   ;; Python
   (autoload 'evilmi-python-get-tag "evil-matchit-python" nil)
   (autoload 'evilmi-python-jump "evil-matchit-python" nil)
