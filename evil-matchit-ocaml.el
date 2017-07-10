@@ -1,28 +1,29 @@
-(setq evilmi-ocaml-keywords
-      '((("struct" "begin" "object") ("end"))
-        (("if") ("then"))
-        (("match") ("with"))
-        (("match" "try") ("with"))
-        (("while" "for") ("done"))
-        (("let") ("in"))
-        ()))
+(defvar evilmi-ocaml-keywords
+  '((("struct" "begin" "object") ("end"))
+    (("if") ("then"))
+    (("match") ("with"))
+    (("match" "try") ("with"))
+    (("while" "for") ("done"))
+    (("let") ("in"))
+    ())
+  "Ocaml keywords.")
 
-;; regexp to find next/previous keyword
-(setq keywords-regex
+(defvar evilmi-ocaml-keywords-regex
   (let ((all-keywords (apply 'append (apply 'append evilmi-ocaml-keywords))))
-    (format "\\<\\(%s\\)\\>" (mapconcat 'identity all-keywords "\\|"))))
+    (format "\\<\\(%s\\)\\>" (mapconcat 'identity all-keywords "\\|")))
+  "Regexp to find next/previous keyword.")
 
 ;; jumps to next keyword. Returs nil if there's no next word
 (defun evilmi-ocaml-next-word (direction)
   (if (= direction 0)
       (let ((new-point (save-excursion
           (forward-char)
-          (if (search-forward-regexp keywords-regex nil t)
-              (search-backward-regexp keywords-regex)
+          (if (search-forward-regexp evilmi-ocaml-keywords-regex nil t)
+              (search-backward-regexp evilmi-ocaml-keywords-regex)
             nil)
         )))
         (if new-point (goto-char new-point)))
-    (search-backward-regexp keywords-regex nil t)))
+    (search-backward-regexp evilmi-ocaml-keywords-regex nil t)))
 
 (defun evilmi-ocaml-end-word ()
   (save-excursion
@@ -33,11 +34,11 @@
   (buffer-substring-no-properties (point) (evilmi-ocaml-end-word)))
 
 (defun evilmi-ocaml-is-keyword (l keyword)
-  "Checks if the keyword belongs to a row"
+  "Checks if the keyword belongs to a row."
   (find-if (lambda (w) (string-equal w keyword)) (apply 'append l)))
 
 (defun evilmi-ocaml-get-tag-info (keyword)
-  "Find the row in the evilmi-ocaml-keywords"
+  "Find the row in the evilmi-ocaml-keywords."
   (find-if (lambda (l) (evilmi-ocaml-is-keyword l keyword)) evilmi-ocaml-keywords))
 
 ;; 0 - forward
@@ -46,7 +47,7 @@
   (if (= level 0)
       (point)
     (if (evilmi-ocaml-next-word direction)
-        (progn 
+        (progn
           (setq keyword (evilmi-ocaml-get-word))
 
           (if (evilmi-ocaml-is-keyword tag-info keyword)
@@ -66,14 +67,17 @@
 
 ;;;###autoload
 (defun evilmi-ocaml-get-tag ()
-  (save-excursion 
+  "Return information of current tag: (list position-of-word word)."
+  (save-excursion
     (evilmi-ocaml-goto-word-beginning)
-    (evilmi-ocaml-get-word)))
+    (list (car (bounds-of-thing-at-point 'word))
+          (evilmi-ocaml-get-word))))
 
 ;;;###autoload
 (defun evilmi-ocaml-jump (rlt num)
-  (let* ((tag-info (evilmi-ocaml-get-tag-info rlt))
-         (direction (if (member rlt (car tag-info)) 0 1)))
+  (let* ((keyword (cadr rlt))
+         (tag-info (evilmi-ocaml-get-tag-info keyword))
+         (direction (if (member keyword (car tag-info)) 0 1)))
     (let ((new-point (save-excursion
                        (evilmi-ocaml-goto-word-beginning)
                        (evilmi-ocaml-go tag-info 1 direction))))

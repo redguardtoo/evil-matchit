@@ -4,7 +4,7 @@
 
 ;; Author: Chen Bin <chenbin.sh@gmail.com>
 ;; URL: http://github.com/redguardtoo/evil-matchit
-;; Version: 2.2.1
+;; Version: 2.2.2
 ;; Keywords: matchit vim evil
 ;; Package-Requires: ((evil "1.0.7"))
 ;;
@@ -312,8 +312,8 @@ If font-face-under-cursor is NOT nil, the quoted string is being processed."
   ;; ocaml
   (autoload 'evilmi-ocaml-get-tag "evil-matchit-ocaml" nil)
   (autoload 'evilmi-ocaml-jump "evil-matchit-ocaml" nil t)
-  (plist-put evilmi-plugins 'tuareg-mode '((evilmi-ocaml-get-tag evilmi-ocaml-jump)
-                                          (evilmi-simple-get-tag evilmi-simple-jump)))
+  (plist-put evilmi-plugins 'tuareg-mode '((evilmi-simple-get-tag evilmi-simple-jump)
+                                           (evilmi-ocaml-get-tag evilmi-ocaml-jump)))
 
   ;; Python
   (autoload 'evilmi-python-get-tag "evil-matchit-python" nil)
@@ -479,7 +479,7 @@ If font-face-under-cursor is NOT nil, the quoted string is being processed."
 ;;;###autoload
 (defun evilmi-version()
   (interactive)
-  (message "2.2.1"))
+  (message "2.2.2"))
 
 ;;;###autoload
 (define-minor-mode evil-matchit-mode
