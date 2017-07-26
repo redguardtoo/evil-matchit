@@ -61,9 +61,8 @@
       nil)))
 
 (defun evilmi-ocaml-goto-word-beginning ()
-  ;; this is so that when the cursor is on the first character we don't jump to previous word
-  (forward-char)
-  (search-backward-regexp "\\<"))
+  (let ((bounds (bounds-of-thing-at-point 'word)))
+    (if bounds (goto-char (car bounds)))))
 
 ;;;###autoload
 (defun evilmi-ocaml-get-tag ()
