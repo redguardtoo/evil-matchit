@@ -8,13 +8,15 @@
     ())
   "Ocaml keywords.")
 
+(defvar evilmi-ocaml-all-keywords
+  (apply 'append (apply 'append evilmi-ocaml-keywords)))
+
 (defvar evilmi-ocaml-keywords-regex
-  (let ((all-keywords (apply 'append (apply 'append evilmi-ocaml-keywords))))
-    (format "\\<\\(%s\\)\\>" (mapconcat 'identity all-keywords "\\|")))
+  (format "\\<\\(%s\\)\\>" (mapconcat 'identity evilmi-ocaml-all-keywords "\\|"))
   "Regexp to find next/previous keyword.")
 
 ;; jumps to next keyword. Returs nil if there's no next word
-(defun evilmi-ocaml-next-word (direction)
+(defun evilmi-ocaml-next-keyword (direction)
   (if (= direction 0)
       (let ((new-point (save-excursion
           (forward-char)
@@ -46,7 +48,7 @@
 (defun evilmi-ocaml-go (tag-info level direction)
   (if (= level 0)
       (point)
-    (if (evilmi-ocaml-next-word direction)
+    (if (evilmi-ocaml-next-keyword direction)
         (progn
           (setq keyword (evilmi-ocaml-get-word))
 
@@ -61,8 +63,17 @@
       nil)))
 
 (defun evilmi-ocaml-goto-word-beginning ()
-  (let ((bounds (bounds-of-thing-at-point 'word)))
-    (if bounds (goto-char (car bounds)))))
+  (let ((bounds (bounds-of-thing-at-point 'word))
+        (word (thing-at-point 'word))
+        (line-end (line-end-position)))
+    (if bounds (goto-char (car bounds)))
+    (let ((next-keyword
+           (save-excursion
+             (if (find word evilmi-ocaml-all-keywords :test 'equal)
+                 (point)
+               (evilmi-ocaml-next-keyword 0)
+               (if (< (point) line-end) (point))))))
+      (if next-keyword (goto-char next-keyword)))))
 
 ;;;###autoload
 (defun evilmi-ocaml-get-tag ()
