@@ -1,4 +1,4 @@
-* evil-matchit (v2.2.3)
+* evil-matchit (v2.2.4)
 
 [[http://melpa.org/#/evil-matchit][file:http://melpa.org/packages/evil-matchit-badge.svg]] [[http://stable.melpa.org/#/evil-matchit][file:http://stable.melpa.org/packages/evil-matchit-badge.svg]]
 
