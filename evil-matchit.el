@@ -4,7 +4,7 @@
 
 ;; Author: Chen Bin <chenbin.sh@gmail.com>
 ;; URL: http://github.com/redguardtoo/evil-matchit
-;; Version: 2.2.4
+;; Version: 2.2.6
 ;; Keywords: matchit vim evil
 ;; Package-Requires: ((evil "1.0.7"))
 ;;
@@ -400,6 +400,15 @@ If IS-FORWARD is t, jump forward; or else jump backward."
                                            (evilmi-ruby-get-tag evilmi-ruby-jump))))
         '(ruby-mode enh-ruby-mode)))
 
+  (autoload 'evilmi-elixir-get-tag "evil-matchit-elixir" nil)
+  (autoload 'evilmi-elixir-jump "evil-matchit-elixir" nil)
+  ;; @see https://github.com/syl20bnr/spacemacs/issues/2093
+  ;; spacemacs use enh-elixir-mode
+  (mapc (lambda (mode)
+          (plist-put evilmi-plugins mode '((evilmi-simple-get-tag evilmi-simple-jump)
+                                           (evilmi-elixir-get-tag evilmi-elixir-jump))))
+        '(elixir-mode))
+
 (defun evilmi--region-to-select-or-delete (num &optional is-inner)
   (let* (where-to-jump-in-theory b e)
     (save-excursion
@@ -492,7 +501,7 @@ If IS-FORWARD is t, jump forward; or else jump backward."
 ;;;###autoload
 (defun evilmi-version()
   (interactive)
-  (message "2.2.4"))
+  (message "2.2.6"))
 
 ;;;###autoload
 (define-minor-mode evil-matchit-mode

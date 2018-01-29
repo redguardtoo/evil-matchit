@@ -1,4 +1,4 @@
-* evil-matchit (v2.2.4)
+* evil-matchit (v2.2.6)
 
 [[http://melpa.org/#/evil-matchit][file:http://melpa.org/packages/evil-matchit-badge.svg]] [[http://stable.melpa.org/#/evil-matchit][file:http://stable.melpa.org/packages/evil-matchit-badge.svg]]
 
@@ -21,6 +21,7 @@ Many modern languages are supported:
 - CMake
 - Org-mode (match tag of org-mode and tags of other languages embedded in org file)
 - Ruby
+- Elixir
 - Bash
 - Lua
 - PHP

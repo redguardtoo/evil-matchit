@@ -1,6 +1,6 @@
 #!/bin/bash
 name=evil-matchit
-version=2.2.4
+version=2.2.6
 pkg=$name-$version
 mkdir $pkg
 cp README.org $pkg
