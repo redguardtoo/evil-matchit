@@ -41,13 +41,13 @@
 
 ;; should try next howto, the purpose is avoid missing any howto
 (defvar evilmi-elixir-extract-keyword-howtos
-  '(("^[ \t]*\\(def[a-z]+\\|fn\\|if\\|case\\|unless\\|cond\\) " 1)
-    ("^[ \t]*\\(end\\|else\\)[ \t]*$" 1)
-    ("^[^=]+=[ \t]*\\(if\\|case\\|unless\\|cond\\)[ \t]+" 1)))
+  '(("^.*\\(do\\)[ \t]*$" 1)
+    ("^[ \t]*\\(fn\\)[( \t]?" 1)
+    ("^[ \t]*\\(end\\|else\\)[ \t]*$" 1)))
 
 (defvar evilmi-elixir-match-tags
-  '((("defmodule" "defp" "defmacro" "fn" "cond") () "end")
-    (("if" "case" "unless") ("else") "end")))
+  '((("fn") () "end")
+    (("do") ("else") "end")))
 
 ;;;###autoload
 (defun evilmi-elixir-get-tag ()
