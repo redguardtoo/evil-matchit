@@ -51,12 +51,28 @@
 
 ;;;###autoload
 (defun evilmi-elixir-get-tag ()
-  (let* ((rlt (evilmi-sdk-get-tag evilmi-elixir-match-tags evilmi-elixir-extract-keyword-howtos)))
+  (let* ((cur-line (evilmi-sdk-curline))
+         rlt)
+    (cond
+     ((string-match-p "^[ \t]*fn.*end$" cur-line)
+      (setq rlt (if (string= (thing-at-point 'symbol) "end")
+                    (line-beginning-position)
+                  (line-end-position))))
+     (t
+      (setq  rlt (evilmi-sdk-get-tag evilmi-elixir-match-tags
+                                     evilmi-elixir-extract-keyword-howtos))))
     rlt))
 
 ;;;###autoload
 (defun evilmi-elixir-jump (rlt NUM)
-  (evilmi-sdk-jump rlt NUM evilmi-elixir-match-tags evilmi-elixir-extract-keyword-howtos))
+  (cond
+   ((integerp rlt)
+    (goto-char rlt))
+   (t
+    (evilmi-sdk-jump rlt
+                     NUM
+                     evilmi-elixir-match-tags
+                     evilmi-elixir-extract-keyword-howtos))))
 
 (provide 'evil-matchit-elixir)
 ;;; evil-matchit-elixir.el ends here
