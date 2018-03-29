@@ -294,7 +294,7 @@ If IS-FORWARD is t, jump forward; or else jump backward."
           (plist-put evilmi-plugins mode '((evilmi-simple-get-tag evilmi-simple-jump)
                                            (evilmi-javascript-get-tag evilmi-javascript-jump)
                                            (evilmi-html-get-tag evilmi-html-jump))))
-        '(js-mode json-mode js2-mode js3-mode javascript-mode rjsx-mode))
+        '(js-mode json-mode js2-mode js3-mode javascript-mode rjsx-mode typescript-mode))
 
   ;; Html
   (autoload 'evilmi-template-get-tag "evil-matchit-template" nil)
@@ -338,7 +338,7 @@ If IS-FORWARD is t, jump forward; or else jump backward."
   (autoload 'evilmi-sql-get-tag "evil-matchit-sql" nil)
   (autoload 'evilmi-sql-jump "evil-matchit-sql" nil)
   (plist-put evilmi-plugins 'sql-mode '((evilmi-simple-get-tag evilmi-simple-jump)
-                                           (evilmi-sql-get-tag evilmi-sql-jump)))
+                                        (evilmi-sql-get-tag evilmi-sql-jump)))
 
   ;; C/C++
   (autoload 'evilmi-c-get-tag "evil-matchit-c" nil)
