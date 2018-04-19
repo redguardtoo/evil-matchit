@@ -4,7 +4,7 @@
 
 ;; Author: Chen Bin <chenbin.sh@gmail.com>
 ;; URL: http://github.com/redguardtoo/evil-matchit
-;; Version: 2.2.6
+;; Version: 2.2.7
 ;; Keywords: matchit vim evil
 ;; Package-Requires: ((evil "1.0.7"))
 ;;
@@ -43,6 +43,7 @@
 ;;; Code:
 
 (require 'evil)
+(require 'evil-matchit-sdk)
 
 (defvar evilmi-plugins '(emacs-lisp-mode
                          ((evilmi-simple-get-tag evilmi-simple-jump)))
@@ -118,18 +119,6 @@ If font-face-under-cursor is NOT nil, the quoted string is being processed."
     (if evilmi-debug (message "evilmi--is-jump-forward return (%s %s %s)" rlt ff (string ch)))
     (list rlt ff ch)))
 
-(defun evilmi--in-comment-p (pos)
-  "Check the code at POS is comment by comparing font face."
-  (let* ((fontfaces (get-text-property pos 'face)))
-    (when (not (listp fontfaces))
-      (setf fontfaces (list fontfaces)))
-    (delq nil
-          (mapcar #'(lambda (f)
-                      ;; learn this trick from flyspell
-                      (or (eq f 'font-lock-comment-face)
-                          (eq f 'font-lock-comment-delimiter-face)))
-                  fontfaces))))
-
 (defun evilmi--scan-sexps (is-forward)
   "Get the position of matching tag.
 If IS-FORWARD is t, jump forward; or else jump backward."
@@ -151,7 +140,7 @@ If IS-FORWARD is t, jump forward; or else jump backward."
              ((= b 93) 91)))
          (rlt start-pos))
     (cond
-     ((evilmi--in-comment-p (point))
+     ((evilmi-in-comment-p (point))
       ;; Matching tag in comment.
       ;; Use own algorithm instead of `scan-sexps'
       ;; because `scan-sexps' not work in some major-mode
@@ -161,7 +150,7 @@ If IS-FORWARD is t, jump forward; or else jump backward."
                     (> lvl 0))
           (setq start-pos (+ start-pos arg))
           (goto-char start-pos)
-          (if (evilmi--in-comment-p start-pos)
+          (if (evilmi-in-comment-p start-pos)
               (cond
                ((= (following-char) b)
                 (setq lvl (1+ lvl)))
@@ -501,7 +490,7 @@ If IS-FORWARD is t, jump forward; or else jump backward."
 ;;;###autoload
 (defun evilmi-version()
   (interactive)
-  (message "2.2.6"))
+  (message "2.2.7"))
 
 ;;;###autoload
 (define-minor-mode evil-matchit-mode

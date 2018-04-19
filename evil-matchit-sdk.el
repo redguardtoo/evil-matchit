@@ -260,6 +260,31 @@ after calling this function."
 
     where-to-jump-in-theory))
 
+
+;;;###autoload
+(defun evilmi-current-font-among-fonts-p (pos fonts)
+  "If current font at POS is among FONTS."
+  (let* ((fontfaces (get-text-property pos 'face)))
+    (when (not (listp fontfaces))
+      (setf fontfaces (list fontfaces)))
+    (delq nil
+          (mapcar (lambda (f)
+                    (member f fonts))
+                  fontfaces))))
+
+;;;###autoload
+(defun evilmi-in-comment-p (pos)
+  "Check character at POS is comment by comparing font face."
+  (evilmi-current-font-among-fonts-p pos '(font-lock-comment-face
+                                           font-lock-comment-delimiter-face)))
+
+
+;;;###autoload
+(defun evilmi-in-string-or-doc-p (pos)
+  "Check character at POS is string or docuemnt by comparing font face."
+  (evilmi-current-font-among-fonts-p pos '(font-lock-string-face
+                                           font-lock-doc-face)))
+
 (defun evilmi-count-matches (regexp str)
   (let* ((count 0)
          (start 0))

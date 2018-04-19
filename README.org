@@ -1,4 +1,4 @@
-* evil-matchit (v2.2.6)
+* evil-matchit (v2.2.7)
 
 [[http://melpa.org/#/evil-matchit][file:http://melpa.org/packages/evil-matchit-badge.svg]] [[http://stable.melpa.org/#/evil-matchit][file:http://stable.melpa.org/packages/evil-matchit-badge.svg]]
 
@@ -163,6 +163,10 @@ You can turn on =evilmi-always-simple-jump= to match brackets at first.
 Thus you disable our *advanced algorithm* which I highly recommend.
 
 Some people may prefer simpler algorithm in =python-mode.
+** APIs you can use
+- evilmi-current-font-among-fonts-p
+- evilmi-in-comment-p
+- evilmi-in-string-or-doc-p
 * Developer guide
 ** Write Emacs Lisp to support new language
 Simple. You only need define two functions and tell evil-matchit in which major-mode they should be used.
