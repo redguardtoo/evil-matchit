@@ -26,6 +26,8 @@
 
 ;;; Code:
 
+(require 'evil-matchit-sdk)
+
 (defvar evilmi-ocaml-keywords
   '((("struct" "begin" "sig" "object") ("end"))
     (("if") ("then"))
@@ -43,17 +45,38 @@
   (format "\\<\\(%s\\)\\>" (mapconcat 'identity evilmi-ocaml-all-keywords "\\|"))
   "Regexp to find next/previous keyword.")
 
+(defun evilmi-ocaml-row-regex (tag-info)
+  "Build regexp to find next/previous keyword in a row."
+  (format "\\<\\(%s\\)\\>" (mapconcat 'identity (apply 'append tag-info) "\\|")))
+
+(defun evilmi-ocaml-valid-position-p ()
+  "Check if point is not in comment, string or doc"
+  (not (or (evilmi-in-comment-p (point))
+           (evilmi-in-string-or-doc-p (point)))))
+
 ;; jumps to next keyword. Returs nil if there's no next word
-(defun evilmi-ocaml-next-keyword (direction)
+(defun evilmi-ocaml-next-possible-keyword (direction keywords-regex)
   (if (= direction 0)
       (let ((new-point (save-excursion
-          (forward-char)
-          (if (search-forward-regexp evilmi-ocaml-keywords-regex nil t)
-              (search-backward-regexp evilmi-ocaml-keywords-regex)
-            nil)
-        )))
+                         (forward-char)
+                         (if (search-forward-regexp keywords-regex nil t)
+                             (search-backward-regexp keywords-regex)
+                           nil)
+                         )))
         (if new-point (goto-char new-point)))
-    (search-backward-regexp evilmi-ocaml-keywords-regex nil t)))
+    (search-backward-regexp keywords-regex nil t)))
+
+(defun evilmi-ocaml-next-keyword (direction &optional keywords-regex)
+  "Jump to next keyword in a valid position. Return nil if no
+such keyword is available."
+  (let ((keywords-regex (or keywords-regex evilmi-ocaml-keywords-regex))
+        (found-keyword-p nil)
+        (keyword-exist-p t))
+    (while (and (not found-keyword-p) keyword-exist-p)
+      (setq keyword-exist-p (evilmi-ocaml-next-possible-keyword direction keywords-regex))
+      (if (and keyword-exist-p (evilmi-ocaml-valid-position-p))
+          (setq found-keyword-p t)))
+    found-keyword-p))
 
 (defun evilmi-ocaml-end-word ()
   (save-excursion
@@ -74,21 +97,15 @@
 ;; 0 - forward
 ;; 1 - backward
 (defun evilmi-ocaml-go (tag-info level direction)
-  (if (= level 0)
-      (point)
-    (if (evilmi-ocaml-next-keyword direction)
-        (progn
-          (setq keyword (evilmi-ocaml-get-word))
-
-          (if (evilmi-ocaml-is-keyword tag-info keyword)
-              ;; interesting tag
-              (if (member keyword (nth direction tag-info))
-                  (evilmi-ocaml-go tag-info (+ level 1) direction)
-                (evilmi-ocaml-go tag-info (- level 1) direction))
-
-            ;; other tag
-            (evilmi-ocaml-go tag-info level direction)))
-      nil)))
+  (let ((stop-p nil)
+        (keywords-regex (evilmi-ocaml-row-regex tag-info)))
+    (while (and (not stop-p) (/= level 0))
+      (if (evilmi-ocaml-next-keyword direction keywords-regex)
+          (if (member (evilmi-ocaml-get-word) (nth direction tag-info))
+              (setq level (1+ level))
+            (setq level (1- level)))
+        (setq stop-p t)))
+    (if (= level 0) (point))))
 
 (defun evilmi-ocaml-goto-word-beginning ()
   (let ((bounds (bounds-of-thing-at-point 'word))
