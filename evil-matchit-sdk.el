@@ -281,7 +281,7 @@ after calling this function."
 
 ;;;###autoload
 (defun evilmi-in-string-or-doc-p (pos)
-  "Check character at POS is string or docuemnt by comparing font face."
+  "Check character at POS is string or document by comparing font face."
   (evilmi-current-font-among-fonts-p pos '(font-lock-string-face
                                            font-lock-doc-face)))
 
