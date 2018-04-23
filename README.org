@@ -162,7 +162,7 @@ You can turn on =evilmi-always-simple-jump= to match brackets at first.
 
 Thus you disable our *advanced algorithm* which I highly recommend.
 
-Some people may prefer simpler algorithm in =python-mode.
+Some people may prefer simpler algorithm in =python-mode=.
 ** APIs you can use
 - evilmi-current-font-among-fonts-p
 - evilmi-in-comment-p
