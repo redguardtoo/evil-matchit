@@ -272,6 +272,31 @@ after calling this function."
                     (member f fonts))
                   fontfaces))))
 
+(defun evilmi-empty-line-p (line)
+  (string-match "^[ \t]*$" line))
+
+(defun evilmi-next-non-empty-line ()
+  "Return next non-empty line content or nil."
+  (let* ((b (line-beginning-position))
+         (e (line-end-position))
+         (cur-pos (point))
+         (continue t)
+         line
+         rlt)
+    (save-excursion
+      (forward-line)
+      (while (and continue (> (point) e))
+        (setq line (evilmi-sdk-curline))
+        (cond
+         ((evilmi-empty-line-p line)
+          (setq b (line-beginning-position))
+          (setq e (line-end-position))
+          (forward-line))
+         (t
+          (setq continue nil)
+          (setq rlt line)))))
+    rlt))
+
 ;;;###autoload
 (defun evilmi-in-comment-p (pos)
   "Check character at POS is comment by comparing font face."
