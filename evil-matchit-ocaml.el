@@ -49,10 +49,10 @@
   "Build regexp to find next/previous keyword in a row."
   (format "\\<\\(%s\\)\\>" (mapconcat 'identity (apply 'append tag-info) "\\|")))
 
-(defun evilmi-ocaml-valid-position-p ()
-  "Check if point is not in comment, string or doc"
-  (not (or (evilmi-in-comment-p (point))
-           (evilmi-in-string-or-doc-p (point)))))
+(defun evilmi-ocaml-in-keyword-p (pos)
+  "Check character at POS is keyword by comparing font face."
+  (evilmi-current-font-among-fonts-p pos '(tuareg-font-lock-governing-face
+                                           font-lock-keyword-face)))
 
 ;; jumps to next keyword. Returs nil if there's no next word
 (defun evilmi-ocaml-next-possible-keyword (direction keywords-regex)
@@ -74,7 +74,7 @@ such keyword is available."
         (keyword-exist-p t))
     (while (and (not found-keyword-p) keyword-exist-p)
       (setq keyword-exist-p (evilmi-ocaml-next-possible-keyword direction keywords-regex))
-      (if (and keyword-exist-p (evilmi-ocaml-valid-position-p))
+      (if (and keyword-exist-p (evilmi-ocaml-in-keyword-p (point)))
           (setq found-keyword-p t)))
     found-keyword-p))
 
