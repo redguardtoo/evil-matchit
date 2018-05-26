@@ -300,8 +300,15 @@ after calling this function."
 ;;;###autoload
 (defun evilmi-in-comment-p (pos)
   "Check character at POS is comment by comparing font face."
-  (evilmi-current-font-among-fonts-p pos '(font-lock-comment-face
-                                           font-lock-comment-delimiter-face)))
+  (cond
+   ;; @see https://github.com/redguardtoo/evil-matchit/issues/92
+   ((eq major-mode 'tuareg-mode)
+    (evilmi-current-font-among-fonts-p pos '(font-lock-comment-face
+                                             font-lock-comment-delimiter-face
+                                             font-lock-doc-face)))
+   (t
+    (evilmi-current-font-among-fonts-p pos '(font-lock-comment-face
+                                             font-lock-comment-delimiter-face)))))
 
 
 ;;;###autoload
