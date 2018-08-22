@@ -63,7 +63,7 @@
 
 ;; should try next howto, the purpose is avoid missing any howto
 (defvar evilmi-verilog-extract-keyword-howtos
-  '(("^[ \t]*\\(while\\|module\\|primitive\\|case\\|function\\|specify\\|table\\|class\\|program\\|clocking\\|property\\|sequence\\|package\\covergroup\\|generate\\|interface\\|task\\|fork\\|join[a-z]*\\)" 1)
+  '(("^[ \t]*\\(while\\|module\\|primitive\\|case\\|function\\|specify\\|table\\|class\\|program\\|clocking\\|property\\|sequence\\|package\\|covergroup\\|generate\\|interface\\|task\\|fork\\|join[a-z]*\\)" 1)
     ("^[ \t]*\\(end[a-z]+\\)" 1)
     ("^[ \t]*\\(`[a-z]+\\)" 1) ; macro
     ("\\([^a-z]\\|^\\)\\(begin\\|end\\)\\([^a-z]\\|$\\)" 2)))
