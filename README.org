@@ -30,7 +30,7 @@ Many modern languages are supported:
 - Laravel Blade Templating
 - Vim script
 - Verilog
-- Emacs email (mesage-mode)
+- Emacs email (message-mode)
 
 This package uses Evil as its vi layer!
 
@@ -82,6 +82,13 @@ If you need visually select lines, I strongly recommend *using "evilmi-select-it
 This is actually an advantage of Emacs, you can tweak the select region without go into visual state at all.
 
 * Advanced tips
+** Support new major modes
+In order to apply three matching rules =evilmi-template=, =evilmi-simple=, and =evilmi-html= on =mhtml-mode=, please insert below code *after* your evil-nerd-commenter setup:
+#+begin_src elisp
+(plist-put evilmi-plugins 'mhtml-mode '((evilmi-template-get-tag evilmi-template-jump)
+                                        (evilmi-simple-get-tag evilmi-simple-jump)
+                                        (evilmi-html-get-tag evilmi-html-jump)
+#+end_src
 ** Use evilmi-select-items instead press '%' in evil-visual-state
 evilmi-select-items is more robust and provides more functionality. It works even when evil-mode is not loaded. 
 
