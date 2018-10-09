@@ -12,7 +12,8 @@ Many modern languages are supported:
 - Java
 - C++/C
 - Javascript
-- React JSX (rjsx-mode)
+- Typescript
+- React JSX (rjsx-mode, react-mode)
 - JSON
 - OCaml
 - Markdown
