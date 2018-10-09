@@ -271,7 +271,7 @@ If IS-FORWARD is t, jump forward; or else jump backward."
           (plist-put evilmi-plugins mode '((evilmi-simple-get-tag evilmi-simple-jump))))
         '(java-mode perl-mode cperl-mode go-mode))
 
-  ;; Javascript
+  ;; Javascript/Typescript
   (autoload 'evilmi-javascript-get-tag "evil-matchit-javascript" nil)
   (autoload 'evilmi-javascript-jump "evil-matchit-javascript" nil)
   (autoload 'evilmi-html-get-tag "evil-matchit-html" nil)
@@ -280,7 +280,7 @@ If IS-FORWARD is t, jump forward; or else jump backward."
           (plist-put evilmi-plugins mode '((evilmi-simple-get-tag evilmi-simple-jump)
                                            (evilmi-javascript-get-tag evilmi-javascript-jump)
                                            (evilmi-html-get-tag evilmi-html-jump))))
-        '(js-mode json-mode js2-mode js3-mode javascript-mode rjsx-mode typescript-mode))
+        '(js-mode json-mode js2-mode js3-mode javascript-mode rjsx-mode react-mode typescript-mode typescript-tsx-mode))
 
   ;; Html
   (autoload 'evilmi-template-get-tag "evil-matchit-template" nil)
