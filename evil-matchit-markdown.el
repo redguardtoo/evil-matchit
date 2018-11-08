@@ -42,7 +42,7 @@ Return (list start-position tag)."
         (let* ((str (match-string 1 cur-line))
                (prefix (buffer-substring-no-properties (point-min)
                                                        (line-beginning-position)))
-               (forward-direction (evenp (evilmi-count-matches str prefix))))
+               (forward-direction (evilmi-evenp (evilmi-count-matches str prefix))))
           (setq rlt (list (if forward-direction (line-beginning-position)
                             (line-end-position))
                           forward-direction

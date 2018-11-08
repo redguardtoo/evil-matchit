@@ -1,4 +1,4 @@
-* evil-matchit (v2.2.8)
+* evil-matchit (v2.2.9)
 
 [[http://melpa.org/#/evil-matchit][file:http://melpa.org/packages/evil-matchit-badge.svg]] [[http://stable.melpa.org/#/evil-matchit][file:http://stable.melpa.org/packages/evil-matchit-badge.svg]]
 
@@ -86,16 +86,14 @@ This is actually an advantage of Emacs, you can tweak the select region without 
 ** Support new major modes
 In order to apply three matching rules =evilmi-template=, =evilmi-simple=, and =evilmi-html= on =mhtml-mode=, please insert below code *after* your evil-nerd-commenter setup:
 #+begin_src elisp
-(plist-put evilmi-plugins 'mhtml-mode '((evilmi-template-get-tag evilmi-template-jump)
-                                        (evilmi-simple-get-tag evilmi-simple-jump)
-                                        (evilmi-html-get-tag evilmi-html-jump)
+(evilmi-load-plugin-rules '(mhtml-mode) '(template simple html))
 #+end_src
 ** Use evilmi-select-items instead press '%' in evil-visual-state
 evilmi-select-items is more robust and provides more functionality. It works even when evil-mode is not loaded. 
 
 So you'd better stick to evilmi-select-items if possible.
 ** Add new tags into existing languages
-I use ruby as an example.
+Use ruby as an example.
 
 If you want to add more tags into ruby, you can do two thing:
 - You need define the regular expression to extract keyword
@@ -118,31 +116,6 @@ So you setup in ~/.emacs is as below:
      ))
 #+end_src
 
-** Support more major modes
-Let's use html tag matching as an example.
-
-html tags are automatically supported in sgml-mode, nxml-mode, web-mode, html-mode and nxhtml-mode,.
-
-You want a new major-mode "my-mode" to do the html tag matching? Easy. Please add below code into your ~/.emacs:
-
-#+BEGIN_SRC elisp
-(plist-put evilmi-plugins my-mode '((evilmi-simple-get-tag evilmi-simple-jump)
-                                    (evilmi-html-get-tag evilmi-html-jump)))
-#+END_SRC
-
-Further explanation: "evilmi-html-get-tag" and "evilmi-html-jump" are existing APIs which are defined in evil-matchit-html.el.
-
-The above line means that use "evilmi-html-get-tag" to find open/closed tag in current line and use "evilmi-html-jump" to jump to matched closed/open tag.
-
-"evilmi-simple-get-tag" and "evilmi-simple-jump" provide generic rules shared by most major modes. For example, jumping between two end of the string, between brackets, etc.
-** Mixed languages in one html template file is supported
-If you embed python language in a html file. You can match both html tags and python statement by inserting below code into your ~/.emacs:
-#+BEGIN_SRC elisp
-(plist-put evilmi-plugins web-mode
-           '((evilmi-python-get-tag evilmi-python-jump)
-             (evilmi-html-get-tag evilmi-html-jump)
-             ))
-#+END_SRC
 ** Re-define keybinding
 You can define your own key bindings instead using evil-matchit default key binding.
 
@@ -171,15 +144,11 @@ You can turn on =evilmi-always-simple-jump= to match brackets at first.
 Thus you disable our *advanced algorithm* which I highly recommend.
 
 Some people may prefer simpler algorithm in =python-mode=.
-** APIs you can use
-- evilmi-current-font-among-fonts-p
-- evilmi-in-comment-p
-- evilmi-in-string-or-doc-p
 * Developer guide
-** Write Emacs Lisp to support new language
+** Create plugin to support new language
 Simple. You only need define two functions and tell evil-matchit in which major-mode they should be used.
 
-Here is a complete sample:
+A complete setup:
 #+BEGIN_SRC elisp
 ;; detect tag in current line and return the result in variable rlt
 ;; the rlt will be used by evilmi-mylang-jump as the first parameter.
@@ -207,20 +176,17 @@ Here is a complete sample:
   ;; If you need know where is the end of the region for region operation,
   ;; you need return the end of region at the end of function
   ;; region operation means selection/deletion of region.
-  888
-  )
+  888)
 
-;; notify evil-matchit how to use above functions
-(plist-put evilmi-plugins mylang-mode '((evilmi-mylang-get-tag evilmi-mylang-jump)))
+;; Notify evil-matchit how to use above functions
+(evilmi-load-plugin-rules '(mylang-mode) '(mylan))
 #+END_SRC
 
-Place above code into your ~/.emacs, after the line "(global-evil-matchit-mode 1)"
+Place above code into your =~/.emacs=, after the line "(global-evil-matchit-mode 1)"
 ** Use SDK
-Please note SDK is *OPTIONAL*! You don't need SDK to write a plugin for evil-matchit.
+For example, it only takes 3 steps to create a new rule =script= to match tags in script like Ruby/Lua/Bash/VimScript,
 
-You can check the evil-matchit-script.el for the sample on how to use SDK.
-
-I attached the full content of evil-matchit-script.el here:
+Step 1, create  =evil-matchit-script.el=,
 #+BEGIN_SRC elisp
 (require 'evil-matchit-sdk)
 
@@ -230,8 +196,7 @@ I attached the full content of evil-matchit-script.el here:
     ("begin" ("rescue" "ensure") "end")
     ("case" ("when" "else") ("esac" "end"))
     (("fun!" "function!" "class" "def" "while" "function" "do") () ("end" "endfun" "endfunction"))
-    ("repeat" ()  "until")
-    )
+    ("repeat" ()  "until"))
   "The table we look up match tags. This is a three column table.
 The first column contains the open tag(s).
 The second column contains the middle tag(s).
@@ -254,26 +219,16 @@ The forth *optional* column defines the relationship between open and close tags
 (provide 'evil-matchit-script)
 #+END_SRC
 
-Simple, eh?
+Step 2, make sure the directory of =evil-matchit-script.el=  is add into =load-path=.
 
-Basically you just need:
-- copy the content of evil-matchit-script.el to your ~/.emacs
-- Search and replace the string "_script" with "_mylang" to respect the name space
-- Update the value of evilmi--mylang-match-tags
-- Notify the evil-matchit about support for new commands. As I mentioned before, it's just one line code in ~/.emacs
-
+Step 3, add below code to =~/.emacs.=,
 #+BEGIN_SRC lisp
-(plist-put evilmi-plugins mylang-mode '((evilmi-mylang-get-tag evilmi-mylang-jump)))
+(evilmi-load-plugin-rules '(ruby-mode lua-mode) '(script))
 #+END_SRC
-
-** Share your code to the world
-Convert your code to a plugin and ask me to merge it into upstream.
-
-Please check "evil-matchit-latex.el" for technical details about plugin.
-
-Key points about code quality of plugin:
-- minimum dependency. For example, if your plugin for html template files is only some web-mode API wrapper, it will break when user don't have web-mode
-- support emacs 23
-- performance is the first priority
+** APIs
+- evilmi-load-plugin-rules
+- evilmi-current-font-among-fonts-p
+- evilmi-in-comment-p
+- evilmi-in-string-or-doc-p
 * Contact me
 Report bugs at [[https://github.com/redguardtoo/evil-matchit]].

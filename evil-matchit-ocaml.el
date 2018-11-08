@@ -26,6 +26,7 @@
 
 ;;; Code:
 
+(require 'cl-lib)
 (require 'evil-matchit-sdk)
 
 (defvar evilmi-ocaml-keywords
@@ -88,11 +89,11 @@ such keyword is available."
 
 (defun evilmi-ocaml-is-keyword (l keyword)
   "Checks if the keyword belongs to a row."
-  (find-if (lambda (w) (string-equal w keyword)) (apply 'append l)))
+  (cl-find-if (lambda (w) (string-equal w keyword)) (apply 'append l)))
 
 (defun evilmi-ocaml-get-tag-info (keyword)
   "Find the row in the evilmi-ocaml-keywords."
-  (find-if (lambda (l) (evilmi-ocaml-is-keyword l keyword)) evilmi-ocaml-keywords))
+  (cl-find-if (lambda (l) (evilmi-ocaml-is-keyword l keyword)) evilmi-ocaml-keywords))
 
 ;; 0 - forward
 ;; 1 - backward
@@ -114,7 +115,7 @@ such keyword is available."
     (if bounds (goto-char (car bounds)))
     (let ((next-keyword
            (save-excursion
-             (if (find word evilmi-ocaml-all-keywords :test 'equal)
+             (if (cl-find word evilmi-ocaml-all-keywords :test 'equal)
                  (point)
                (evilmi-ocaml-next-keyword 0)
                (if (< (point) line-end) (point))))))

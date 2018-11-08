@@ -317,6 +317,10 @@ after calling this function."
   (evilmi-current-font-among-fonts-p pos '(font-lock-string-face
                                            font-lock-doc-face)))
 
+;;;###autoload
+(defun evilmi-evenp (num)
+  (= (% num 2) 0))
+
 (defun evilmi-count-matches (regexp str)
   (let* ((count 0)
          (start 0))

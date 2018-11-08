@@ -29,6 +29,7 @@
 ;; OPTIONAL, you don't need SDK to write a plugin for evil-matchit
 ;; but SDK do make you write less code, isn't it?
 ;; All you need to do is just define the match-tags for SDK algorithm to lookup.
+(require 'org)
 (require 'evil-matchit-sdk)
 
 (defvar evilmi-org-extract-keyword-howtos
