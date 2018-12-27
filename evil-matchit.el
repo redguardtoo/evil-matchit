@@ -438,8 +438,9 @@ If IS-FORWARD is t, jump forward; or else jump backward."
       (back-to-indentation))))
 
 ;;;###autoload
-(defun evilmi-jump-items (&optional num)
+(evil-define-command evilmi-jump-items (&optional num)
   "Jump between items."
+  :repeat nil
   (interactive "P")
   (cond
    ((and evilmi-may-jump-by-percentage num)
