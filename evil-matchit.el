@@ -437,7 +437,7 @@ If IS-FORWARD is t, jump forward; or else jump backward."
       (goto-char dst)
       (back-to-indentation))))
 
-;;;###autoload
+;;;###autoload (autoload 'evilmi-jump-items "evil-matchit" nil t)
 (evil-define-command evilmi-jump-items (&optional num)
   "Jump between items."
   :repeat nil
