@@ -34,17 +34,15 @@
 (defvar evilmi-ruby-extract-keyword-howtos
   '(("^[ \t]*[^ \t=]+[ \t]*=[ \t]*\\([a-z]+\\)\\( .*\\| *\\)$" 1)
     ("^[ \t]*\\([a-z]+\\)\\( .*\\| *\\)$" 1)
-    ("^.* \\(do\\) |[a-z0-9A-Z_, ]+|$" 1)
+    ("^.* \\(do\\) |[a-z0-9A-Z_, *]+|$" 1)
     ("^.* \\(do\\) *$" 1)
-    ("^.* \\(end\\)\\..*$" 1)
-    ))
+    ("^.* \\(end\\)\\..*$" 1)))
 
 (defvar evilmi-ruby-match-tags
   '((("unless" "if") ("elsif" "else") "end")
     ("begin" ("rescue" "ensure") "end")
     ("case" ("when" "else") "end")
-    (("class" "def" "while" "do" "module" "for" "until") () "end")
-    ))
+    (("class" "def" "while" "do" "module" "for" "until") () "end")))
 
 ;;;###autoload
 (defun evilmi-ruby-get-tag ()
