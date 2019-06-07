@@ -4,7 +4,7 @@
 
 ;; Author: Chen Bin <chenbin.sh@gmail.com>
 ;; URL: http://github.com/redguardtoo/evil-matchit
-;; Version: 2.2.9
+;; Version: 2.3.0
 ;; Keywords: matchit vim evil
 ;; Package-Requires: ((evil "1.2.0") (emacs "24.4"))
 ;;
@@ -31,7 +31,16 @@
 ;;
 ;; This program emulates matchit.vim by Benji Fisher.
 ;; Add `(global-evil-matchit-mode 1)' into Emacs setup.
-;; Then press % to match items.
+;; Then press % or `evilmi-jump-items' to jump between then matched pair.
+;; Text object "%" is also provided.
+;;
+;; The shortcut "%" is defined in `evilmi-shortcut'. It's both the name of
+;; text object and shortcut of `evilmi-jump-items'. Some people prefer set it
+;; to "m". Here is sample setup:
+;;
+;;   (setq evilmi-shortcut "m")
+;;   (global-evil-matchit-mode 1)
+;;
 ;; See https://github.com/redguardtoo/evil-matchit/ for help.
 ;;
 ;; This program requires EVIL (http://gitorious.org/evil)
@@ -50,6 +59,10 @@
   "Simulate `evil-jump-item'.
 For example, `50%' jumps to 50 percentage of buffer.
 If nil, `50%' jumps 50 times.")
+
+(defvar evilmi-shortcut "%"
+  "The keybinding of `evilmi-jump-items' and then text object shortcut.
+Some people prefer using \"m\" instead.")
 
 (defvar evilmi-always-simple-jump nil
   "`major-mode' like `python-mode' use optimized algorithm by default.
@@ -389,8 +402,8 @@ If IS-FORWARD is t, jump forward; or else jump backward."
   (let ((selected-region (evilmi--region-to-select-or-delete num)))
     (evil-range (car selected-region) (cadr selected-region) 'line)))
 
-(define-key evil-inner-text-objects-map "%" 'evilmi-inner-text-object)
-(define-key evil-outer-text-objects-map "%" 'evilmi-outer-text-object)
+(define-key evil-inner-text-objects-map evilmi-shortcut 'evilmi-inner-text-object)
+(define-key evil-outer-text-objects-map evilmi-shortcut 'evilmi-outer-text-object)
 
 ;;;###autoload
 (defun evilmi-select-items (&optional num)
@@ -442,7 +455,7 @@ If IS-FORWARD is t, jump forward; or else jump backward."
 ;;;###autoload
 (defun evilmi-version()
   (interactive)
-  (message "2.2.9"))
+  (message "2.3.0"))
 
 ;;;###autoload
 (define-minor-mode evil-matchit-mode
@@ -455,8 +468,8 @@ If IS-FORWARD is t, jump forward; or else jump backward."
       ;; use user's own key bindings
       (evilmi-customize-keybinding)
     ;; else use default key bindings
-    (evil-define-key 'normal evil-matchit-mode-map "%" 'evilmi-jump-items)
-    (evil-define-key 'visual evil-matchit-mode-map "%" 'evilmi-jump-items))
+    (evil-define-key 'normal evil-matchit-mode-map evilmi-shortcut 'evilmi-jump-items)
+    (evil-define-key 'visual evil-matchit-mode-map evilmi-shortcut 'evilmi-jump-items))
 
   (evil-normalize-keymaps))
 
