@@ -26,7 +26,7 @@
 
 ;;; Code:
 
-(require 'evil-matchit)
+(require 'evil-matchit-sdk)
 
 (autoload 'sgml-skip-tag-backward "sgml-mode" nil t)
 (autoload 'sgml-skip-tag-forward "sgml-mode" nil t)

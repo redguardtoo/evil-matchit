@@ -27,7 +27,6 @@
 ;;; Code:
 
 (require 'evil-matchit-sdk)
-(require 'evil-matchit)
 
 ;; @return number of indent
 (defun evilmi--python-calculate-indent (line)

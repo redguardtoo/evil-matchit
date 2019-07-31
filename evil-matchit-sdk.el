@@ -1,3 +1,6 @@
+(defvar evilmi-debug nil
+  "Debug flag.")
+
 (defvar evilmi-sdk-extract-keyword-howtos
   '(("^[ \t]*\\([a-z]+\!?\\)\\( .*\\| *\\)$" 1)
     ("^.* \\(do\\) |[a-z0-9A-Z,|]+|$" 1))

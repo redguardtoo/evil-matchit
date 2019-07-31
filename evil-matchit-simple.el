@@ -28,7 +28,6 @@
 ;;; Code:
 
 (require 'evil-matchit-sdk)
-(require 'evil-matchit)
 
 (defun evilmi--simple-find-open-brace (cur-line)
   (if evilmi-debug (message "evilmi--simple-find-open-brace called => cur-line=%s (point)=%d" cur-line (point)))

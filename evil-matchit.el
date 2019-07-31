@@ -71,7 +71,6 @@ If it's t, use simple jump.")
 (defvar evilmi-forward-chars (string-to-list "[{("))
 (defvar evilmi-backward-chars (string-to-list "]})"))
 (defvar evilmi-quote-chars (string-to-list "'\"/"))
-(defvar evilmi-debug nil)
 
 (defun evilmi--char-is-simple (ch)
   "Special handling of character CH for `python-mode'."

@@ -27,7 +27,6 @@
 ;;; Code:
 
 (require 'evil-matchit-sdk)
-(require 'evil-matchit)
 
 (defvar evilmi-javascript-matching-chars
   (string-to-list "{[(}}])"))
