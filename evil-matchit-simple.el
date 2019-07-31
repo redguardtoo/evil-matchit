@@ -1,6 +1,6 @@
 ;;; evil-matchit-simple.el --- simple match plugin of evil-matchit
 
-;; Copyright (C) 2014-2017 Chen Bin <chenbin.sh@gmail.com>
+;; Copyright (C) 2014-2019 Chen Bin <chenbin.sh@gmail.com>
 
 
 ;; Author: Chen Bin <chenbin.sh@gmail.com>
@@ -30,25 +30,37 @@
 (require 'evil-matchit-sdk)
 
 (defun evilmi--simple-find-open-brace (cur-line)
+  "Find open brace from CUR-LINE."
   (if evilmi-debug (message "evilmi--simple-find-open-brace called => cur-line=%s (point)=%d" cur-line (point)))
   (let (rlt)
-    ;; javascript code line "(function(...) { ..."
-    ;; C code line "} else {"
     (cond
+
+     ;; code "(function(...) { ..."
+     ;; code "} else {"
      ;; css-mode use characters ".:-"
-     ((or (string-match "^[ \t]*[\(\}]?[.:_a-zA-Z0-9-]+.*{ *\\(\/\/.*\\)?$" cur-line)
-          (string-match "^[ \t]*[\(\}]?[.:_a-zA-Z0-9-]+.*{ *\\(\/\*[^/]*\*\/\\)?$" cur-line))
+     ((or (string-match-p "^[ \t]*[\(\}]?[.:_a-zA-Z0-9-]+.*{ *\\(\/\/.*\\)?$" cur-line)
+          (string-match-p "^[ \t]*[\(\}]?[.:_a-zA-Z0-9-]+.*{ *\\(\/\*[^/]*\*\/\\)?$" cur-line))
       (setq rlt 1))
+
+    ;; code "} if (...) {"
+    ;; code "} else (...) {"
+     ((and (string-match-p "^[ \t]*[\}]? \\(if\\|el[a-z]*\\) *.*{ *?$" cur-line)
+           (not (eq (following-char) ?})))
+      (setq rlt 1))
+
+     ;; next line is "{"
      (t
       (save-excursion
         (forward-line)
         (setq cur-line (evilmi-sdk-curline))
-        (if (string-match "^[ \t]*{ *$" cur-line)
+        (if (string-match-p "^[ \t]*{ *$" cur-line)
             (setq rlt 2)))))
+
     rlt))
 
 ;;;###autoload
 (defun evilmi-simple-get-tag ()
+  "Get current tag in simple language."
   (let* (forward-line-num
          ;; Only handle open tag
          (tmp (evilmi--get-char-under-cursor))
@@ -76,6 +88,7 @@
 
 ;;;###autoload
 (defun evilmi-simple-jump (rlt NUM)
+  "Jump from current tag to matching tag in simple language."
   (when rlt
     (if evilmi-debug (message "evilmi-simple-jump called (point)=%d" (point)))
 

@@ -4,7 +4,7 @@
 
 ;; Author: Chen Bin <chenbin.sh@gmail.com>
 ;; URL: http://github.com/redguardtoo/evil-matchit
-;; Version: 2.3.0
+;; Version: 2.3.1
 ;; Keywords: matchit vim evil
 ;; Package-Requires: ((evil "1.2.0") (emacs "24.4"))
 ;;
@@ -454,7 +454,7 @@ If IS-FORWARD is t, jump forward; or else jump backward."
 ;;;###autoload
 (defun evilmi-version()
   (interactive)
-  (message "2.3.0"))
+  (message "2.3.1"))
 
 ;;;###autoload
 (define-minor-mode evil-matchit-mode
