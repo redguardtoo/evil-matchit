@@ -28,6 +28,14 @@
 
 (require 'evil-matchit-sdk)
 
+;; should try next howto, the purpose is avoid missing any howto
+(defvar evilmi-javascript-extract-keyword-howtos
+  '(("const .* *= *\\(styled\\)[^`]*` *$" 1) ; styled component
+    ("^[ \t]*\\(`\\); *$" 1)))
+
+(defvar evilmi-javascript-match-tags
+  '((("styled") () "`")))
+
 (defvar evilmi-javascript-matching-chars
   (string-to-list "{[(}}])"))
 
@@ -54,22 +62,44 @@
 ;;;###autoload
 (defun evilmi-javascript-get-tag ()
   ;; only handle open tag
-  (cond
-   ((memq (following-char)
-          evilmi-javascript-matching-chars)
-    (list (point)))
-   (t
-    (let* ((r (evilmi--javascript-find-open-brace (evilmi-sdk-curline)))
-           (p (line-beginning-position)))
-      (when r
-        (forward-line (1- (car r)))
-        (search-forward (cadr r) nil nil)
-        (backward-char)
-        (list p))))))
+  (let* (rlt)
+    (cond
+     ;; bracket
+     ((memq (following-char)
+            evilmi-javascript-matching-chars)
+      (setq rlt (list (point))))
+
+     ;; use defined tag
+     ((setq rlt (evilmi-sdk-get-tag evilmi-javascript-match-tags
+                                    evilmi-javascript-extract-keyword-howtos))
+      ;; do nothing
+      )
+
+     ;; other javascript statements containing brackets
+     (t
+      (let* ((r (evilmi--javascript-find-open-brace (evilmi-sdk-curline)))
+             (p (line-beginning-position)))
+        (when r
+          (forward-line (1- (car r)))
+          (search-forward (cadr r) nil nil)
+          (backward-char)
+          (setq rlt (list p))))))
+    rlt))
 
 ;;;###autoload
-(defun evilmi-javascript-jump (rlt NUM)
-  (when rlt
+(defun evilmi-javascript-jump (rlt num)
+  "Jump to the matching tag using RLT and NUM."
+  (cond
+   ((not rlt)
+    ;; don nothing
+    )
+   ((evilmi-sdk-get-tag evilmi-javascript-match-tags
+                        evilmi-javascript-extract-keyword-howtos)
+    (evilmi-sdk-jump rlt
+                     num
+                     evilmi-javascript-match-tags
+                     evilmi-javascript-extract-keyword-howtos))
+   (t
     (evilmi--simple-jump)
     (let* ((cur-line (evilmi-sdk-curline)))
       ;; hack for javascript
@@ -77,6 +107,6 @@
               (string-match "^[ \t]*}\(.*\))\; *$" cur-line)
               (string-match "^[ \t]*}\])\; *$" cur-line))
           (line-end-position)
-        (1+ (point))))))
+        (1+ (point)))))))
 
 (provide 'evil-matchit-javascript)
