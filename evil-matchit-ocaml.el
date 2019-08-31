@@ -37,6 +37,8 @@
     (("while" "for") ("done"))
     (("let") ("in"))
     (("(") (")"))
+    (("[") ("]"))
+    (("{") ("}"))
     ())
   "Ocaml keywords.")
 
@@ -46,12 +48,12 @@
 ;; Please note this regex is a bit funny: we don't need to check for word
 ;; boundaries because later on we check evilmi-ocaml-in-keyword-p
 (defvar evilmi-ocaml-keywords-regex
-  (format "\\(%s\\)" (mapconcat 'identity evilmi-ocaml-all-keywords "\\|"))
+  (format "\\(%s\\)" (mapconcat 'regexp-quote evilmi-ocaml-all-keywords "\\|"))
   "Regexp to find next/previous keyword.")
 
 (defun evilmi-ocaml-row-regex (tag-info)
   "Build regexp to find next/previous keyword in a row."
-  (format "\\(%s\\)" (mapconcat 'identity (apply 'append tag-info) "\\|")))
+  (format "\\(%s\\)" (mapconcat 'regexp-quote (apply 'append tag-info) "\\|")))
 
 (defun evilmi-ocaml-in-keyword-p (pos)
   "Check character at POS is keyword by comparing font face."
