@@ -36,23 +36,27 @@
     (("match" "try") ("with"))
     (("while" "for") ("done"))
     (("let") ("in"))
+    (("(") (")"))
     ())
   "Ocaml keywords.")
 
 (defvar evilmi-ocaml-all-keywords
   (apply 'append (apply 'append evilmi-ocaml-keywords)))
 
+;; Please note this regex is a bit funny: we don't need to check for word
+;; boundaries because later on we check evilmi-ocaml-in-keyword-p
 (defvar evilmi-ocaml-keywords-regex
-  (format "\\<\\(%s\\)\\>" (mapconcat 'identity evilmi-ocaml-all-keywords "\\|"))
+  (format "\\(%s\\)" (mapconcat 'identity evilmi-ocaml-all-keywords "\\|"))
   "Regexp to find next/previous keyword.")
 
 (defun evilmi-ocaml-row-regex (tag-info)
   "Build regexp to find next/previous keyword in a row."
-  (format "\\<\\(%s\\)\\>" (mapconcat 'identity (apply 'append tag-info) "\\|")))
+  (format "\\(%s\\)" (mapconcat 'identity (apply 'append tag-info) "\\|")))
 
 (defun evilmi-ocaml-in-keyword-p (pos)
   "Check character at POS is keyword by comparing font face."
   (evilmi-current-font-among-fonts-p pos '(tuareg-font-lock-governing-face
+                                           tuareg-font-lock-operator-face  ;; for parentheses
                                            font-lock-keyword-face)))
 
 ;; jumps to next keyword. Returs nil if there's no next word
@@ -81,10 +85,11 @@ such keyword is available."
 
 (defun evilmi-ocaml-end-word ()
   (save-excursion
-    (search-forward-regexp "\\>")
+    (search-forward-regexp evilmi-ocaml-keywords-regex)
     (point)))
 
 (defun evilmi-ocaml-get-word ()
+  "Get keyword assuming we're at the begging of it"
   (buffer-substring-no-properties (point) (evilmi-ocaml-end-word)))
 
 (defun evilmi-ocaml-is-keyword (l keyword)
@@ -109,34 +114,29 @@ such keyword is available."
     (if (= level 0) (point))))
 
 (defun evilmi-ocaml-goto-word-beginning ()
-  (let ((bounds (bounds-of-thing-at-point 'word))
-        (word (thing-at-point 'word))
-        (line-end (line-end-position)))
-    (if bounds (goto-char (car bounds)))
-    (let ((next-keyword
-           (save-excursion
-             (if (cl-find word evilmi-ocaml-all-keywords :test 'equal)
-                 (point)
-               (evilmi-ocaml-next-keyword 0)
-               (if (< (point) line-end) (point))))))
-      (if next-keyword (goto-char next-keyword)))))
+  (let ((candidate
+         (save-excursion
+           (evilmi-ocaml-next-keyword 1)
+           (evilmi-ocaml-next-keyword 0)
+           (point))))
+    (if (< candidate (line-end-position)) (goto-char candidate))))
 
 ;;;###autoload
 (defun evilmi-ocaml-get-tag ()
   "Return information of current tag: (list position-of-word word)."
   (save-excursion
     (evilmi-ocaml-goto-word-beginning)
-    (list (car (bounds-of-thing-at-point 'word))
-          (evilmi-ocaml-get-word))))
+    (list (point) (evilmi-ocaml-get-word))))
 
 ;;;###autoload
 (defun evilmi-ocaml-jump (rlt num)
   (let* ((keyword (cadr rlt))
          (tag-info (evilmi-ocaml-get-tag-info keyword))
          (direction (if (member keyword (car tag-info)) 0 1)))
-    (let ((new-point (save-excursion
-                       (evilmi-ocaml-goto-word-beginning)
-                       (evilmi-ocaml-go tag-info 1 direction))))
-      (if new-point (goto-char new-point)))))
+    (if tag-info
+        (let ((new-point (save-excursion
+                           (evilmi-ocaml-goto-word-beginning)
+                           (evilmi-ocaml-go tag-info 1 direction))))
+          (if new-point (goto-char new-point))))))
 
 (provide 'evil-matchit-ocaml)
