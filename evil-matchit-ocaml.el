@@ -35,7 +35,7 @@
     (("match") ("with"))
     (("match" "try") ("with"))
     (("while" "for") ("done"))
-    (("let") ("in"))
+    (("let") ("in" ";;"))
     (("(") (")"))
     (("[") ("]"))
     (("{") ("}"))
@@ -59,6 +59,7 @@
   "Check character at POS is keyword by comparing font face."
   (evilmi-current-font-among-fonts-p pos '(tuareg-font-lock-governing-face
                                            tuareg-font-lock-operator-face  ;; for parentheses
+                                           tuareg-font-double-colon-face   ;; for double semicolon
                                            font-lock-keyword-face)))
 
 ;; jumps to next keyword. Returs nil if there's no next word
