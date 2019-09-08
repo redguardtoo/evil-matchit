@@ -62,7 +62,9 @@ between '\\(' and '\\)' in regular expression.
   ;; org-element-at-point is available only at org7+
   (let ((lang (evilmi--element-property :language (org-element-at-point))))
     (when lang
-      (intern (concat lang "-mode")))))
+      (if (string= lang "elisp")
+          'emacs-lisp-mode
+          (intern (concat lang "-mode"))))))
 
 ;;;###autoload
 (defun evilmi-org-get-tag ()
