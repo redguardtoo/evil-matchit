@@ -34,22 +34,19 @@
 
 (defvar evilmi-org-extract-keyword-howtos
   '(("^[ \t]*#\\+\\([a-zA-Z_]+\\).*$" 1)
-    ("^[ \t]*\\:\\([a-zA-Z_]+\\)\\:$" 1)
-    )
+    ("^[ \t]*\\:\\([a-zA-Z_]+\\)\\:$" 1))
   "The list of HOWTO on extracting keyword from current line.
 Each howto is actually a pair. The first element of pair is the regular
 expression to match the current line. The second is the index of sub-matches
 to extract the keyword which starts from one. The sub-match is the match defined
-between '\\(' and '\\)' in regular expression.
-"
-  )
+between '\\(' and '\\)' in regular expression.")
+
 ;; ruby/bash/lua/vimrc
 (defvar evilmi-org-match-tags
   '((("begin_src") () ( "end_src") "MONOGAMY")
     (("begin_example") () ( "end_example") "MONOGAMY")
     (("begin_html") () ( "end_html") "MONOGAMY")
-    (("results") () ( "end") "MONOGAMY")
-    ))
+    (("results") () ( "end") "MONOGAMY")))
 
 (defun evilmi--element-property (property element)
   "Extract the value from the PROPERTY of an ELEMENT."
@@ -60,7 +57,7 @@ between '\\(' and '\\)' in regular expression.
 
 (defun evilmi--get-embedded-language-major-mode ()
   ;; org-element-at-point is available only at org7+
-  (let ((lang (evilmi--element-property :language (org-element-at-point))))
+  (let* ((lang (evilmi--element-property :language (org-element-at-point))))
     (when lang
       (if (string= lang "elisp")
           'emacs-lisp-mode
@@ -68,39 +65,37 @@ between '\\(' and '\\)' in regular expression.
 
 ;;;###autoload
 (defun evilmi-org-get-tag ()
-  (let (rlt)
-    (setq rlt (evilmi-sdk-get-tag evilmi-org-match-tags evilmi-org-extract-keyword-howtos))
-    (if (not rlt)
-        (setq rlt '(-1)) ;; evilmi-org-jump knows what -1 means
-      )
-    rlt
-    ))
+  "Get current tag in org file."
+  (let* ((rlt (evilmi-sdk-get-tag evilmi-org-match-tags
+                                  evilmi-org-extract-keyword-howtos)))
+    (unless rlt
+        ;; evilmi-org-jump knows what -1 means
+        (setq rlt '(-1)))
+    rlt))
 
 ;;;###autoload
-(defun evilmi-org-jump (rlt NUM)
-  (if (< (car rlt) 0)
-      (let (where-to-jump-in-theory
-            jumped
-            plugin
-            info
-            (lang-f (evilmi--get-embedded-language-major-mode)))
-        (when lang-f
-          (setq plugin (plist-get evilmi-plugins lang-f))
-          (when plugin
-              (mapc
-               (lambda (elem)
-                 (setq info (funcall (nth 0 elem)))
-                 (when (and info (not jumped))
-                   ;; before jump, we may need some operation
-                   (setq where-to-jump-in-theory (funcall (nth 1 elem) info NUM))
-                   ;; jump only once if the jump is successful
-                   (setq jumped t)
-                   ))
-               plugin
-               ))
-          )
-        )
-      (evilmi-sdk-jump rlt NUM evilmi-org-match-tags evilmi-org-extract-keyword-howtos)
-      ))
+(defun evilmi-org-jump (rlt num)
+  (cond
+   ((< (car rlt) 0)
+    (let* (where-to-jump-in-theory
+           jumped
+           info
+           (lang-f (evilmi--get-embedded-language-major-mode))
+           (plugin (and lang-f (plist-get evilmi-plugins lang-f))))
+      (when plugin
+        (mapc
+         (lambda (elem)
+           (setq info (funcall (nth 0 elem)))
+           (when (and info (not jumped))
+             ;; before jump, we may need some operation
+             (setq where-to-jump-in-theory (funcall (nth 1 elem) info num))
+             ;; jump only once if the jump is successful
+             (setq jumped t)))
+         plugin))))
+   (t
+    (evilmi-sdk-jump rlt
+                     num
+                     evilmi-org-match-tags
+                     evilmi-org-extract-keyword-howtos))))
 
 (provide 'evil-matchit-org)

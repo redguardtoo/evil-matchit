@@ -1,4 +1,4 @@
-* evil-matchit (v2.3.3)
+* evil-matchit (v2.3.4)
 
 [[http://melpa.org/#/evil-matchit][file:http://melpa.org/packages/evil-matchit-badge.svg]] [[http://stable.melpa.org/#/evil-matchit][file:http://stable.melpa.org/packages/evil-matchit-badge.svg]]
 
@@ -235,8 +235,5 @@ Step 3, add below code to =~/.emacs.=,
 #+END_SRC
 ** APIs
 - evilmi-load-plugin-rules
-- evilmi-current-font-among-fonts-p
-- evilmi-in-comment-p
-- evilmi-in-string-or-doc-p
 * Contact me
 Report bugs at [[https://github.com/redguardtoo/evil-matchit]].

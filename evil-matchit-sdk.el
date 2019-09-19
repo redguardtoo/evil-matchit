@@ -1,6 +1,12 @@
 (defvar evilmi-debug nil
   "Debug flag.")
 
+(defvar evilmi-ignored-fonts
+  '(font-lock-string-face
+    font-lock-doc-face
+    font-lock-comment-face)
+  "Text with ingored fonts has no string keyword.")
+
 (defvar evilmi-sdk-extract-keyword-howtos
   '(("^[ \t]*\\([a-z]+\!?\\)\\( .*\\| *\\)$" 1)
     ("^.* \\(do\\) |[a-z0-9A-Z,|]+|$" 1))
@@ -126,6 +132,15 @@ is-function-exit-point could be unknown status"
         ;; keep search keyword by using next howto (regex and match-string index)
         (if (not (evilmi-sdk-member keyword match-tags)) (setq keyword nil)))
       (setq i (1+ i)))
+
+    (when keyword
+      ;; ignore text with specific font
+      (save-excursion
+        (goto-char (line-beginning-position))
+        (when (and (search-forward keyword (line-end-position) t)
+                   (evilmi-among-fonts-p (point)
+                                         evilmi-ignored-fonts))
+          (setq keyword nil))))
     keyword))
 
 (defun evilmi--is-monogamy (tag-info)
@@ -265,7 +280,7 @@ after calling this function."
 
 
 ;;;###autoload
-(defun evilmi-current-font-among-fonts-p (pos fonts)
+(defun evilmi-among-fonts-p (pos fonts)
   "If current font at POS is among FONTS."
   (let* ((fontfaces (get-text-property pos 'face)))
     (when (not (listp fontfaces))
@@ -299,26 +314,6 @@ after calling this function."
           (setq continue nil)
           (setq rlt line)))))
     rlt))
-
-;;;###autoload
-(defun evilmi-in-comment-p (pos)
-  "Check character at POS is comment by comparing font face."
-  (cond
-   ;; @see https://github.com/redguardtoo/evil-matchit/issues/92
-   ((eq major-mode 'tuareg-mode)
-    (evilmi-current-font-among-fonts-p pos '(font-lock-comment-face
-                                             font-lock-comment-delimiter-face
-                                             font-lock-doc-face)))
-   (t
-    (evilmi-current-font-among-fonts-p pos '(font-lock-comment-face
-                                             font-lock-comment-delimiter-face)))))
-
-
-;;;###autoload
-(defun evilmi-in-string-or-doc-p (pos)
-  "Check character at POS is string or document by comparing font face."
-  (evilmi-current-font-among-fonts-p pos '(font-lock-string-face
-                                           font-lock-doc-face)))
 
 ;;;###autoload
 (defun evilmi-evenp (num)

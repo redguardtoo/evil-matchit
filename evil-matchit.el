@@ -4,7 +4,7 @@
 
 ;; Author: Chen Bin <chenbin.sh@gmail.com>
 ;; URL: http://github.com/redguardtoo/evil-matchit
-;; Version: 2.3.3
+;; Version: 2.3.4
 ;; Keywords: matchit vim evil
 ;; Package-Requires: ((evil "1.2.0") (emacs "24.4"))
 ;;
@@ -126,6 +126,18 @@ If font-face-under-cursor is NOT nil, the quoted string is being processed."
 
     (if evilmi-debug (message "evilmi--is-jump-forward return (%s %s %s)" rlt ff (string ch)))
     (list rlt ff ch)))
+
+(defun evilmi-in-comment-p (pos)
+  "Check character at POS is comment by comparing font face."
+  (cond
+   ;; @see https://github.com/redguardtoo/evil-matchit/issues/92
+   ((eq major-mode 'tuareg-mode)
+    (evilmi-among-fonts-p pos '(font-lock-comment-face
+                                             font-lock-comment-delimiter-face
+                                             font-lock-doc-face)))
+   (t
+    (evilmi-among-fonts-p pos '(font-lock-comment-face
+                                             font-lock-comment-delimiter-face)))))
 
 (defun evilmi--scan-sexps (is-forward)
   "Get the position of matching tag.
@@ -455,7 +467,7 @@ If IS-FORWARD is t, jump forward; or else jump backward."
 ;;;###autoload
 (defun evilmi-version()
   (interactive)
-  (message "2.3.3"))
+  (message "2.3.4"))
 
 ;;;###autoload
 (define-minor-mode evil-matchit-mode
