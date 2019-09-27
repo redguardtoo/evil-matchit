@@ -320,6 +320,7 @@ If IS-FORWARD is t, jump forward; or else jump backward."
                               nxml-mode
                               nxhtml-mode
                               sgml-mode
+                              php-mode
                               message-mode
                               mhtml-mode)
                             '(template simple html))
