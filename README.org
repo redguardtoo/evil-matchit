@@ -2,7 +2,7 @@
 
 [[http://melpa.org/#/evil-matchit][file:http://melpa.org/packages/evil-matchit-badge.svg]] [[http://stable.melpa.org/#/evil-matchit][file:http://stable.melpa.org/packages/evil-matchit-badge.svg]]
 
-Vim [[http://www.vim.org/scripts/script.php?script_id=39][matchit.vim]] by Benji Fisher ported into Emacs.
+Vim [[http://www.vim.org/scripts/script.php?script_id=39][matchit.vim]] by Benji Fisher is ported into Emacs.
 
 Press "%" to jump between matched tags in Emacs. For example, in HTML "<div>" and "</div>" are a pair of tags.
 
@@ -44,7 +44,6 @@ Tested on Emacs 24.3, 24.4, 24.5, 25.1
 - Support any modern languages (html/java/c/c++/python/latex/javascript ...)
 - Powerful. If you mix jsp, freemarker, html, jquery template or any weird syntax into one file, it still works!
 - Extendable. Write a plugin for it takes only 5 minutes
-- Long term support
 
 Screen cast for python:
 [[file:screencast.gif]]
@@ -53,13 +52,13 @@ Screen cast for python:
 It's already uploaded to [[http://melpa.org/]].
 
 * Set up
-Insert below code into your ~/.emacs:
+Insert below code into =~/.emacs=:
 #+BEGIN_SRC lisp
 (require 'evil-matchit)
 (global-evil-matchit-mode 1)
 #+END_SRC
 
-Alternatively, you can enable evil-matchit-mode along a major mode by adding =turn-on-evil-matchit-mode= to the mode hook.
+Alternatively, you can enable =evil-matchit-mode= along a major mode by adding =turn-on-evil-matchit-mode= to the mode hook.
 
 * Usage
 Press "%" to jump inside between tag pair in normal mode or visual mode (you press "v" to switch to visual mode). Please note evil-matchit is smart enough to *detect the tag automatically*.
@@ -68,17 +67,17 @@ Tag pair could be open/closed html tag, or character pair like "{}" "[]" "()", o
 
 Inner/outer text object "%" is also created. It roughly equals the region when you press "%" from evil-matchit.
 
-Press "va%" to select line(s) wrapped by tags including tags themselves. `M-x evilmi-select-items` does the same thing.
+Press "va%" to select line(s) wrapped by tags including tags themselves. =M-x evilmi-select-items= does the same thing.
 
-Press "da%" to delete line(s) wrapped by tags including tags themselves. `M-x evilmi-delete-items` does the same thing.
+Press "da%" to delete line(s) wrapped by tags including tags themselves. =M-x evilmi-delete-items= does the same thing.
 
 All commands support numeric argument like "3%", "5va%" or "9da%"
 
-Pressing "3%" jumps to a line 3 percentage down the file. It's the default behavior in original =evil-mode=. You can `(setq evilmi-may-jump-by-percentage nil)` to turn off this feature. Then "3%" will jump 3 times.
+Pressing "3%" jumps to a line 3 percentage down the file. It's the default behavior in original =evil-mode=. You can =(setq evilmi-may-jump-by-percentage nil)= to turn off this feature. Then "3%" will jump 3 times.
 
-Please note *only "evil-visual-state" and "evil-normal-state" are officially supported*.
+Please note *only =evil-visual-state= and =evil-normal-state= are supported*.
 
-If you need visually select lines, I strongly recommend *using "evilmi-select-items" instead*.
+If you need visually select lines, I *strongly recommend* using =evilmi-select-items= instead.
 
 This is actually an advantage of Emacs, you can tweak the select region without go into visual state at all.
 
@@ -89,9 +88,9 @@ In order to apply three matching rules =evilmi-template=, =evilmi-simple=, and =
 (evilmi-load-plugin-rules '(mhtml-mode) '(template simple html))
 #+end_src
 ** Use evilmi-select-items instead press "%" in evil-visual-state
-evilmi-select-items is more robust and provides more functionality. It works even when =evil-mode= is not loaded.
+=evilmi-select-items= is more robust and provides more functionality. It works even when =evil-mode= is not loaded.
 
-So you'd better stick to evilmi-select-items if possible.
+So you'd better stick to =evilmi-select-item= if possible.
 ** Add new tags into existing languages
 Use ruby as an example.
 
@@ -111,9 +110,8 @@ So you setup in ~/.emacs is as below:
 #+begin_src elisp
 (eval-after-load 'evil-matchit-ruby
   '(progn
-     (add-to-list 'evilmi-ruby-extract-keyword-howtos '("^[ \t]*\\([a-z]+\\)\\( .*\\| *\\)$" 1))
-     (add-to-list 'evilmi-ruby-match-tags '(("unless" "if") ("elsif" "else") "end"))
-     ))
+     (push '("^[ \t]*\\([a-z]+\\)\\( .*\\| *\\)$" 1) evilmi-ruby-extract-keyword-howtos)
+     (push '(("unless" "if") ("elsif" "else") "end"))) evilmi-ruby-match-tags)
 #+end_src
 
 ** Re-define keybinding
@@ -187,7 +185,7 @@ A complete setup:
   888)
 
 ;; Notify evil-matchit how to use above functions
-(evilmi-load-plugin-rules '(mylang-mode) '(mylan))
+(evilmi-load-plugin-rules '(mylang-mode) '(mylang))
 #+END_SRC
 
 Place above code into your =~/.emacs=, after the line "(global-evil-matchit-mode 1)"

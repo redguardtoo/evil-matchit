@@ -1,6 +1,6 @@
 ;;; evil-matchit-html.el ---html plugin of evil-matchit
 
-;; Copyright (C) 2014-2017 Chen Bin <chenbin.sh@gmail.com>
+;; Copyright (C) 2014-2019 Chen Bin <chenbin.sh@gmail.com>
 
 ;; Author: Chen Bin <chenbin.sh@gmail.com>
 
@@ -33,69 +33,59 @@
 
 ;;;###autoload
 (defun evilmi-html-get-tag ()
-  (let ((b (line-beginning-position))
-        (e (line-end-position))
-        (looping t)
-        (html-tag-char (string-to-char "<"))
-        (char (following-char))
-        (p (point))
-        (found_tag -1)
-        (rlt nil))
+  (let* ((b (line-beginning-position))
+         (e (line-end-position))
+         (looping t)
+         (char (following-char))
+         (p (point))
+         (found_tag -1)
+         rlt)
 
     (save-excursion
       ;; search backward
-      (unless (= char html-tag-char)
-        (while (and looping (<= b (point)) (not (= char 60)))
+      (unless (eq char ?<)
+        (while (and looping (<= b (point)) (not (eq char ?<)))
           (setq char (following-char))
           (setq p (point))
-          (if (= p (point-min))
+          (if (eq p (point-min))
               ;; need get out of loop anyway
               (setq looping nil)
-            (backward-char))
-          ))
+            (backward-char))))
 
       ;; search forward
-      (if (not (= char html-tag-char))
-          (save-excursion
-            (while (and (>= e (point)) (not (= char 60)))
-              (setq char (following-char))
-              (setq p (point))
-              (forward-char)
-              )
-            )
-        )
+      (unless (eq char ?<)
+        (save-excursion
+          (while (and (>= e (point)) (not (eq char ?<)))
+            (setq char (following-char))
+            (setq p (point))
+            (forward-char))))
 
       ;; is end tag?
-      (when (and (= char html-tag-char) (< p e))
+      (when (and (eq char ?<) (< p e))
         (goto-char p)
         (forward-char)
-        (if (= (following-char) 47)
-            (progn
-              ;; </
-              (skip-chars-forward "^>")
-              (forward-char)
-              (setq p (point))
-              (setq found_tag 1)
-              )
-          (progn
-            ;; < , looks fine
-            (backward-char)
-            (setq found_tag 0)
-            )
-          )
-        )
-      )
+        (cond
+         ((eq (following-char) ?/)
+          ;; </
+          (skip-chars-forward "^>")
+          (forward-char)
+          (setq p (point))
+          (setq found_tag 1))
+         (t
+          ;; < , looks fine
+          (backward-char)
+          (setq found_tag 0)))))
     (setq rlt (list p found_tag ""))
     rlt))
 
 ;;;###autoload
-(defun evilmi-html-jump (rlt NUM)
-  (let ((tag-type (nth 1 rlt))
-        ;; web-mode-forward-sexp is assigned to forward-sexp-function
-        ;; it's buggy in web-mode v11, here is the workaround
-        (forward-sexp-function nil))
-    (if (=  1 tag-type) (sgml-skip-tag-backward NUM))
-    (if (=  0 tag-type) (sgml-skip-tag-forward NUM))
+(defun evilmi-html-jump (rlt num)
+  (let* ((tag-type (nth 1 rlt))
+         ;; `web-mode-forward-sexp' is assigned to `forward-sexp-function'
+         ;; it's buggy in web-mode v11, here is the workaround
+         (forward-sexp-function nil))
+    (if (eq 1 tag-type) (sgml-skip-tag-backward num))
+    (if (eq 0 tag-type) (sgml-skip-tag-forward num))
     (point)))
 
 (provide 'evil-matchit-html)

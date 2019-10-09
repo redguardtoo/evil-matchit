@@ -5,7 +5,7 @@
   '(font-lock-string-face
     font-lock-doc-face
     font-lock-comment-face)
-  "Text with ingored fonts has no string keyword.")
+  "Text with ignored fonts has no string keyword.")
 
 (defvar evilmi-sdk-extract-keyword-howtos
   '(("^[ \t]*\\([a-z]+\!?\\)\\( .*\\| *\\)$" 1)
@@ -89,22 +89,22 @@ between '\\(' and '\\)' in regular expression.")
 ;;;###autoload
 (defun evilmi-sdk-get-tag-info (keyword match-tags)
   "Return (row column is-function-exit-point keyword).
-The row and column marked position in evilmi-mylang-match-tags
+The row and column mark the position in evilmi-mylang-match-tags
 is-function-exit-point could be unknown status"
   (let* (rlt
-         elems
-         elem
+         items
+         item
          found
          (i 0)
          j)
 
     (while (and (< i (length match-tags)) (not found))
-      (setq elems (nth i match-tags))
+      (setq items (nth i match-tags))
       (setq j 0)
-      (while (and (not found) (< j (length elems)))
-        (setq elem (nth j elems))
-        (setq found (and (or (stringp elem) (listp elem))
-                         (evilmi-sdk-member keyword elem)))
+      (while (and (not found) (< j (length items)))
+        (setq item (nth j items))
+        (setq found (and (or (stringp item) (listp item))
+                         (evilmi-sdk-member keyword item)))
         (if (not found)
             (setq j (1+ j))))
       (if (not found) (setq i (1+ i))))
@@ -193,7 +193,7 @@ after calling this function."
          keyword
          found
          where-to-jump-in-theory)
-    (if evilmi-debug (message "evilmi-sdk-jump called => rlt=%s (piont)=%s" rlt (point)))
+    (if evilmi-debug (message "evilmi-sdk-jump called => rlt=%s (point)=%s" rlt (point)))
 
     (while (not found)
       (forward-line (if (= orig-tag-type 2) -1 1))
@@ -316,8 +316,8 @@ after calling this function."
     rlt))
 
 ;;;###autoload
-(defun evilmi-evenp (num)
-  (= (% num 2) 0))
+(defmacro evilmi-evenp (num)
+  `(= (% ,num 2) 0))
 
 (defun evilmi-count-matches (regexp str)
   (let* ((count 0)

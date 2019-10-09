@@ -1,6 +1,6 @@
 ;;; evil-matchit-ruby.el ---ruby plugin of evil-matchit
 
-;; Copyright (C) 2014-2017 Chen Bin <chenbin.sh@gmail.com>
+;; Copyright (C) 2014-2019 Chen Bin <chenbin.sh@gmail.com>
 
 ;; Author: Chen Bin <chenbin.sh@gmail.com>
 
@@ -24,11 +24,14 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-;;; Code:
+;;; Commentary:
 
 ;; OPTIONAL, you don't need SDK to write a plugin for evil-matchit
 ;; but SDK do make you write less code, isn't it?
 ;; All you need to do is just define the match-tags for SDK algorithm to lookup.
+
+;;; Code:
+
 (require 'evil-matchit-sdk)
 
 (defvar evilmi-ruby-extract-keyword-howtos
@@ -47,12 +50,10 @@
 
 ;;;###autoload
 (defun evilmi-ruby-get-tag ()
-  (let (rlt)
-    (setq rlt (evilmi-sdk-get-tag evilmi-ruby-match-tags evilmi-ruby-extract-keyword-howtos))
-    rlt))
+  (evilmi-sdk-get-tag evilmi-ruby-match-tags evilmi-ruby-extract-keyword-howtos))
 
 ;;;###autoload
-(defun evilmi-ruby-jump (rlt NUM)
-  (evilmi-sdk-jump rlt NUM evilmi-ruby-match-tags evilmi-ruby-extract-keyword-howtos))
+(defun evilmi-ruby-jump (rlt num)
+  (evilmi-sdk-jump rlt num evilmi-ruby-match-tags evilmi-ruby-extract-keyword-howtos))
 
 (provide 'evil-matchit-ruby)
