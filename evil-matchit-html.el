@@ -38,8 +38,7 @@
          (looping t)
          (char (following-char))
          (p (point))
-         (found_tag -1)
-         rlt)
+         (found_tag -1))
 
     (save-excursion
       ;; search backward
@@ -69,14 +68,29 @@
           ;; </
           (skip-chars-forward "^>")
           (forward-char)
-          (setq p (point))
           (setq found_tag 1))
          (t
           ;; < , looks fine
           (backward-char)
-          (setq found_tag 0)))))
-    (setq rlt (list p found_tag ""))
-    rlt))
+          (setq found_tag 0)))
+        (setq p (point))))
+
+    (when (eq found_tag 0)
+      ;; sgml-skip-tag-forward can't handle the open html tag whose attribute containing "<" or ">" character
+      ;; UNLESS the start position is above "<" character
+      (goto-char p) ; move to the closest "<"
+      (when (or (evilmi-among-fonts-p (point) evilmi-ignored-fonts)
+                ;; In `rjsx-mode', the attribute value's font face could be nil
+                ;; like <Component a1={3 > 2} />
+                (and (eq ?< (following-char))
+                     ;; if it's html tag, the character next "<" should
+                     ;; have some font face
+                     (not (get-text-property (1+ p) 'face))))
+        ;; since current "<" is not part of open html tag,
+        ;; skip backward to move cursor over the "<" of open html tag
+        (sgml-skip-tag-backward 1)
+        (setq p (point))))
+    (list p found_tag "")))
 
 ;;;###autoload
 (defun evilmi-html-jump (rlt num)

@@ -2,7 +2,8 @@
   "Debug flag.")
 
 (defvar evilmi-ignored-fonts
-  '(font-lock-string-face
+  '(web-mode-html-attr-value-face
+    font-lock-string-face
     font-lock-doc-face
     font-lock-comment-face)
   "Text with ignored fonts has no string keyword.")
