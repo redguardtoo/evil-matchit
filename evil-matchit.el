@@ -458,6 +458,7 @@ If IS-FORWARD is t, jump forward; or else jump backward."
 (evil-define-command evilmi-jump-items (&optional num)
   "Jump between items."
   :repeat nil
+  :jump t
   (interactive "P")
   (cond
    ((and evilmi-may-jump-by-percentage num)
