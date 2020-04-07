@@ -108,10 +108,9 @@ Open evil-matchit-ruby.el whole structure is like,
 
 So you setup in ~/.emacs is as below:
 #+begin_src elisp
-(eval-after-load 'evil-matchit-ruby
-  '(progn
-     (push '("^[ \t]*\\([a-z]+\\)\\( .*\\| *\\)$" 1) evilmi-ruby-extract-keyword-howtos)
-     (push '(("unless" "if") ("elsif" "else") "end"))) evilmi-ruby-match-tags)
+(with-eval-after-load "evil-matchit-ruby"
+  (push '("^[ \t]*\\([a-z]+\\)\\( .*\\| *\\)$" 1) evilmi-ruby-extract-keyword-howtos)
+  (push '(("unless" "if") ("elsif" "else") "end")) evilmi-ruby-match-tags)
 #+end_src
 
 ** Re-define keybinding
