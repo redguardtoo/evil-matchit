@@ -195,7 +195,7 @@ after calling this function."
          (cur-line (evilmi-sdk-curline))
          keyword
          found
-         where-to-jump-in-theory)
+         ideal-dest)
     (if evilmi-debug (message "evilmi-sdk-jump called => rlt=%s (point)=%s" rlt (point)))
 
     (while (not found)
@@ -216,14 +216,14 @@ after calling this function."
            ((and (= orig-tag-type 0) (= cur-tag-type 1))
             (when (evilmi-sdk-tags-is-matched level orig-tag-info cur-tag-info match-tags)
               (back-to-indentation)
-              (setq where-to-jump-in-theory (1- (line-beginning-position)))
+              (setq ideal-dest (1- (line-beginning-position)))
               (setq found t)))
 
            ;; open (0) -> closed (2) found when level is zero, level--
            ((and (= orig-tag-type 0) (= cur-tag-type 2))
             (when (evilmi-sdk-tags-is-matched level orig-tag-info cur-tag-info match-tags)
               (goto-char (line-end-position))
-              (setq where-to-jump-in-theory (line-end-position))
+              (setq ideal-dest (line-end-position))
               (setq found t))
             (setq level (1- level)))
 
@@ -241,14 +241,14 @@ after calling this function."
 
             (when (evilmi-sdk-tags-is-matched level orig-tag-info cur-tag-info match-tags)
               (back-to-indentation)
-              (setq where-to-jump-in-theory (1- (line-beginning-position)))
+              (setq ideal-dest (1- (line-beginning-position)))
               (setq found t)))
 
            ;; mid (1) -> closed (2) found when level is zero, level --
            ((and (= orig-tag-type 1) (= cur-tag-type 2))
             (when (evilmi-sdk-tags-is-matched level orig-tag-info cur-tag-info match-tags)
               (goto-char (line-end-position))
-              (setq where-to-jump-in-theory (line-end-position))
+              (setq ideal-dest (line-end-position))
               (setq found t))
             (setq level (1- level)))
 
@@ -267,7 +267,7 @@ after calling this function."
            ;; closed (2) -> open (0) found when level is zero, level--
            ((and (= orig-tag-type 2) (= cur-tag-type 0))
             (when (evilmi-sdk-tags-is-matched level orig-tag-info cur-tag-info match-tags)
-              (setq where-to-jump-in-theory (line-beginning-position))
+              (setq ideal-dest (line-beginning-position))
               (back-to-indentation)
               (setq found t))
             (setq level (1- level)))
@@ -279,7 +279,7 @@ after calling this function."
               (= (line-beginning-position) (point-min)))
           (setq found t)))
 
-    where-to-jump-in-theory))
+    ideal-dest))
 
 
 ;;;###autoload

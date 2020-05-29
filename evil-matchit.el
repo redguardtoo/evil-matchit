@@ -241,37 +241,43 @@ If IS-FORWARD is t, jump forward; or else jump backward."
     (goto-char (evilmi--find-position-to-jump ff jump-forward ch))
     (evilmi--tweak-selected-region ff jump-forward)))
 
-(defun evilmi--operate-on-item (num &optional FUNC)
-  (if evilmi-debug (message "evilmi--operate-on-item called => %s (point)=%d" num (point)))
-  (let* ((plugin (plist-get evilmi-plugins major-mode))
+(defun evilmi--operate-on-item (num &optional func)
+  "Jump NUM times and apply function FUNC."
+  (when evilmi-debug
+    (message "evilmi--operate-on-item called => %s (point)=%d" num (point)))
+  (let* ((jump-rules (plist-get evilmi-plugins major-mode))
          rlt
+         (i 0)
+         rule
          jumped
-         where-to-jump-in-theory)
+         ideal-dest)
 
     (unless num (setq num 1))
 
-    (if plugin
-        (mapc
-         (lambda (elem)
-           ;; execute evilmi-xxxx-get-tag
-           (setq rlt (funcall (nth 0 elem)))
-           (when (and rlt (not jumped))
-             ;; before jump, we may need some operation
-             (if FUNC (funcall FUNC rlt))
-             ;; jump now, execute evilmi-xxxx-jump
-             (setq where-to-jump-in-theory (funcall (nth 1 elem) rlt num))
-             ;; jump only once if the jump is successful
-             (setq jumped t)))
-         plugin))
+    (when jump-rules
+      (dolist (rule jump-rules)
+        ;; execute evilmi-xxxx-get-tag
+        ;; every rule should be executed.
+        ;; the simple rule might just forward a word
+        (setq rlt (funcall (nth 0 rule)))
+        (when (and rlt (not jumped))
+          ;; before jump, we may need some operation
+          (if func (funcall func rlt))
+          ;; jump now, execute evilmi-xxxx-jump
+          (setq ideal-dest (funcall (nth 1 rule) rlt num))
+          ;; jump only once if the jump is successful
+          (setq jumped t))
+        (when evilmi-debug
+          (message "rule=%s ideal-dest=%s (point)=%s" rule ideal-dest (point)))))
 
-    ;; give `evilmi--simple-jump' a chance
-    (when (not jumped)
-      (if FUNC (funcall FUNC (list (point))))
+    ;; give `evilmi--simple-jump' a second chance
+    (unless jumped
+      (if func (funcall func (list (point))))
       (evilmi--simple-jump)
-      (setq where-to-jump-in-theory (point)))
+      (setq ideal-dest (point)))
 
-    (if evilmi-debug (message "evilmi--operate-on-item called. Return: %s" where-to-jump-in-theory))
-    where-to-jump-in-theory))
+    (if evilmi-debug (message "evilmi--operate-on-item called. Return: %s" ideal-dest))
+    ideal-dest))
 
 (defun evilmi--push-mark (rlt)
     (push-mark (nth 0 rlt) t t))
@@ -376,10 +382,10 @@ If IS-FORWARD is t, jump forward; or else jump backward."
 
 
 (defun evilmi--region-to-select-or-delete (num &optional is-inner)
-  (let* (where-to-jump-in-theory b e)
+  (let* (ideal-dest b e)
     (save-excursion
-      (setq where-to-jump-in-theory (evilmi--operate-on-item num 'evilmi--push-mark))
-      (if where-to-jump-in-theory (goto-char where-to-jump-in-theory))
+      (setq ideal-dest (evilmi--operate-on-item num 'evilmi--push-mark))
+      (if ideal-dest (goto-char ideal-dest))
       (setq b (region-beginning))
       (setq e (region-end))
       (goto-char b)

@@ -1,6 +1,6 @@
 ;;; evil-matchit-simple.el --- simple match plugin of evil-matchit
 
-;; Copyright (C) 2014-2019 Chen Bin <chenbin.sh@gmail.com>
+;; Copyright (C) 2014-2020 Chen Bin <chenbin.sh@gmail.com>
 
 
 ;; Author: Chen Bin <chenbin.sh@gmail.com>
@@ -24,6 +24,9 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
+
+;;; Commentary:
 
 ;;; Code:
 
@@ -87,21 +90,26 @@
     rlt))
 
 ;;;###autoload
-(defun evilmi-simple-jump (rlt NUM)
-  "Jump from current tag to matching tag in simple language."
-  (when rlt
+(defun evilmi-simple-jump (info num)
+  "Use INFO of current tag ot jump to matching tag.  NUM is ignored."
+  (when info
     (if evilmi-debug (message "evilmi-simple-jump called (point)=%d" (point)))
 
     ;; In latex-mode `scan-sexps' does NOT work properly between "[]"
     ;; so we have to fallback to evil's API.
-    (if (memq major-mode '(latex-mode))
-        (evil-jump-item)
-      (evilmi--simple-jump))
+    (cond
+     ((memq major-mode '(latex-mode))
+      (evil-jump-item))
+     (t
+      (evilmi--simple-jump)))
 
     ;; hack for javascript
-    (if (string-match-p "^[ \t]*})\\((.*)\\)?\; *$"
-                      (evilmi-sdk-curline))
-        (line-end-position)
-      (1+ (point)))))
+    (cond
+     ((string-match "^[ \t]*})\\((.*)\\)?\; *$"
+                    (evilmi-sdk-curline))
+      (line-end-position))
+     (t
+      (1+ (point))))))
 
 (provide 'evil-matchit-simple)
+;;; evil-matchit-simple.el ends here

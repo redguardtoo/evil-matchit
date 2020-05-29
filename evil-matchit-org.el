@@ -77,7 +77,7 @@ between '\\(' and '\\)' in regular expression.")
 (defun evilmi-org-jump (rlt num)
   (cond
    ((< (car rlt) 0)
-    (let* (where-to-jump-in-theory
+    (let* (ideal-dest
            jumped
            info
            (lang-f (evilmi--get-embedded-language-major-mode))
@@ -88,7 +88,7 @@ between '\\(' and '\\)' in regular expression.")
            (setq info (funcall (nth 0 elem)))
            (when (and info (not jumped))
              ;; before jump, we may need some operation
-             (setq where-to-jump-in-theory (funcall (nth 1 elem) info num))
+             (setq ideal-dest (funcall (nth 1 elem) info num))
              ;; jump only once if the jump is successful
              (setq jumped t)))
          plugin))))
