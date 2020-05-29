@@ -1,10 +1,10 @@
 ;;; evil-matchit.el --- Vim matchit ported to Evil
 
-;; Copyright (C) 2014-2018 Chen Bin <chenbin.sh@gmail.com>
+;; Copyright (C) 2014-2020 Chen Bin <chenbin DOT sh AT gmail DOT com>
 
-;; Author: Chen Bin <chenbin.sh@gmail.com>
+;; Author: Chen Bin <chenbin DOT sh AT gmail DOT com>
 ;; URL: http://github.com/redguardtoo/evil-matchit
-;; Version: 2.3.4
+;; Version: 2.3.5
 ;; Keywords: matchit vim evil
 ;; Package-Requires: ((evil "1.2.0") (emacs "24.4"))
 ;;
@@ -34,9 +34,9 @@
 ;; Then press % or `evilmi-jump-items' to jump between then matched pair.
 ;; Text object "%" is also provided.
 ;;
-;; The shortcut "%" is defined in `evilmi-shortcut'. It's both the name of
-;; text object and shortcut of `evilmi-jump-items'. Some people prefer set it
-;; to "m". Here is sample setup:
+;; The shortcut "%" is defined in `evilmi-shortcut'.  It's both the name of
+;; text object and shortcut of `evilmi-jump-items'.  Some people prefer set it
+;; to "m".  Here is sample setup:
 ;;
 ;;   (setq evilmi-shortcut "m")
 ;;   (global-evil-matchit-mode 1)
@@ -51,8 +51,7 @@
 (require 'evil)
 (require 'evil-matchit-sdk)
 
-(defvar evilmi-plugins '(emacs-lisp-mode
-                         ((evilmi-simple-get-tag evilmi-simple-jump)))
+(defvar evilmi-plugins '(emacs-lisp-mode ((evilmi-simple-get-tag evilmi-simple-jump)))
   "The Matrix to of algorithms.")
 
 (defvar evilmi-may-jump-by-percentage t
@@ -186,8 +185,8 @@ If IS-FORWARD is t, jump forward; or else jump backward."
     (if evilmi-debug (message "evilmi--scan-sexps called => rlt=%s lvl=%s" rlt lvl))
     rlt))
 
-(defun evilmi--find-the-other-quote-char (ff is-forward ch)
-  "The end character under cursor has different font-face from FF."
+(defun evilmi--find-the-other-quote-char (font-face is-forward char)
+  "The end character under cursor has different font from FONT-FACE."
   (let* (rlt
          got
          (delta (if is-forward 1 -1))
@@ -196,8 +195,8 @@ If IS-FORWARD is t, jump forward; or else jump backward."
     (while (not got)
       (cond
        ((or (= pos end)
-            (and (= ch (evilmi--get-char-at-position (- pos delta)))
-                 (not (eq ff (get-text-property pos 'face)))))
+            (and (= char (evilmi--get-char-at-position (- pos delta)))
+                 (not (eq font-face (get-text-property pos 'face)))))
         (setq rlt (if is-forward pos (+ 1 pos)))
         (setq got t))
        (t
@@ -221,12 +220,13 @@ If IS-FORWARD is t, jump forward; or else jump backward."
     (if evilmi-debug (message "evilmi--find-position-to-jump return %s" (evilmi--adjust-jumpto is-forward rlt)))
     (evilmi--adjust-jumpto is-forward rlt)))
 
-(defun evilmi--tweak-selected-region (ff jump-forward)
+(defun evilmi--tweak-selected-region (font-face jump-forward)
+  "Tweak selected region using FONT-FACE and JUMP-FORWARD."
   ;; visual-state hack!
-  (if (and jump-forward (eq evil-state 'visual) (not ff))
-      ;; if ff is non-nil, I control the jump flow from character level,
-      ;; so hack to workaround scan-sexps is NOT necessary
-        (evil-backward-char)))
+  (when (and jump-forward (eq evil-state 'visual) (not font-face))
+    ;; if font-face is non-nil, I control the jump flow from character level,
+    ;; so hack to workaround scan-sexps is NOT necessary
+    (evil-backward-char)))
 
 (defun evilmi--simple-jump ()
   "Alternative for `evil-jump-item'."
@@ -247,8 +247,6 @@ If IS-FORWARD is t, jump forward; or else jump backward."
     (message "evilmi--operate-on-item called => %s (point)=%d" num (point)))
   (let* ((jump-rules (plist-get evilmi-plugins major-mode))
          rlt
-         (i 0)
-         rule
          jumped
          ideal-dest)
 
@@ -426,7 +424,7 @@ If IS-FORWARD is t, jump forward; or else jump backward."
 
 ;;;###autoload
 (defun evilmi-select-items (&optional num)
-  "Select items/tags and the region between them."
+  "Select NUM items/tags and the region between them."
   (interactive "p")
   (let* ((selected-region (evilmi--region-to-select-or-delete num)))
     (when selected-region
@@ -435,7 +433,7 @@ If IS-FORWARD is t, jump forward; or else jump backward."
 
 ;;;###autoload
 (defun evilmi-delete-items (&optional num)
-  "Delete items/tags and the region between them."
+  "Delete NUM items/tags and the region between them."
   (interactive "p")
   (let* ((selected-region (evilmi--region-to-select-or-delete num)))
     ;; 1+ because the line feed
@@ -462,7 +460,7 @@ If IS-FORWARD is t, jump forward; or else jump backward."
 
 ;;;###autoload (autoload 'evilmi-jump-items "evil-matchit" nil t)
 (evil-define-command evilmi-jump-items (&optional num)
-  "Jump between items."
+  "Jump between items NUM times."
   :repeat nil
   :jump t
   (interactive "P")
@@ -474,8 +472,9 @@ If IS-FORWARD is t, jump forward; or else jump backward."
 
 ;;;###autoload
 (defun evilmi-version()
+  "Print version."
   (interactive)
-  (message "2.3.4"))
+  (message "2.3.5"))
 
 ;;;###autoload
 (define-minor-mode evil-matchit-mode
@@ -495,12 +494,12 @@ If IS-FORWARD is t, jump forward; or else jump backward."
 
 ;;;###autoload
 (defun turn-on-evil-matchit-mode ()
-  "Enable evil-matchit-mode in the current buffer."
+  "Enable `evil-matchit-mode' in the current buffer."
   (evil-matchit-mode 1))
 
 ;;;###autoload
 (defun turn-off-evil-matchit-mode ()
-  "Disable evil-matchit-mode in the current buffer."
+  "Disable `evil-matchit-mode' in the current buffer."
   (evil-matchit-mode -1))
 
 ;;;###autoload

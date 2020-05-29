@@ -1,6 +1,6 @@
 ;;; evil-matchit-ocaml.el -- tuareg-mode  plugin of evil-matchit
 
-;; Copyright (C) 2014-2017 Chen Bin <chenbin.sh@gmail.com>
+;; Copyright (C) 2014-2020 Chen Bin <chenbin DOT sh AT gmail DOT com>
 
 ;; Author: Tomasz Kołodziejski <tkolodziejski@gmail.com>
 
