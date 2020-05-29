@@ -268,7 +268,7 @@ If IS-FORWARD is t, jump forward; or else jump backward."
           ;; jump only once if the jump is successful
           (setq jumped t))
         (when evilmi-debug
-          (message "rule=%s ideal-dest=%s (point)=%s" rule ideal-dest (point)))))
+          (message "rlt=%s rule=%s p=%s jumped=%s" rlt rule (point) jumped))))
 
     ;; give `evilmi--simple-jump' a second chance
     (unless jumped

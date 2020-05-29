@@ -1,6 +1,6 @@
 ;;; evil-matchit-html.el ---html plugin of evil-matchit
 
-;; Copyright (C) 2014-2019 Chen Bin <chenbin.sh@gmail.com>
+;; Copyright (C) 2014-2020 Chen Bin <chenbin.sh@gmail.com>
 
 ;; Author: Chen Bin <chenbin.sh@gmail.com>
 
@@ -31,8 +31,17 @@
 (autoload 'sgml-skip-tag-backward "sgml-mode" nil t)
 (autoload 'sgml-skip-tag-forward "sgml-mode" nil t)
 
+(defun evilmi-html--open-tag-candidate (position)
+  "Get html open tag candidate.
+It starts from POSITION and possibly ends at line end."
+  (let* ((partial-line (save-excursion
+                         (goto-char position)
+                         (buffer-substring position (line-end-position)))))
+    (car (split-string partial-line "[ \t]+"))))
+
 ;;;###autoload
 (defun evilmi-html-get-tag ()
+  "Get current tag."
   (let* ((b (line-beginning-position))
          (e (line-end-position))
          (looping t)
@@ -40,8 +49,9 @@
          (p (point))
          (found_tag -1))
 
+    (if evilmi-debug (message "evilmi-html-get-tag called. p=%s" p))
     (save-excursion
-      ;; search backward
+      ;; search backward for "<"
       (unless (eq char ?<)
         (while (and looping (<= b (point)) (not (eq char ?<)))
           (setq char (following-char))
@@ -51,13 +61,19 @@
               (setq looping nil)
             (backward-char))))
 
-      ;; search forward
+      ;; search forward for "<"
       (unless (eq char ?<)
         (save-excursion
           (while (and (>= e (point)) (not (eq char ?<)))
             (setq char (following-char))
             (setq p (point))
             (forward-char))))
+
+      ;; a valid html tag should be like <[^;]
+      (unless (and (eq char ?<)
+                   ;; html tags should not contain " ,;"
+                   (string-match "^<[^ ;,]+$" (evilmi-html--open-tag-candidate p)))
+        (setq char nil))
 
       ;; is end tag?
       (when (and (eq char ?<) (< p e))
@@ -93,13 +109,18 @@
     (list p found_tag "")))
 
 ;;;###autoload
-(defun evilmi-html-jump (rlt num)
-  (let* ((tag-type (nth 1 rlt))
+(defun evilmi-html-jump (info num)
+  "Use INFO from current tag to jump NUM times."
+  (let* ((tag-type (nth 1 info))
          ;; `web-mode-forward-sexp' is assigned to `forward-sexp-function'
          ;; it's buggy in web-mode v11, here is the workaround
          (forward-sexp-function nil))
-    (if (eq 1 tag-type) (sgml-skip-tag-backward num))
-    (if (eq 0 tag-type) (sgml-skip-tag-forward num))
+    (if evilmi-debug (message "evilmi-html-jump called. tag-type=%s" tag-type))
+    (cond
+     ((eq 1 tag-type)
+      (sgml-skip-tag-backward num))
+     ((eq 0 tag-type)
+      (sgml-skip-tag-forward num)))
     (point)))
 
 (provide 'evil-matchit-html)
