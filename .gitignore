@@ -25,3 +25,5 @@ Session.vim
 *.tar
 *.elc
 
+deps/
+TAGS

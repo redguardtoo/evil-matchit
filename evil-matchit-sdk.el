@@ -39,8 +39,7 @@ If font-face-under-cursor is NOT nil, the quoted string is being processed."
       (setq rlt (eq (setq ff (get-text-property p 'face))
                     (get-text-property (+ 1 p) 'face)))))
 
-    (when evilmi-debug
-      (message "evilmi-sdk-jump-forward-p => (%s %s %s)" rlt ff (string ch)))
+    (if evilmi-debug (message "evilmi-sdk-jump-forward-p => (%s %s %s)" rlt ff (string ch)))
     (list rlt ff ch)))
 
 (defun evilmi-sdk-simple-jump ()

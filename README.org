@@ -1,5 +1,5 @@
 * evil-matchit
-
+[[https://travis-ci.org/redguardtoo/evil-matchit][https://travis-ci.org/redguardtoo/evil-matchit.svg?branch=master]]
 [[http://melpa.org/#/evil-matchit][file:http://melpa.org/packages/evil-matchit-badge.svg]] [[http://stable.melpa.org/#/evil-matchit][file:http://stable.melpa.org/packages/evil-matchit-badge.svg]]
 
 Vim [[http://www.vim.org/scripts/script.php?script_id=39][matchit.vim]] by Benji Fisher is ported into Emacs.

@@ -40,8 +40,11 @@ It starts from POSITION and possibly ends at line end."
     (car (split-string partial-line "[ \t]+"))))
 
 (defun evilmi-html--detect-self-closing-tag-end (char position)
-  "Use CHAR at POSITION to test if it's the end of self closing tag.
-If at the end of self closing tag, "
+  "Use CHAR at POSITION to test if it's the end of self closing tag."
+  (when evilmi-debug
+    (message "evilmi-html--detect-self-closing-tag-end called => %s %s"
+             char
+             position))
   (when (or (and (eq char ?>)
                  (eq (evilmi-sdk-get-char (1- position)) ?/))
             (and (eq char ?/)
@@ -49,11 +52,14 @@ If at the end of self closing tag, "
     (list (if (eq char ?>) position (1+ position)) 1 "")))
 
 (defun evilmi-html--detect-normal-tags (char position)
-  "Test one of matched tags or beginning of self closing tag."
+  "Test matched tags or beginning of self closing tag.
+Use CHAR at POSITION."
   (let* ((begin (line-beginning-position))
          (end (line-end-position))
          (looping t)
          (found_tag -1))
+    (when evilmi-debug
+      (message "evilmi-html--detect-normal-tags: position=%s" position))
     (save-excursion
       ;; search backward for "<"
       (unless (eq char ?<)
@@ -67,10 +73,12 @@ If at the end of self closing tag, "
       ;; search forward for "<"
       (unless (eq char ?<)
         (save-excursion
-          (while (and (>= end (point)) (not (eq char ?<)))
+          (while (and (>= end (point))
+                      (not (eq char ?<))
+                      (< (point) (point-max)))
             (setq char (following-char))
             (setq position (point))
-            (forward-char))))
+            (unless (eq (point) (point-max)) (forward-char)))))
 
       ;; a valid html tag should be like <[^;]
       (unless (and (eq char ?<)
@@ -115,10 +123,14 @@ If at the end of self closing tag, "
 (defun evilmi-html-get-tag ()
   "Get current tag."
   (let* ((char (following-char))
-         (position (point)))
-    (if evilmi-debug (message "evilmi-html-get-tag called. position" position))
-    (or (evilmi-html--detect-self-closing-tag-end char position)
-        (evilmi-html--detect-normal-tags char position))))
+         (position (point))
+         rlt)
+    (if evilmi-debug (message "evilmi-html-get-tag called. position=%s" position))
+    (setq rlt (or (evilmi-html--detect-self-closing-tag-end char position)
+                  (evilmi-html--detect-normal-tags char position)))
+    ;; restore original position
+    (goto-char position)
+    rlt))
 
 ;;;###autoload
 (defun evilmi-html-jump (info num)
@@ -127,7 +139,8 @@ If at the end of self closing tag, "
          ;; `web-mode-forward-sexp' is assigned to `forward-sexp-function'
          ;; it's buggy in web-mode v11, here is the workaround
          (forward-sexp-function nil))
-    (if evilmi-debug (message "evilmi-html-jump called. tag-type=%s" tag-type))
+    (when evilmi-debug
+      (message "evilmi-html-jump called. tag-type=%s info=%s" tag-type info))
     (cond
      ((eq 1 tag-type)
       (sgml-skip-tag-backward num))
