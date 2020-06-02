@@ -1,6 +1,10 @@
 (defvar evilmi-debug nil
   "Debug flag.")
 
+(defvar evilmi-forward-chars (string-to-list "[{("))
+(defvar evilmi-backward-chars (string-to-list "]})"))
+(defvar evilmi-quote-chars (string-to-list "'\"/"))
+
 (defvar evilmi-ignored-fonts
   '(web-mode-html-attr-value-face
     font-lock-string-face
@@ -17,15 +21,41 @@ expression to match the current line. The second is the index of sub-matches
 to extract the keyword which starts from one. The sub-match is the match defined
 between '\\(' and '\\)' in regular expression.")
 
-;; slower but I don't care
-;; @see http://ergoemacs.org/emacs/modernization_elisp_lib_problem.html
-(defun evilmi-sdk-trim-string (string)
-  (replace-regexp-in-string "\\`[ \t\n]*" "" (replace-regexp-in-string "[ \t\n]*\\'" "" string)))
+(defmacro evilmi-sdk-keyword (info)
+  "Get keyword from INFO."
+  `(nth 3 ,info))
 
-(defun evilmi-sdk-keyword (info)
-  (nth 3 info))
+(defun evilmi-sdk-jump-forward-p ()
+  "Return: (forward-direction font-face-under-cursor character-under-cursor).
+If font-face-under-cursor is NOT nil, the quoted string is being processed."
+  (let* ((ch (following-char))
+         (p (point))
+         ff
+         (rlt t))
+    (cond
+     ((memq ch evilmi-backward-chars)
+      (setq rlt nil))
+     ((and (memq ch evilmi-quote-chars))
+      (setq rlt (eq (setq ff (get-text-property p 'face))
+                    (get-text-property (+ 1 p) 'face)))))
 
-(defun evilmi-sdk-tags-is-matched (level orig-tag-info cur-tag-info match-tags)
+    (when evilmi-debug
+      (message "evilmi-sdk-jump-forward-p => (%s %s %s)" rlt ff (string ch)))
+    (list rlt ff ch)))
+
+(defun evilmi-sdk-simple-jump ()
+  "Alternative for `evil-jump-item'."
+  (if evilmi-debug (message "evilmi-sdk-simple-jump called (point)=%d" (point)))
+  (let* ((tmp (evilmi-sdk-jump-forward-p))
+         (jump-forward (car tmp))
+         ;; if ff is not nil, it's jump between quotes
+         ;; so we should not use (scan-sexps)
+         (ff (nth 1 tmp))
+         (ch (nth 2 tmp)))
+    (goto-char (evilmi--find-position-to-jump ff jump-forward ch))
+    (evilmi--tweak-selected-region ff jump-forward)))
+
+(defun evilmi-sdk-tags-matched-p (level orig-tag-info cur-tag-info match-tags)
   (let* (rlt
          (orig-keyword (evilmi-sdk-keyword orig-tag-info))
          (cur-keyword (evilmi-sdk-keyword cur-tag-info))
@@ -131,14 +161,14 @@ is-function-exit-point could be unknown status"
     rlt))
 
 (defun evilmi--sdk-extract-keyword (cur-line match-tags howtos)
-  "Extract keyword from CUR-LINE.  Keyword is defined in MATCH-TAGS."
+  "Extract keyword from CUR-LINE.  Keyword is defined in MATCH-TAGS.
+Rule is looked up in HOWTOS."
   (let* (keyword howto (i 0))
     (while (and (not keyword) (< i (length howtos)))
       (setq howto (nth i howtos))
       (when (string-match (nth 0 howto) cur-line)
         ;; keyword should be trimmed because FORTRAN use "else if"
-        (setq keyword (evilmi-sdk-trim-string (match-string (nth 1 howto)
-                                                            cur-line)))
+        (setq keyword (string-trim (match-string (nth 1 howto) cur-line)))
         ;; keep search keyword by using next howto (regex and match-string index)
         (unless (evilmi-sdk-member keyword match-tags) (setq keyword nil)))
       (setq i (1+ i)))
@@ -165,6 +195,10 @@ is-function-exit-point could be unknown status"
             (setq rlt (evilmi--exactly-same-type crt orig))
           (setq rlt t)))
     rlt))
+
+(defmacro evilmi-sdk-get-char (position)
+  "Get character at POSITION."
+  `(char-after ,position))
 
 ;;;###autoload
 (defun evilmi-sdk-get-tag (match-tags howtos)
@@ -214,14 +248,14 @@ after calling this function."
            ;; handle open tag
            ;; open (0) -> mid (1)  found when level is one else ignore
            ((and (= orig-tag-type 0) (= cur-tag-type 1))
-            (when (evilmi-sdk-tags-is-matched level orig-tag-info cur-tag-info match-tags)
+            (when (evilmi-sdk-tags-matched-p level orig-tag-info cur-tag-info match-tags)
               (back-to-indentation)
               (setq ideal-dest (1- (line-beginning-position)))
               (setq found t)))
 
            ;; open (0) -> closed (2) found when level is zero, level--
            ((and (= orig-tag-type 0) (= cur-tag-type 2))
-            (when (evilmi-sdk-tags-is-matched level orig-tag-info cur-tag-info match-tags)
+            (when (evilmi-sdk-tags-matched-p level orig-tag-info cur-tag-info match-tags)
               (goto-char (line-end-position))
               (setq ideal-dest (line-end-position))
               (setq found t))
@@ -239,14 +273,14 @@ after calling this function."
            ;; level is one means we are not in some embedded loop/conditional statements
            ((and (= orig-tag-type 1) (= cur-tag-type 1))
 
-            (when (evilmi-sdk-tags-is-matched level orig-tag-info cur-tag-info match-tags)
+            (when (evilmi-sdk-tags-matched-p level orig-tag-info cur-tag-info match-tags)
               (back-to-indentation)
               (setq ideal-dest (1- (line-beginning-position)))
               (setq found t)))
 
            ;; mid (1) -> closed (2) found when level is zero, level --
            ((and (= orig-tag-type 1) (= cur-tag-type 2))
-            (when (evilmi-sdk-tags-is-matched level orig-tag-info cur-tag-info match-tags)
+            (when (evilmi-sdk-tags-matched-p level orig-tag-info cur-tag-info match-tags)
               (goto-char (line-end-position))
               (setq ideal-dest (line-end-position))
               (setq found t))
@@ -266,7 +300,7 @@ after calling this function."
 
            ;; closed (2) -> open (0) found when level is zero, level--
            ((and (= orig-tag-type 2) (= cur-tag-type 0))
-            (when (evilmi-sdk-tags-is-matched level orig-tag-info cur-tag-info match-tags)
+            (when (evilmi-sdk-tags-matched-p level orig-tag-info cur-tag-info match-tags)
               (setq ideal-dest (line-beginning-position))
               (back-to-indentation)
               (setq found t))

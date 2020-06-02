@@ -67,64 +67,26 @@ Some people prefer using \"m\" instead.")
   "`major-mode' like `python-mode' use optimized algorithm by default.
 If it's t, use simple jump.")
 
-(defvar evilmi-forward-chars (string-to-list "[{("))
-(defvar evilmi-backward-chars (string-to-list "]})"))
-(defvar evilmi-quote-chars (string-to-list "'\"/"))
-
 (defun evilmi--char-is-simple (ch)
   "Special handling of character CH for `python-mode'."
-  (let* (rlt)
-    (cond
-     ((and (not evilmi-always-simple-jump)
-           (memq major-mode '(python-mode))
-           ;; in evil-visual-state, (point) could equal to (line-end-position)
-           (>= (point) (1- (line-end-position))))
-      ;; handle follow python code,
-      ;;
-      ;; if true:
-      ;;     a = "hello world"
-      ;;
-      ;; If current cursor is at end of line, rlt should be nil!
-      ;; or else, matching algorithm can't work in above python sample
-      (setq rlt nil))
-     (t
-      (setq rlt (or (memq ch evilmi-forward-chars)
-                    (memq ch evilmi-backward-chars)
-                    ;; sorry we could not jump between ends of string in python-mode
-                    (memq ch evilmi-quote-chars)))))
-    rlt))
-
-(defun evilmi--get-char-at-position (pos)
-  "Get character at POS."
-  (let* ((ch (char-after pos)))
-    (if evilmi-debug (message "evilmi--get-char-at-position called. Return: %s" (string ch)))
-    ch))
-
-(defun evilmi--get-char-under-cursor ()
-  "Return: (character position)."
-  (let* ((ch (following-char))
-         (p (point)))
-    (if evilmi-debug (message "evilmi--get-char-under-cursor called. Return: (%d %s)" ch p))
-    (list ch p)))
-
-(defun evilmi--is-jump-forward ()
-  "Return: (forward-direction font-face-under-cursor character-under-cursor).
-If font-face-under-cursor is NOT nil, the quoted string is being processed."
-  (if evilmi-debug (message "evilmi--is-jump-forward called"))
-  (let* ((tmp (evilmi--get-char-under-cursor))
-         (ch (car tmp))
-         (p (cadr tmp))
-         ff
-         (rlt t))
-    (cond
-     ((memq ch evilmi-backward-chars)
-      (setq rlt nil))
-     ((memq ch evilmi-quote-chars)
-      (setq rlt (eq (setq ff (get-text-property p 'face))
-                    (get-text-property (+ 1 p) 'face)))))
-
-    (if evilmi-debug (message "evilmi--is-jump-forward return (%s %s %s)" rlt ff (string ch)))
-    (list rlt ff ch)))
+  (cond
+   ((and (not evilmi-always-simple-jump)
+         (memq major-mode '(python-mode))
+         ;; in evil-visual-state, (point) could equal to (line-end-position)
+         (>= (point) (1- (line-end-position))))
+    ;; handle follow python code,
+    ;;
+    ;; if true:
+    ;;     a = "hello world"
+    ;;
+    ;; If current cursor is at end of line, rlt should be nil!
+    ;; or else, matching algorithm can't work in above python sample
+    nil)
+   (t
+    (or (memq ch evilmi-forward-chars)
+        (memq ch evilmi-backward-chars)
+        ;; sorry we could not jump between ends of string in python-mode
+        (memq ch evilmi-quote-chars)))))
 
 (defun evilmi-in-comment-p (pos)
   "Check character at POS is comment by comparing font face."
@@ -132,11 +94,11 @@ If font-face-under-cursor is NOT nil, the quoted string is being processed."
    ;; @see https://github.com/redguardtoo/evil-matchit/issues/92
    ((eq major-mode 'tuareg-mode)
     (evilmi-among-fonts-p pos '(font-lock-comment-face
-                                             font-lock-comment-delimiter-face
-                                             font-lock-doc-face)))
+                                font-lock-comment-delimiter-face
+                                font-lock-doc-face)))
    (t
     (evilmi-among-fonts-p pos '(font-lock-comment-face
-                                             font-lock-comment-delimiter-face)))))
+                                font-lock-comment-delimiter-face)))))
 
 (defun evilmi--scan-sexps (is-forward)
   "Get the position of matching tag.
@@ -195,7 +157,7 @@ If IS-FORWARD is t, jump forward; or else jump backward."
     (while (not got)
       (cond
        ((or (= pos end)
-            (and (= char (evilmi--get-char-at-position (- pos delta)))
+            (and (= char (evilmi-sdk-get-char (- pos delta)))
                  (not (eq font-face (get-text-property pos 'face)))))
         (setq rlt (if is-forward pos (+ 1 pos)))
         (setq got t))
@@ -213,11 +175,10 @@ If IS-FORWARD is t, jump forward; or else jump backward."
 
 ;; @see http://emacs.stackexchange.com/questions/13222/a-elisp-function-to-jump-between-matched-pair
 (defun evilmi--find-position-to-jump (ff is-forward ch)
-  (if evilmi-debug (message "evilmi--find-position-to-jump called => %s %s %s %d" ff is-forward ch (point)))
   "Non-nil ff means jumping between quotes"
   (let* ((rlt (if ff (evilmi--find-the-other-quote-char ff is-forward ch)
                 (evilmi--scan-sexps is-forward))))
-    (if evilmi-debug (message "evilmi--find-position-to-jump return %s" (evilmi--adjust-jumpto is-forward rlt)))
+    (if evilmi-debug (message "evilmi--find-position-to-jump => %s" (evilmi--adjust-jumpto is-forward rlt)))
     (evilmi--adjust-jumpto is-forward rlt)))
 
 (defun evilmi--tweak-selected-region (font-face jump-forward)
@@ -227,19 +188,6 @@ If IS-FORWARD is t, jump forward; or else jump backward."
     ;; if font-face is non-nil, I control the jump flow from character level,
     ;; so hack to workaround scan-sexps is NOT necessary
     (evil-backward-char)))
-
-(defun evilmi--simple-jump ()
-  "Alternative for `evil-jump-item'."
-  (interactive)
-  (if evilmi-debug (message "evilmi--simple-jump called (point)=%d" (point)))
-  (let* ((tmp (evilmi--is-jump-forward))
-         (jump-forward (car tmp))
-         ;; if ff is not nil, it's jump between quotes
-         ;; so we should not use (scan-sexps)
-         (ff (nth 1 tmp))
-         (ch (nth 2 tmp)))
-    (goto-char (evilmi--find-position-to-jump ff jump-forward ch))
-    (evilmi--tweak-selected-region ff jump-forward)))
 
 (defun evilmi--operate-on-item (num &optional func)
   "Jump NUM times and apply function FUNC."
@@ -268,10 +216,10 @@ If IS-FORWARD is t, jump forward; or else jump backward."
         (when evilmi-debug
           (message "rlt=%s rule=%s p=%s jumped=%s" rlt rule (point) jumped))))
 
-    ;; give `evilmi--simple-jump' a second chance
+    ;; give `evilmi-sdk-simple-jump' a second chance
     (unless jumped
       (if func (funcall func (list (point))))
-      (evilmi--simple-jump)
+      (evilmi-sdk-simple-jump)
       (setq ideal-dest (point)))
 
     (if evilmi-debug (message "evilmi--operate-on-item called. Return: %s" ideal-dest))

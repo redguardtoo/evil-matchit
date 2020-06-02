@@ -65,12 +65,8 @@
 (defun evilmi-simple-get-tag ()
   "Get current tag in simple language."
   (let* (forward-line-num
-         ;; Only handle open tag
-         (tmp (evilmi--get-char-under-cursor))
-         (ch (if tmp (car tmp)))
+         (ch (following-char))
          rlt)
-
-    (if evilmi-debug (message "evilmi-simple-get-tag called => ch=%s (point)=%d" ch (point)))
 
     (cond
      ;; In evil-visual-state, the (preceding-char) is actually the character under cursor
@@ -82,16 +78,23 @@
         (forward-line (1- forward-line-num))
         (search-forward "{" nil nil)
         (backward-char)))
+     ((and (memq ch evilmi-quote-chars)
+           (eq ch ?/)
+           (not (eq ?* (evilmi-sdk-get-char (1- (point)))))
+           (not (eq ?* (evilmi-sdk-get-char (1+ (point))))))
+      ;; character at point is not "/*" or "*/"
+      (setq rlt nil))
      (t
-      ;; use evil's own evilmi--simple-jump
+      ;; use evil's own evilmi-sdk-simple-jump
       (setq rlt (list (point)))))
 
-    (if (and evilmi-debug rlt) (message "evilmi-simple-get-tag called rlt=%s" rlt))
+    (if (and evilmi-debug rlt) (message "evilmi-simple-get-tag called char=%s => %s" ch rlt))
     rlt))
 
 ;;;###autoload
 (defun evilmi-simple-jump (info num)
-  "Use INFO of current tag ot jump to matching tag.  NUM is ignored."
+  "Use INFO of current tag to jump to matching tag.  NUM is ignored."
+  (ignore num)
   (when info
     (if evilmi-debug (message "evilmi-simple-jump called (point)=%d" (point)))
 
@@ -101,7 +104,7 @@
      ((memq major-mode '(latex-mode))
       (evil-jump-item))
      (t
-      (evilmi--simple-jump)))
+      (evilmi-sdk-simple-jump)))
 
     ;; hack for javascript
     (cond

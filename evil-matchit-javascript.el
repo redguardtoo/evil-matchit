@@ -100,7 +100,7 @@
                      evilmi-javascript-match-tags
                      evilmi-javascript-extract-keyword-howtos))
    (t
-    (evilmi--simple-jump)
+    (evilmi-sdk-simple-jump)
     (let* ((cur-line (evilmi-sdk-curline)))
       ;; hack for javascript
       (if (or (string-match "^[ \t]*}\)\(.*\)\; *$" cur-line)

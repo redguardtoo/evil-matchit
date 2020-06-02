@@ -39,24 +39,27 @@ It starts from POSITION and possibly ends at line end."
                          (buffer-substring position (line-end-position)))))
     (car (split-string partial-line "[ \t]+"))))
 
-;;;###autoload
-(defun evilmi-html-get-tag ()
-  "Get current tag."
-  (let* ((b (line-beginning-position))
-         (e (line-end-position))
-         (looping t)
-         (char (following-char))
-         (p (point))
-         (found_tag -1))
+(defun evilmi-html--detect-self-closing-tag-end (char position)
+  "Use CHAR at POSITION to test if it's the end of self closing tag.
+If at the end of self closing tag, "
+  (when (or (and (eq char ?>)
+                 (eq (evilmi-sdk-get-char (1- position)) ?/))
+            (and (eq char ?/)
+                 (eq (evilmi-sdk-get-char (1+ position)) ?>)))
+    (list (if (eq char ?>) position (1+ position)) 1 "")))
 
-    (if evilmi-debug (message "evilmi-html-get-tag called. p=%s" p))
+(defun evilmi-html--detect-normal-tags (char position)
+  "Test one of matched tags or beginning of self closing tag."
+  (let* ((begin (line-beginning-position))
+         (end (line-end-position))
+         (looping t)
+         (found_tag -1))
     (save-excursion
       ;; search backward for "<"
       (unless (eq char ?<)
-        (while (and looping (<= b (point)) (not (eq char ?<)))
+        (while (and looping (<= begin (point)) (not (eq char ?<)))
           (setq char (following-char))
-          (setq p (point))
-          (if (eq p (point-min))
+          (if (eq (setq position (point)) (point-min))
               ;; need get out of loop anyway
               (setq looping nil)
             (backward-char))))
@@ -64,20 +67,20 @@ It starts from POSITION and possibly ends at line end."
       ;; search forward for "<"
       (unless (eq char ?<)
         (save-excursion
-          (while (and (>= e (point)) (not (eq char ?<)))
+          (while (and (>= end (point)) (not (eq char ?<)))
             (setq char (following-char))
-            (setq p (point))
+            (setq position (point))
             (forward-char))))
 
       ;; a valid html tag should be like <[^;]
       (unless (and (eq char ?<)
                    ;; html tags should not contain " ,;"
-                   (string-match "^<[^ ;,]+$" (evilmi-html--open-tag-candidate p)))
+                   (string-match "^<[^ ;,]+$" (evilmi-html--open-tag-candidate position)))
         (setq char nil))
 
       ;; is end tag?
-      (when (and (eq char ?<) (< p e))
-        (goto-char p)
+      (when (and (eq char ?<) (< position end))
+        (goto-char position)
         (forward-char)
         (cond
          ((eq (following-char) ?/)
@@ -89,24 +92,33 @@ It starts from POSITION and possibly ends at line end."
           ;; < , looks fine
           (backward-char)
           (setq found_tag 0)))
-        (setq p (point))))
+        (setq position (point))))
 
     (when (eq found_tag 0)
-      ;; sgml-skip-tag-forward can't handle the open html tag whose attribute containing "<" or ">" character
-      ;; UNLESS the start position is above "<" character
-      (goto-char p) ; move to the closest "<"
+      ;; `sgml-skip-tag-forward' can't handle the open html tag whose attribute containing "<" or ">" character
+      ;; unless the start position is above "<" character
+      (goto-char position) ; move to the closest "<"
       (when (or (evilmi-among-fonts-p (point) evilmi-ignored-fonts)
                 ;; In `rjsx-mode', the attribute value's font face could be nil
                 ;; like <Component a1={3 > 2} />
                 (and (eq ?< (following-char))
                      ;; if it's html tag, the character next "<" should
                      ;; have some font face
-                     (not (get-text-property (1+ p) 'face))))
+                     (not (get-text-property (1+ position) 'face))))
         ;; since current "<" is not part of open html tag,
         ;; skip backward to move cursor over the "<" of open html tag
         (sgml-skip-tag-backward 1)
-        (setq p (point))))
-    (list p found_tag "")))
+        (setq position (point))))
+    (list position found_tag "")))
+
+;;;###autoload
+(defun evilmi-html-get-tag ()
+  "Get current tag."
+  (let* ((char (following-char))
+         (position (point)))
+    (if evilmi-debug (message "evilmi-html-get-tag called. position" position))
+    (or (evilmi-html--detect-self-closing-tag-end char position)
+        (evilmi-html--detect-normal-tags char position))))
 
 ;;;###autoload
 (defun evilmi-html-jump (info num)
