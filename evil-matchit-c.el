@@ -43,9 +43,9 @@
   (evilmi-sdk-get-tag evilmi-c-match-tags evilmi-c-extract-keyword-howtos))
 
 ;;;###autoload
-(defun evilmi-c-jump (rlt NUM)
+(defun evilmi-c-jump (rlt num)
   (let* ((old-pos (point))
-         (pos (evilmi-sdk-jump rlt NUM evilmi-c-match-tags evilmi-c-extract-keyword-howtos))
+         (pos (evilmi-sdk-jump rlt num evilmi-c-match-tags evilmi-c-extract-keyword-howtos))
          (orig-tag (and rlt (nth 3 (cadr rlt)))))
 
     ;; Place cursor over last case of 'switch' statement and press %:

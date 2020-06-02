@@ -1,4 +1,4 @@
-;;; evil-matchit-html.el ---html plugin of evil-matchit
+;;; evil-matchit-html.el --- html plugin of evil-matchit
 
 ;; Copyright (C) 2014-2020 Chen Bin <chenbin DOT sh AT gmail DOT com>
 

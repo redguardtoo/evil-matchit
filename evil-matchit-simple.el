@@ -32,6 +32,10 @@
 
 (require 'evil-matchit-sdk)
 
+(defvar evilmi-always-simple-jump nil
+  "`major-mode' like `python-mode' use optimized algorithm by default.
+If it's t, use simple jump.")
+
 (defun evilmi--simple-find-open-brace (cur-line)
   "Find open brace from CUR-LINE."
   (if evilmi-debug (message "evilmi--simple-find-open-brace called => cur-line=%s (point)=%d" cur-line (point)))
@@ -60,6 +64,27 @@
             (setq rlt 2)))))
 
     rlt))
+
+(defun evilmi--char-is-simple (ch)
+  "Special handling of character CH for `python-mode'."
+  (cond
+   ((and (not evilmi-always-simple-jump)
+         (memq major-mode '(python-mode))
+         ;; in evil-visual-state, (point) could equal to (line-end-position)
+         (>= (point) (1- (line-end-position))))
+    ;; handle follow python code,
+    ;;
+    ;; if true:
+    ;;     a = "hello world"
+    ;;
+    ;; If current cursor is at end of line, rlt should be nil!
+    ;; or else, matching algorithm can't work in above python sample
+    nil)
+   (t
+    (or (memq ch evilmi-forward-chars)
+        (memq ch evilmi-backward-chars)
+        ;; sorry we could not jump between ends of string in python-mode
+        (memq ch evilmi-quote-chars)))))
 
 ;;;###autoload
 (defun evilmi-simple-get-tag ()

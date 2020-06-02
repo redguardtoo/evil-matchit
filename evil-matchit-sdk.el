@@ -1,3 +1,5 @@
+(require 'evil nil t)
+
 (defvar evilmi-debug nil
   "Debug flag.")
 
@@ -25,6 +27,10 @@ between '\\(' and '\\)' in regular expression.")
   "Get keyword from INFO."
   `(nth 3 ,info))
 
+(defmacro evilmi-sdk-get-char (position)
+  "Get character at POSITION."
+  `(char-after ,position))
+
 (defun evilmi-sdk-jump-forward-p ()
   "Return: (forward-direction font-face-under-cursor character-under-cursor).
 If font-face-under-cursor is NOT nil, the quoted string is being processed."
@@ -42,6 +48,107 @@ If font-face-under-cursor is NOT nil, the quoted string is being processed."
     (if evilmi-debug (message "evilmi-sdk-jump-forward-p => (%s %s %s)" rlt ff (string ch)))
     (list rlt ff ch)))
 
+(defun evilmi-sdk-the-other-quote-char (font-face is-forward char)
+  "The end character under cursor has different font from FONT-FACE."
+  (let* (rlt
+         got
+         (delta (if is-forward 1 -1))
+         (pos (+ delta (point)))
+         (end (if is-forward (point-max) (point-min))))
+    (while (not got)
+      (cond
+       ((or (= pos end)
+            (and (= char (evilmi-sdk-get-char (- pos delta)))
+                 (not (eq font-face (get-text-property pos 'face)))))
+        (setq rlt (if is-forward pos (+ 1 pos)))
+        (setq got t))
+       (t
+        (setq pos (+ delta pos)))))
+    (if evilmi-debug (message "evilmi-sdk-the-other-quote-char called Return: %s" rlt))
+    rlt))
+
+(defun evilmi-sdk-comment-p (pos)
+  "Check character at POS is comment by comparing font face."
+  (cond
+   ;; @see https://github.com/redguardtoo/evil-matchit/issues/92
+   ((eq major-mode 'tuareg-mode)
+    (evilmi-among-fonts-p pos '(font-lock-comment-face
+                                font-lock-comment-delimiter-face
+                                font-lock-doc-face)))
+   (t
+    (evilmi-among-fonts-p pos '(font-lock-comment-face
+                                font-lock-comment-delimiter-face)))))
+
+(defun evilmi-sdk-scan-sexps (is-forward)
+  "Get the position of matching tag.
+If IS-FORWARD is t, jump forward; or else jump backward."
+  (let* ((start-pos (if is-forward (point) (+ 1 (point))))
+         (arg (if is-forward 1 -1))
+         (limit (if is-forward (point-max) (point-min)))
+         (lvl 1)
+         (b (following-char))
+         (e (cond
+             ;; {}
+             ((= b 123) 125)
+             ((= b 125) 123)
+             ;; ()
+             ((= b 40) 41)
+             ((= b 41) 40)
+             ;; []
+             ((= b 91) 93)
+             ((= b 93) 91)))
+         (rlt start-pos))
+    (cond
+     ((evilmi-sdk-comment-p (point))
+      ;; Matching tag in comment.
+      ;; Use own algorithm instead of `scan-sexps'
+      ;; because `scan-sexps' not work in some major-mode
+      (save-excursion
+        (setq start-pos (point))
+        (while (and (not (= start-pos limit))
+                    (> lvl 0))
+          (goto-char (setq start-pos (+ start-pos arg)))
+          (when (evilmi-sdk-comment-p start-pos)
+            (cond
+             ((= (following-char) b)
+              (setq lvl (1+ lvl)))
+             ((= (following-char) e)
+              (setq lvl (1- lvl))))))
+        (when (= lvl 0)
+          (setq rlt (+ start-pos (if is-forward 1 0))))))
+     (t
+      ;; not comment
+      ;; search but ignore comments
+      (let* ((parse-sexp-ignore-comments t))
+        (setq rlt (scan-sexps start-pos arg)))))
+
+    (when evilmi-debug
+      (message "evilmi-sdk-scan-sexps => rlt=%s lvl=%s is-forward=%s" rlt lvl is-forward))
+    rlt))
+
+(defun evilmi-sdk-adjust-jumpto (is-forward rlt)
+  ;; normal-state hack!
+  (unless (eq evil-state 'visual)
+    (if is-forward (setq rlt (- rlt 1))))
+  (if evilmi-debug (message "evilmi-sdk-adjust-jumpto => %s" rlt))
+  rlt)
+
+;; @see http://emacs.stackexchange.com/questions/13222/a-elisp-function-to-jump-between-matched-pair
+(defun evilmi-sdk-jumpto-where (ff is-forward ch)
+  "Non-nil ff means jumping between quotes"
+  (let* ((rlt (if ff (evilmi-sdk-the-other-quote-char ff is-forward ch)
+                (evilmi-sdk-scan-sexps is-forward))))
+    (if evilmi-debug (message "evilmi-sdk-jumpto-where => %s" (evilmi-sdk-adjust-jumpto is-forward rlt)))
+    (evilmi-sdk-adjust-jumpto is-forward rlt)))
+
+(defun evilmi-sdk-tweak-selected-region (font-face jump-forward)
+  "Tweak selected region using FONT-FACE and JUMP-FORWARD."
+  ;; visual-state hack!
+  (when (and jump-forward (eq evil-state 'visual) (not font-face))
+    ;; if font-face is non-nil, I control the jump flow from character level,
+    ;; so hack to workaround scan-sexps is NOT necessary
+    (evil-backward-char)))
+
 (defun evilmi-sdk-simple-jump ()
   "Alternative for `evil-jump-item'."
   (if evilmi-debug (message "evilmi-sdk-simple-jump called (point)=%d" (point)))
@@ -51,8 +158,11 @@ If font-face-under-cursor is NOT nil, the quoted string is being processed."
          ;; so we should not use (scan-sexps)
          (ff (nth 1 tmp))
          (ch (nth 2 tmp)))
-    (goto-char (evilmi--find-position-to-jump ff jump-forward ch))
-    (evilmi--tweak-selected-region ff jump-forward)))
+    (goto-char (evilmi-sdk-jumpto-where ff jump-forward ch))
+    (evilmi-sdk-tweak-selected-region ff jump-forward)))
+
+(defmacro evilmi-sdk-strictly-type-p (crt orig)
+  `(or (evilmi-sdk-monogamy-p ,crt) (evilmi-sdk-monogamy-p ,orig)))
 
 (defun evilmi-sdk-tags-matched-p (level orig-tag-info cur-tag-info match-tags)
   (let* (rlt
@@ -65,8 +175,8 @@ If font-face-under-cursor is NOT nil, the quoted string is being processed."
     ;; handle function exit point
     (when (= 1 level)
       ;; end tag could be the same
-      (if (and (evilmi--is-strictly-type cur-tag-info orig-tag-info)
-               (not (evilmi--exactly-same-type cur-tag-info orig-tag-info)))
+      (if (and (evilmi-sdk-strictly-type-p cur-tag-info orig-tag-info)
+               (not (evilmi-sdk-exactly-same-type-p cur-tag-info orig-tag-info)))
           ;; just pass
           (setq rlt nil)
         (cond
@@ -81,20 +191,15 @@ If font-face-under-cursor is NOT nil, the quoted string is being processed."
     rlt))
 
 ;;;###autoload
-(defun evilmi-sdk-curline ()
-  (buffer-substring-no-properties
-   (line-beginning-position)
-   (line-end-position)))
+(defmacro evilmi-sdk-curline ()
+  `(buffer-substring-no-properties (line-beginning-position) (line-end-position)))
 
 ;;;###autoload
 (defun evilmi-sdk-member (keyword keyword-list)
   "Check if KEYWORD exist in KEYWORD-LIST."
   (let* (rlt)
     (cond
-     ((not keyword)
-      (setq rlt nil))
-
-     ((not keyword-list)
+     ((or (not keyword) (not keyword-list))
       (setq rlt nil))
 
      ((stringp keyword-list)
@@ -112,14 +217,15 @@ If font-face-under-cursor is NOT nil, the quoted string is being processed."
       ;; just ignore first element
       (setq rlt (evilmi-sdk-member keyword (cdr keyword-list)))))
 
-     (if (and evilmi-debug rlt) (message "evilmi-sdk-member called => %s %s. rlt=%s" keyword keyword-list rlt))
+    (when (and evilmi-debug rlt)
+      (message "evilmi-sdk-member called => %s %s. rlt=%s" keyword keyword-list rlt))
     rlt))
 
 
 ;;;###autoload
 (defun evilmi-sdk-get-tag-info (keyword match-tags)
   "Return (row column is-function-exit-point keyword).
-The row and column mark the position in evilmi-mylang-match-tags
+The row and column mark the position in `evilmi-mylang-match-tags'
 is-function-exit-point could be unknown status"
   (let* (rlt
          items
@@ -145,7 +251,7 @@ is-function-exit-point could be unknown status"
                           (nth 3 (nth i match-tags))
                           keyword))
         (setq rlt (list i j nil keyword))))
-  (if evilmi-debug (message "evilmi-sdk-get-tag-info called => %s %s. rlt=%s" keyword match-tags rlt))
+    (if evilmi-debug (message "evilmi-sdk-get-tag-info called => %s %s. rlt=%s" keyword match-tags rlt))
     rlt))
 
 (defun evilmi--sdk-check-keyword (keyword begin end)
@@ -177,27 +283,18 @@ Rule is looked up in HOWTOS."
                                     (line-beginning-position)
                                     (line-end-position)))))
 
-(defun evilmi--is-monogamy (tag-info)
-  (and (nth 2 tag-info) (string= (nth 2 tag-info) "MONOGAMY")))
+(defmacro evilmi-sdk-monogamy-p (tag-info)
+  `(and (nth 2 ,tag-info) (string= (nth 2 ,tag-info) "MONOGAMY")))
 
-(defun evilmi--exactly-same-type (crt orig)
-  (= (nth 0 crt) (nth 0 orig)))
+(defmacro evilmi-sdk-exactly-same-type-p (crt orig)
+  `(= (nth 0 ,crt) (nth 0 ,orig)))
 
-(defun evilmi--is-strictly-type (crt orig)
-  (or (evilmi--is-monogamy crt) (evilmi--is-monogamy orig)))
-
-(defun evilmi--same-type (crt orig)
-  (let* (rlt)
-    (if (and crt orig)
-        ;; crt and orig should be at same row if either of them is monogamy
-        (if (evilmi--is-strictly-type crt orig)
-            (setq rlt (evilmi--exactly-same-type crt orig))
-          (setq rlt t)))
-    rlt))
-
-(defmacro evilmi-sdk-get-char (position)
-  "Get character at POSITION."
-  `(char-after ,position))
+(defmacro evilmi-sdk-same-type (crt orig)
+  `(when (and ,crt ,orig)
+     ;; crt and orig should be at same row if either of them is monogamy
+     (if (evilmi-sdk-strictly-type-p ,crt ,orig)
+         (evilmi-sdk-exactly-same-type-p ,crt ,orig)
+       t)))
 
 ;;;###autoload
 (defun evilmi-sdk-get-tag (match-tags howtos)
@@ -239,7 +336,7 @@ after calling this function."
 
       (when keyword
         (setq cur-tag-info (evilmi-sdk-get-tag-info keyword match-tags))
-        (when (evilmi--same-type cur-tag-info orig-tag-info)
+        (when (evilmi-sdk-same-type cur-tag-info orig-tag-info)
           (setq cur-tag-type (nth 1 cur-tag-info))
 
           ;; key algorithm

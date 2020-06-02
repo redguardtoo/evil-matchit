@@ -46,12 +46,14 @@
 
 ;;;###autoload
 (defun evilmi-cmake-get-tag ()
-  (evilmi-sdk-get-tag evilmi-cmake-match-tags evilmi-cmake-extract-keyword-howtos)
-  )
+  (evilmi-sdk-get-tag evilmi-cmake-match-tags
+                      evilmi-cmake-extract-keyword-howtos))
 
 ;;;###autoload
-(defun evilmi-cmake-jump (rlt NUM)
-  (evilmi-sdk-jump rlt NUM evilmi-cmake-match-tags evilmi-cmake-extract-keyword-howtos)
-  )
+(defun evilmi-cmake-jump (info num)
+  (evilmi-sdk-jump info
+                   num
+                   evilmi-cmake-match-tags
+                   evilmi-cmake-extract-keyword-howtos))
 
 (provide 'evil-matchit-cmake)
