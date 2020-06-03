@@ -128,5 +128,37 @@
       (should (string= (thing-at-point 'symbol) "/p"))
 
       (should (eq major-mode 'html-mode)))))
+
+(ert-deftest evilmi-test-c ()
+  (let* ((str "#ifdef CONFIG_COMPAT\n#ifndef TEST1\nstruct mtip_s {\n  int v1;\n}\n#endif\n#endif\nstatic int fn1()\n{\nprintf(\"hello world\");\n}\nint a = 3;"))
+    (with-temp-buffer
+      (insert str)
+      (c-mode)
+
+      ;; jump from start
+      (goto-char (point-min))
+      ;; test #ifdef
+      (evilmi-jump-items)
+      (should (string= "endif" (thing-at-point 'symbol)))
+      ;; test #ifndef
+      (forward-line -1)
+      (evilmi-jump-items)
+      (should (eq (point) (line-beginning-position)))
+      (should (eq (following-char) ?#))
+      (forward-char)
+      (should (string= "ifndef" (thing-at-point 'symbol)))
+
+      ;; jump from function begin to end
+      (goto-char (point-min))
+      (search-forward "static int");
+      (evilmi-jump-items)
+      (should (eq (following-char) ?}))
+      (should (string= (evilmi-sdk-curline) "}"))
+      ;; jump back
+      (evilmi-jump-items)
+      (should (eq (following-char) ?{))
+      (should (string= (evilmi-sdk-curline) "{"))
+
+      (should (eq major-mode 'c-mode)))))
 (ert-run-tests-batch-and-exit)
 ;;; evil-matchit-tests.el ends here
