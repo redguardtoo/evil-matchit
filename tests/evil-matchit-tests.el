@@ -69,96 +69,113 @@
       (should (eq major-mode 'fundamental-mode)))))
 
 (ert-deftest evilmi-test-javascript ()
-  (let* ((str "function hello() {\n  console.log('hello world');\n}"))
-    (with-temp-buffer
-      (insert str)
-      (js-mode)
-      ;; for javascript, jump from anywhere in function beginning
-      (goto-char (+ 3 (point-min)))
-      (evilmi-jump-items)
-      (should (eq (following-char) ?}))
+  (with-temp-buffer
+    (insert  "function hello() {\n  console.log('hello world');\n}")
+    (js-mode)
+    ;; for javascript, jump from anywhere in function beginning
+    (goto-char (+ 3 (point-min)))
+    (evilmi-jump-items)
+    (should (eq (following-char) ?}))
 
-      ;; jump from start again
-      (goto-char (point-min))
-      (search-forward "{")
-      (evilmi-jump-items)
-      (should (eq (following-char) ?}))
-      ;; jump back
-      (evilmi-jump-items)
-      (should (eq (following-char) ?{))
+    ;; jump from start again
+    (goto-char (point-min))
+    (search-forward "{")
+    (evilmi-jump-items)
+    (should (eq (following-char) ?}))
+    ;; jump back
+    (evilmi-jump-items)
+    (should (eq (following-char) ?{))
 
-      ;; jump between ends of string can't be tested.
-      ;; because font face is not useable in batch mode
+    ;; jump between ends of string can't be tested.
+    ;; because font face is not useable in batch mode
 
-      (should (eq major-mode 'js-mode)))))
+    (should (eq major-mode 'js-mode))))
 
 (ert-deftest evilmi-test-html ()
-  (let* ((str "<html lang=\"en\">\n<head>\n<link rel=\"icon\" href=\"%PUBLIC_URL%/favicon.ico\" />\n</head>\n<body>\n<p>Hello world!</p>\n</body>\n</html>"))
-    (with-temp-buffer
-      (insert str)
-      (html-mode)
+  (with-temp-buffer
+    (insert  "<html lang=\"en\">\n<head>\n<link rel=\"icon\" href=\"%PUBLIC_URL%/favicon.ico\" />\n</head>\n<body>\n<p>Hello world!</p>\n</body>\n</html>")
+    (html-mode)
 
-      ;; jump from start again
-      (goto-char (point-min))
-      (search-forward "<head")
-      ;; Please note it jumps to line feed
-      (evilmi-jump-items)
-      (goto-char (1- (point)))
-      (should (eq (following-char) ?>))
-      (should (string= (thing-at-point 'symbol) "/head"))
+    ;; jump from start again
+    (goto-char (point-min))
+    (search-forward "<head")
+    ;; Please note it jumps to line feed
+    (evilmi-jump-items)
+    (goto-char (1- (point)))
+    (should (eq (following-char) ?>))
+    (should (string= (thing-at-point 'symbol) "/head"))
 
-      ;; self closing tag
-      (goto-char (point-min))
-      (search-forward "<link")
-      (evilmi-jump-items)
-      (goto-char (1- (point)))
-      (should (eq (following-char) ?>))
-      (should (string= (thing-at-point 'symbol) "/"))
-      (evilmi-jump-items)
-      (should (eq (following-char) ?<))
-      (forward-char)
-      (should (string= (thing-at-point 'word) "link"))
+    ;; self closing tag
+    (goto-char (point-min))
+    (search-forward "<link")
+    (evilmi-jump-items)
+    (goto-char (1- (point)))
+    (should (eq (following-char) ?>))
+    (should (string= (thing-at-point 'symbol) "/"))
+    (evilmi-jump-items)
+    (should (eq (following-char) ?<))
+    (forward-char)
+    (should (string= (thing-at-point 'word) "link"))
 
-      ;; tags in one line
-      (goto-char (point-min))
-      (search-forward "<p")
-      (evilmi-jump-items)
-      (goto-char (1- (point)))
-      (should (eq (following-char) ?>))
-      (should (string= (thing-at-point 'symbol) "/p"))
+    ;; tags in one line
+    (goto-char (point-min))
+    (search-forward "<p")
+    (evilmi-jump-items)
+    (goto-char (1- (point)))
+    (should (eq (following-char) ?>))
+    (should (string= (thing-at-point 'symbol) "/p"))
 
-      (should (eq major-mode 'html-mode)))))
+    (should (eq major-mode 'html-mode))))
 
 (ert-deftest evilmi-test-c ()
-  (let* ((str "#ifdef CONFIG_COMPAT\n#ifndef TEST1\nstruct mtip_s {\n  int v1;\n}\n#endif\n#endif\nstatic int fn1()\n{\nprintf(\"hello world\");\n}\nint a = 3;"))
-    (with-temp-buffer
-      (insert str)
-      (c-mode)
+  (with-temp-buffer
+    (insert "#ifdef CONFIG_COMPAT\n#ifndef TEST1\nstruct mtip_s {\n  int v1;\n}\n#endif\n#endif\n"
+            "static int fn1()\n{\nprintf(\"hello world\");\n}\nint a = 3;\n"
+            "switch(c) {\ncase 'a':\nbreak;\ncase 'b':\nbreak;\n}\n")
+    (c-mode)
 
-      ;; jump from start
-      (goto-char (point-min))
-      ;; test #ifdef
-      (evilmi-jump-items)
-      (should (string= "endif" (thing-at-point 'symbol)))
-      ;; test #ifndef
-      (forward-line -1)
-      (evilmi-jump-items)
-      (should (eq (point) (line-beginning-position)))
-      (should (eq (following-char) ?#))
-      (forward-char)
-      (should (string= "ifndef" (thing-at-point 'symbol)))
+    ;; jump from start
+    (goto-char (point-min))
+    ;; test #ifdef
+    (evilmi-jump-items)
+    (should (string= "endif" (thing-at-point 'symbol)))
+    ;; test #ifndef
+    (forward-line -1)
+    (evilmi-jump-items)
+    (should (eq (point) (line-beginning-position)))
+    (should (eq (following-char) ?#))
+    (forward-char)
+    (should (string= "ifndef" (thing-at-point 'symbol)))
 
-      ;; jump from function begin to end
-      (goto-char (point-min))
-      (search-forward "static int");
-      (evilmi-jump-items)
-      (should (eq (following-char) ?}))
-      (should (string= (evilmi-sdk-curline) "}"))
-      ;; jump back
-      (evilmi-jump-items)
-      (should (eq (following-char) ?{))
-      (should (string= (evilmi-sdk-curline) "{"))
+    ;; jump from function begin to end
+    (goto-char (point-min))
+    (search-forward "static int");
+    (evilmi-jump-items)
+    (should (eq (following-char) ?}))
+    (should (string= (evilmi-sdk-curline) "}"))
+    ;; jump back
+    (evilmi-jump-items)
+    (should (eq (following-char) ?{))
+    (should (string= (evilmi-sdk-curline) "{"))
 
-      (should (eq major-mode 'c-mode)))))
+    ;; jump in switch statement
+    (goto-char (point-min))
+    (search-forward "switch");
+    (evilmi-jump-items)
+    (should (eq (following-char) ?c))
+    (should (string= (thing-at-point 'symbol) "case"))
+    (should (string-match "case 'a'" (evilmi-sdk-curline)))
+    ;; goto next case statement
+    (evilmi-jump-items)
+    (should (eq (following-char) ?c))
+    (should (string= (thing-at-point 'symbol) "case"))
+    (should (string-match "case 'b'" (evilmi-sdk-curline) ))
+                                        ; jump back
+    (evilmi-jump-items)
+    (should (eq (following-char) ?{))
+    (message "(point)=%s" (point))
+    (should (string-match "switch(c)" (evilmi-sdk-curline) ))
+
+    (should (eq major-mode 'c-mode))))
 (ert-run-tests-batch-and-exit)
 ;;; evil-matchit-tests.el ends here

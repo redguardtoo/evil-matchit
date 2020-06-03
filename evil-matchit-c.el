@@ -40,13 +40,19 @@
 
 ;;;###autoload
 (defun evilmi-c-get-tag ()
-  (evilmi-sdk-get-tag evilmi-c-match-tags evilmi-c-extract-keyword-howtos))
+  "Get tag at point."
+  (evilmi-sdk-get-tag evilmi-c-match-tags
+                      evilmi-c-extract-keyword-howtos))
 
 ;;;###autoload
-(defun evilmi-c-jump (rlt num)
+(defun evilmi-c-jump (info num)
+  "Use INFO to jump NUM times."
   (let* ((old-pos (point))
-         (pos (evilmi-sdk-jump rlt num evilmi-c-match-tags evilmi-c-extract-keyword-howtos))
-         (orig-tag (and rlt (nth 3 (cadr rlt)))))
+         (new-pos (evilmi-sdk-jump info
+                               num
+                               evilmi-c-match-tags
+                               evilmi-c-extract-keyword-howtos))
+         (orig-tag (and info (nth 3 (cadr info)))))
 
     ;; Place cursor over last case of 'switch' statement and press %:
     ;; Should go back to beginning of switch:
@@ -58,11 +64,11 @@
     ;;   }
     (when (and (string= orig-tag "case")
                ;; failed to find matching tag
-               (not pos))
+               (not new-pos))
       (goto-char old-pos)
       ;; Goto outer bracket
       (backward-up-list)
-      (setq pos (beginning-of-line)))
-    pos))
+      (setq new-pos (beginning-of-line)))
+    new-pos))
 
 (provide 'evil-matchit-c)
