@@ -173,7 +173,6 @@
                                         ; jump back
     (evilmi-jump-items)
     (should (eq (following-char) ?{))
-    (message "(point)=%s" (point))
     (should (string-match "switch(c)" (evilmi-sdk-curline) ))
 
     (should (eq major-mode 'c-mode))))

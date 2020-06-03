@@ -1,4 +1,5 @@
 (require 'evil nil t)
+(require 'subr-x)
 
 (defvar evilmi-debug nil
   "Debug flag.")
@@ -274,7 +275,6 @@ Rule is looked up in HOWTOS."
       (setq howto (nth i howtos))
       (when (string-match (nth 0 howto) cur-line)
         ;; keyword should be trimmed because FORTRAN use "else if"
-        (unless (featurep 'subr-x) (require 'subr-x))
         (setq keyword (string-trim (match-string (nth 1 howto) cur-line)))
         ;; keep search keyword by using next howto (regex and match-string index)
         (unless (evilmi-sdk-member keyword match-tags) (setq keyword nil)))
@@ -289,7 +289,7 @@ Rule is looked up in HOWTOS."
   (and (nth 2 tag-info) (string= (nth 2 tag-info) "MONOGAMY")))
 
 (defun evilmi-sdk-exactly-same-type-p (crt orig)
-  (= (nth 0 crt) (nth 0 orig)))
+  (eq (nth 0 crt) (nth 0 orig)))
 
 (defun evilmi-sdk-same-type (crt orig)
   (when (and crt orig)
@@ -425,9 +425,6 @@ after calling this function."
                     (member f fonts))
                   fontfaces))))
 
-(defun evilmi-empty-line-p (line)
-  (string-match "^[ \t]*$" line))
-
 (defun evilmi-next-non-empty-line ()
   "Return next non-empty line content or nil."
   (let* ((b (line-beginning-position))
@@ -441,7 +438,7 @@ after calling this function."
       (while (and continue (> (point) e))
         (setq line (evilmi-sdk-curline))
         (cond
-         ((evilmi-empty-line-p line)
+         ((string-blank-p line)
           (setq b (line-beginning-position))
           (setq e (line-end-position))
           (forward-line))
@@ -450,14 +447,10 @@ after calling this function."
           (setq rlt line)))))
     rlt))
 
-;;;###autoload
-(defun evilmi-evenp (num)
-  (= (% num 2) 0))
-
-(defun evilmi-count-matches (regexp str)
+(defun evilmi-sdk-count-matches (regexp str)
+  "Count matches of regexp in STR."
   (let* ((count 0)
          (start 0))
-    (unless start (setq start 0))
     (while (string-match regexp str start)
       (setq count (1+ count))
       (setq start (match-end 0)))
