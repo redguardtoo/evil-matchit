@@ -103,8 +103,9 @@ Some people prefer using \"m\" instead.")
     (if evilmi-debug (message "evilmi--operate-on-item called. Return: %s" ideal-dest))
     ideal-dest))
 
-(defun evilmi--push-mark (rlt)
-  (push-mark (nth 0 rlt) t t))
+(defun evilmi--push-mark (position)
+  "Pus POSITION as marker."
+  (push-mark (nth 0 position) t t))
 
 (defun evilmi--convert-rules (rules)
   "Convert RULES to function pairs list."
@@ -210,6 +211,8 @@ Some people prefer using \"m\" instead.")
 
 
 (defun evilmi--region-to-select-or-delete (num &optional is-inner)
+  "Get NUM region(s) to select or delete.
+If IS-INNER is t, the region is inner text object."
   (let* (ideal-dest b e)
     (save-excursion
       (setq ideal-dest (evilmi--operate-on-item num #'evilmi--push-mark))
@@ -271,7 +274,7 @@ Some people prefer using \"m\" instead.")
 
 ;;;###autoload
 (defun evilmi-jump-to-percentage (num)
-  "Like Vim %."
+  "Like Vim %, NUM is the percentage of location."
   (interactive "P")
   (let* (dst)
     (when (and num (> num 0))
@@ -306,6 +309,9 @@ Some people prefer using \"m\" instead.")
   (interactive)
   (message "2.3.5"))
 
+(defvar evil-matchit-mode-map (make-sparse-keymap)
+  "Keymap used by the minor mode.")
+
 ;;;###autoload
 (define-minor-mode evil-matchit-mode
   "Buffer-local minor mode to emulate matchit.vim."
@@ -324,12 +330,12 @@ Some people prefer using \"m\" instead.")
 
 ;;;###autoload
 (defun turn-on-evil-matchit-mode ()
-  "Enable `evil-matchit-mode' in the current buffer."
+  "Enable the minor mode in the current buffer."
   (evil-matchit-mode 1))
 
 ;;;###autoload
 (defun turn-off-evil-matchit-mode ()
-  "Disable `evil-matchit-mode' in the current buffer."
+  "Disable the minor mode in the current buffer."
   (evil-matchit-mode -1))
 
 ;;;###autoload

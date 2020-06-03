@@ -106,7 +106,7 @@ Open evil-matchit-ruby.el whole structure is like,
 (provide 'evil-matchit-ruby)
 #+end_src
 
-So you setup in ~/.emacs is as below:
+So you configuration in =~/.emacs= is as below:
 #+begin_src elisp
 (with-eval-after-load "evil-matchit-ruby"
   (push '("^[ \t]*\\([a-z]+\\)\\( .*\\| *\\)$" 1) evilmi-ruby-extract-keyword-howtos)
@@ -114,7 +114,7 @@ So you setup in ~/.emacs is as below:
 #+end_src
 
 ** Re-define keybinding
-All you need to do is to define function evilmi-customize-keybinding before turning on evil-match-mode:
+All you need to do is to define function =evilmi-customize-keybinding= before turning on =evil-matchit-mode=:
 
 The shortcut =%= is defined in =evilmi-shortcut=. It's the name of text object and shortcut of =evilmi-jump-items=. Some people prefer set it
 to "m".

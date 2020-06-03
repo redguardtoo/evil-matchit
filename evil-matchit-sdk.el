@@ -20,16 +20,16 @@
   "The list of HOWTO on extracting keyword from current line.
 Each howto is actually a pair. The first element of pair is the regular
 expression to match the current line. The second is the index of sub-matches
-to extract the keyword which starts from one. The sub-match is the match defined
+to extract the keyword which starts from one.  The sub-match is the match defined
 between '\\(' and '\\)' in regular expression.")
 
-(defmacro evilmi-sdk-keyword (info)
+(defun evilmi-sdk-keyword (info)
   "Get keyword from INFO."
-  `(nth 3 ,info))
+  (nth 3 info))
 
-(defmacro evilmi-sdk-get-char (position)
+(defun evilmi-sdk-get-char (position)
   "Get character at POSITION."
-  `(char-after ,position))
+  (char-after position))
 
 (defun evilmi-sdk-jump-forward-p ()
   "Return: (forward-direction font-face-under-cursor character-under-cursor).
@@ -161,8 +161,8 @@ If IS-FORWARD is t, jump forward; or else jump backward."
     (goto-char (evilmi-sdk-jumpto-where ff jump-forward ch))
     (evilmi-sdk-tweak-selected-region ff jump-forward)))
 
-(defmacro evilmi-sdk-strictly-type-p (crt orig)
-  `(or (evilmi-sdk-monogamy-p ,crt) (evilmi-sdk-monogamy-p ,orig)))
+(defun evilmi-sdk-strictly-type-p (crt orig)
+  (or (evilmi-sdk-monogamy-p crt) (evilmi-sdk-monogamy-p orig)))
 
 (defun evilmi-sdk-tags-matched-p (level orig-tag-info cur-tag-info match-tags)
   (let* (rlt
@@ -191,8 +191,9 @@ If IS-FORWARD is t, jump forward; or else jump backward."
     rlt))
 
 ;;;###autoload
-(defmacro evilmi-sdk-curline ()
-  `(buffer-substring-no-properties (line-beginning-position) (line-end-position)))
+(defun evilmi-sdk-curline ()
+  (buffer-substring-no-properties (line-beginning-position)
+                                  (line-end-position)))
 
 ;;;###autoload
 (defun evilmi-sdk-member (keyword keyword-list)
@@ -273,6 +274,7 @@ Rule is looked up in HOWTOS."
       (setq howto (nth i howtos))
       (when (string-match (nth 0 howto) cur-line)
         ;; keyword should be trimmed because FORTRAN use "else if"
+        (unless (featurep 'subr-x) (require 'subr-x))
         (setq keyword (string-trim (match-string (nth 1 howto) cur-line)))
         ;; keep search keyword by using next howto (regex and match-string index)
         (unless (evilmi-sdk-member keyword match-tags) (setq keyword nil)))
@@ -283,18 +285,18 @@ Rule is looked up in HOWTOS."
                                     (line-beginning-position)
                                     (line-end-position)))))
 
-(defmacro evilmi-sdk-monogamy-p (tag-info)
-  `(and (nth 2 ,tag-info) (string= (nth 2 ,tag-info) "MONOGAMY")))
+(defun evilmi-sdk-monogamy-p (tag-info)
+  (and (nth 2 tag-info) (string= (nth 2 tag-info) "MONOGAMY")))
 
-(defmacro evilmi-sdk-exactly-same-type-p (crt orig)
-  `(= (nth 0 ,crt) (nth 0 ,orig)))
+(defun evilmi-sdk-exactly-same-type-p (crt orig)
+  (= (nth 0 crt) (nth 0 orig)))
 
-(defmacro evilmi-sdk-same-type (crt orig)
-  `(when (and ,crt ,orig)
-     ;; crt and orig should be at same row if either of them is monogamy
-     (if (evilmi-sdk-strictly-type-p ,crt ,orig)
-         (evilmi-sdk-exactly-same-type-p ,crt ,orig)
-       t)))
+(defun evilmi-sdk-same-type (crt orig)
+  (when (and crt orig)
+    ;; crt and orig should be at same row if either of them is monogamy
+    (if (evilmi-sdk-strictly-type-p crt orig)
+        (evilmi-sdk-exactly-same-type-p crt orig)
+      t)))
 
 ;;;###autoload
 (defun evilmi-sdk-get-tag (match-tags howtos)
@@ -449,8 +451,8 @@ after calling this function."
     rlt))
 
 ;;;###autoload
-(defmacro evilmi-evenp (num)
-  `(= (% ,num 2) 0))
+(defun evilmi-evenp (num)
+  (= (% num 2) 0))
 
 (defun evilmi-count-matches (regexp str)
   (let* ((count 0)
