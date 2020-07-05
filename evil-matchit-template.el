@@ -22,8 +22,9 @@
 ;;
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-
+;;
+;;; Commentary:
+;;
 ;;; Code:
 
 ;; OPTIONAL, you don't need SDK to write a plugin for evil-matchit
@@ -33,8 +34,7 @@
 
 (defvar evilmi-template-extract-keyword-howtos
   '(("^[ \t]*<\\?php +\\([a-z]+\\).*$" 1)
-    ("^[ \t]*\\([@a-z]+\\).*$" 1)
-    ))
+    ("^[ \t]*\\([@a-z]+\\).*$" 1)))
 
 (defvar evilmi-template-match-tags
   '(("if" ("elseif" "else") "endif" "MONOGAMY")
@@ -47,17 +47,17 @@
     ("@for" () "@endfor" "MONOGAMY")
     ("@foreach" () "@endforeach" "MONOGAMY")
     ("@forelse" "@empty" "@endforelse" "MONOGAMY")
-    ("@while" () "@endwhile" "MONOGAMY")
-    ))
+    ("@while" () "@endwhile" "MONOGAMY")))
 
 ;;;###autoload
 (defun evilmi-template-get-tag ()
-  (let (rlt)
-    (setq rlt (evilmi-sdk-get-tag evilmi-template-match-tags evilmi-template-extract-keyword-howtos))
-    rlt))
+  "Get tag at point."
+  (evilmi-sdk-get-tag evilmi-template-match-tags evilmi-template-extract-keyword-howtos))
 
 ;;;###autoload
-(defun evilmi-template-jump (rlt NUM)
-  (evilmi-sdk-jump rlt NUM evilmi-template-match-tags evilmi-template-extract-keyword-howtos))
+(defun evilmi-template-jump (info num)
+  "Jump to the matching tag using INFO and NUM."
+  (evilmi-sdk-jump info num evilmi-template-match-tags evilmi-template-extract-keyword-howtos))
 
 (provide 'evil-matchit-template)
+;;; evil-matchit-template.el ends here

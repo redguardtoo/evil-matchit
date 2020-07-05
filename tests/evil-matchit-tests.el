@@ -223,5 +223,69 @@
 
     (should (eq major-mode 'lua-mode))))
 
+(ert-deftest evilmi-test-diff ()
+  (with-temp-buffer
+    (insert "diff 1\n"
+            "index abed2b7\n"
+            "--- a/1.c\n"
+            "+++ b/1.c\n"
+            "line1\n"
+            "line2\n"
+            "diff 2"
+            "index abed2b7\n"
+            "--- a/2.c\n"
+            "+++ b/2.c\n"
+            "line3\n"
+            "line4")
+    (diff-mode)
+
+    ;; test git diff
+    ;; jump to diff end
+    (goto-char (point-min))
+    (evilmi-jump-items)
+    (should (string= "line2" (evilmi-sdk-curline)))
+    ;; jump back to diff beginning
+    (evilmi-jump-items)
+    (should (string= "diff 1" (evilmi-sdk-curline)))
+    (should (eq (point) (point-min)))
+    ;; jump from second line of diff beginning
+    (forward-line 1)
+    (evilmi-jump-items)
+    (should (string= "line2" (evilmi-sdk-curline)))
+    ;; jump from third line of diff beginning
+    (goto-char (point-min))
+    (forward-line 2)
+    (evilmi-jump-items)
+    (should (string= "line2" (evilmi-sdk-curline)))
+    ;; jump from fourth line of diff beginning
+    (goto-char (point-min))
+    (forward-line 3)
+    (evilmi-jump-items)
+    (should (string= "line2" (evilmi-sdk-curline)))
+
+    ;; test GNU diff
+    (erase-buffer)
+    (insert "--- a/1.c\n"
+            "+++ b/1.c\n"
+            "line1\n"
+            "line2\n"
+            "--- a/2.c\n"
+            "+++ b/2.c\n"
+            "line3\n"
+            "line4")
+    ;; jump to diff end
+    (goto-char (point-min))
+    (evilmi-jump-items)
+    (should (string= "line2" (evilmi-sdk-curline)))
+    ;; jump back to diff beginning
+    (evilmi-jump-items)
+    (should (string= "--- a/1.c" (evilmi-sdk-curline)))
+    (should (eq (point) (point-min)))
+    ;; jump from second line of diff beginning
+    (forward-line 1)
+    (evilmi-jump-items)
+    (should (string= "line2" (evilmi-sdk-curline)))
+    (should (eq major-mode 'diff-mode))))
+
 (ert-run-tests-batch-and-exit)
 ;;; evil-matchit-tests.el ends here

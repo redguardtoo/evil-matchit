@@ -47,8 +47,8 @@
   (evilmi-sdk-get-tag evilmi-sh-match-tags evilmi-sh-extract-keyword-howtos))
 
 ;;;###autoload
-(defun evilmi-sh-jump (rlt NUM)
-  (evilmi-sdk-jump rlt NUM evilmi-sh-match-tags evilmi-sh-extract-keyword-howtos))
+(defun evilmi-sh-jump (info num)
+  (evilmi-sdk-jump info num evilmi-sh-match-tags evilmi-sh-extract-keyword-howtos))
 
 (provide 'evil-matchit-sh)
 ;;; evil-matchit-sh.el ends here

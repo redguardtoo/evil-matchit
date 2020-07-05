@@ -22,12 +22,9 @@
 ;;
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-
-
+;;
 ;;; Commentary:
 ;;
-
 ;;; Code:
 
 ;; OPTIONAL, you don't need SDK to write a plugin for evil-matchit
@@ -36,8 +33,7 @@
 (require 'evil-matchit-sdk)
 
 (defvar evilmi-cmake-extract-keyword-howtos
-  '(("^[ \t]*\\([a-zA-Z]+ *\\) *(.*$" 1)
-    ))
+  '(("^[ \t]*\\([a-zA-Z]+ *\\) *(.*$" 1)))
 
 ;; CMake (http://www.cmake.org) syntax
 (defvar evilmi-cmake-match-tags
@@ -45,8 +41,7 @@
     (("foreach") () ("endforeach") "MONOGAMY")
     (("macro") () ("endmacro") "MONOGAMY")
     (("while") () ("endwhile") "MONOGAMY")
-    (("function") () ("endfunction") "MONOGAMY")
-    ))
+    (("function") () ("endfunction") "MONOGAMY")))
 
 ;;;###autoload
 (defun evilmi-cmake-get-tag ()
@@ -59,8 +54,6 @@
                    num
                    evilmi-cmake-match-tags
                    evilmi-cmake-extract-keyword-howtos))
-
-(provide 'evil-matchit-cmake)
 
 (provide 'evil-matchit-cmake)
 ;;; evil-matchit-cmake.el ends here

@@ -4,7 +4,7 @@
 
 ;; Author: Chen Bin <chenbin DOT sh AT gmail DOT com>
 ;; URL: http://github.com/redguardtoo/evil-matchit
-;; Version: 2.3.5
+;; Version: 2.3.6
 ;; Keywords: matchit vim evil
 ;; Package-Requires: ((evil "1.2.0") (emacs "24.4"))
 ;;
@@ -307,7 +307,7 @@ If IS-INNER is t, the region is inner text object."
 (defun evilmi-version()
   "Print version."
   (interactive)
-  (message "2.3.5"))
+  (message "2.3.6"))
 
 (defvar evil-matchit-mode-map (make-sparse-keymap)
   "Keymap used by the minor mode.")

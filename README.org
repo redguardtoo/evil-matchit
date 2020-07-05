@@ -170,12 +170,12 @@ A complete setup:
 ;; @param NUM numeric argument when user press "%" to match tag
 ;; @return the matching tag position in theory, useful only for
 ;;         selecting or deleting text between matching tags and tags
-(defun evilmi-mylang-jump (rlt NUM)
-  (message "rlt=%s" rlt)
+(defun evilmi-mylang-jump (info num)
+  (message "info=%s" info)
   ;; if we need select region between tags (including tags itself)
   ;; we get the beginning of region by reading the first element of
-  ;; rlt
-  (push-mark (nth 0 rlt) t t)
+  ;; info
+  (push-mark (nth 0 info) t t)
   ;; say 999 is the where we jump to
   (goto-char 999)
   ;; If you need know where is the end of the region for region operation,

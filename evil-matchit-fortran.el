@@ -61,8 +61,8 @@
   (evilmi-sdk-get-tag evilmi-fortran-match-tags evilmi-fortran-extract-keyword-howtos))
 
 ;;;###autoload
-(defun evilmi-fortran-jump (rlt NUM)
-  (evilmi-sdk-jump rlt NUM evilmi-fortran-match-tags evilmi-fortran-extract-keyword-howtos))
+(defun evilmi-fortran-jump (info num)
+  (evilmi-sdk-jump info num evilmi-fortran-match-tags evilmi-fortran-extract-keyword-howtos))
 
 (provide 'evil-matchit-fortran)
 ;;; evil-matchit-fortran.el ends here

@@ -22,71 +22,97 @@
 ;;
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-
+;;
+;;; Commentary:
+;;
 ;;; Code:
 
 (require 'evil-matchit-sdk)
 
-(defun evilmi-diff-guess-final-pos ()
-  (let* ((final-pos (point)))
+(defun evilmi-diff-begin ()
+  "Find diff begin."
+  (let* (rlt)
     (save-excursion
-      (let* (tmp-line)
+      (cond
+       ((string-match "^diff " (evilmi-sdk-curline))
+        (setq rlt (line-beginning-position)))
+
+       ((string-match "^index " (evilmi-sdk-curline))
         (forward-line -1)
-        (setq tmp-line (evilmi-sdk-curline))
-        (if (string-match-p "^index [0-9a-z]+\\.+[0-9a-z]+ [0-9]+$" tmp-line)
-            (forward-line -1))
-        (setq tmp-line (evilmi-sdk-curline))
-        (if (string-match-p "^diff [^ ]" tmp-line)
-            (forward-line -1))
-        (setq final-pos (line-end-position))))
-    final-pos))
+        (setq rlt (line-beginning-position)))
+
+       (t
+        ;; make sure the current line has prefix "---"
+        (when (string-match "^\\+\\+\\+ " (evilmi-sdk-curline))
+          (forward-line -1))
+        (cond
+         ((string-match "^--- " (evilmi-sdk-curline))
+          (setq rlt (line-beginning-position))
+          (forward-line -2))
+         (t
+          (forward-line -1)))
+        (when (string-match "^diff " (evilmi-sdk-curline))
+          (setq rlt (line-beginning-position))))))
+    rlt))
+
+(defun evilmi-diff-end ()
+  "Find diff end."
+  (let* (rlt)
+    ;; find next diff beginning
+    (save-excursion
+      (when (re-search-forward "^diff " (point-max) t)
+        (setq rlt (line-beginning-position))))
+    (save-excursion
+      (when (re-search-forward "^--- " (point-max) t)
+        (when (or (not rlt) (< (line-beginning-position) rlt))
+          (setq rlt (line-beginning-position)))))
+    ;; calculate diff end
+    (cond
+     (rlt
+      (save-excursion
+        (goto-char rlt)
+        (forward-line -1)
+        (setq rlt (line-end-position))))
+     (t
+      (setq rlt (point-max))))
+    rlt))
 
 ;;;###autoload
 (defun evilmi-diff-get-tag ()
-  ;; do nothing
-  (let* ((cur-line (evilmi-sdk-curline))
-         (final-pos (point)))
-    (if (string-match-p "^--- " cur-line)
-        (save-excursion
-          (setq final-pos (evilmi-diff-guess-final-pos))))
-    (list final-pos)))
+  "Get tag at point."
+  (let* (pos)
+    (cond
+     ((string-match "^\\(\\+\\+\\+\\|---\\|diff\\|index\\) " (evilmi-sdk-curline))
+      (when (setq pos (evilmi-diff-begin))
+        ;; open tags
+        (list pos 0)))
+     (t
+      (when (setq pos (evilmi-diff-end))
+        ;; close tags
+        (list pos 1))))))
 
 ;;;###autoload
-(defun evilmi-diff-jump (rlt NUM)
-  (let* ((cur-line (evilmi-sdk-curline))
-         (final-pos (point)))
-    (cond
-     ((string-match-p "^\\+\\+\\+ " cur-line)
-      ;; next file in diff-mode
+(defun evilmi-diff-jump (info num)
+  "Jump to the matching tag using INFO and NUM."
+  (ignore num)
+  (when info
+    (let* ((pos (nth 0 info))
+           (type (nth 1 info))
+           dest)
       (cond
-       ((re-search-forward "^--- " (point-max) t)
-        (setq final-pos (evilmi-diff-guess-final-pos))
-        (re-search-forward "^\\+\\+\\+ " (point-max) t)
-        (goto-char (line-beginning-position)))
-       (t
-        (setq final-pos (goto-char (point-max))))))
+       ((eq type 0)
+        (goto-char pos)
+        (re-search-forward "^\\+\\+\\+ ")
+        (forward-line 1)
+        (when (setq dest (evilmi-diff-end))
+          (goto-char dest)))
 
-     ((string-match "^--- " cur-line)
-      ;; previous file in diff-mode
-      (when (re-search-backward "^\\+\\+\\+ " (point-min) t)
-        (save-excursion
-          (forward-line 1)
-          (setq final-pos (line-end-position)))
-        (re-search-backward "^--- " (point-min) t)
-        (goto-char (line-beginning-position))))
-
-     ((string-match-p "^@@ " cur-line)
-      (forward-line 1)
-      ;; previous file in diff-mode
-      (cond
-       ((re-search-forward "^\\(diff\\|---\\|@@ \\)" (point-max) t)
-        (goto-char (line-beginning-position))
-        (save-excursion
-          (forward-line -1)
-          (setq final-pos (line-end-position))))
        (t
-        (setq final-pos (goto-char (point-max)))))))
-    final-pos))
+        (goto-char pos)
+        (re-search-backward "^\\+\\+\\+ ")
+        (when (setq dest (evilmi-diff-begin))
+          (goto-char dest))))
+      dest)))
 
 (provide 'evil-matchit-diff)
+;;; evil-matchit-diff.el ends here
