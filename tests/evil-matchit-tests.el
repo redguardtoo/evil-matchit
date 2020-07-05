@@ -173,8 +173,55 @@
                                         ; jump back
     (evilmi-jump-items)
     (should (eq (following-char) ?{))
-    (should (string-match "switch(c)" (evilmi-sdk-curline) ))
+    (should (string-match "switch(c)" (evilmi-sdk-curline)))
 
     (should (eq major-mode 'c-mode))))
+
+(ert-deftest evilmi-test-lua ()
+  (with-temp-buffer
+    (insert "if configTable:FindFirstChild(configName) then\n"
+            "    configs[configName] = configTable:FindFirstChild(configName).Value\n"
+            "else\n"
+            "    configs[configName] = defaultValue\n"
+            "end\n"
+            "\n"
+            "local thread = coroutine.create(function()\n"
+            "    while true do\n"
+            "        wait()\n"
+            "        if state then\n"
+            "            display.Text = state.Name\n"
+            "        end\n"
+            "    end\n"
+            "end)\n")
+    (lua-mode)
+
+    ;; jump from start
+    (goto-char (point-min))
+
+    ;; test if else end
+    (evilmi-jump-items)
+    (should (string= "else" (thing-at-point 'symbol)))
+    (evilmi-jump-items)
+    (should (string= "end" (thing-at-point 'symbol)))
+    (evilmi-jump-items)
+    ;; no back to the beginning
+    (should (string= "if" (thing-at-point 'symbol)))
+    (should (eq (point) (point-min)))
+
+    ;; test function
+    (search-forward "local thread = coroutine.create")
+    (evilmi-jump-items)
+    (should (string= "end)" (evilmi-sdk-curline)))
+    (evilmi-jump-items)
+    (should (string= "local thread = coroutine.create(function()" (string-trim (evilmi-sdk-curline))))
+    ;; test while embedded in function
+    (search-forward "while true do")
+    (evilmi-jump-items)
+    (should (string= "end" (thing-at-point 'symbol)))
+    (evilmi-jump-items)
+    (should (string= "while true do" (string-trim (evilmi-sdk-curline))))
+
+    (should (eq major-mode 'lua-mode))))
+
 (ert-run-tests-batch-and-exit)
 ;;; evil-matchit-tests.el ends here

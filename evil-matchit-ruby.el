@@ -1,4 +1,4 @@
-;;; evil-matchit-ruby.el ---ruby plugin of evil-matchit
+;;; evil-matchit-ruby.el --- ruby plugin of evil-matchit
 
 ;; Copyright (C) 2014-2020 Chen Bin <chenbin DOT sh AT gmail DOT com>
 
@@ -29,7 +29,9 @@
 ;; OPTIONAL, you don't need SDK to write a plugin for evil-matchit
 ;; but SDK do make you write less code, isn't it?
 ;; All you need to do is just define the match-tags for SDK algorithm to lookup.
-
+;;
+;;; Commentary:
+;;
 ;;; Code:
 
 (require 'evil-matchit-sdk)
@@ -57,3 +59,4 @@
   (evilmi-sdk-jump rlt num evilmi-ruby-match-tags evilmi-ruby-extract-keyword-howtos))
 
 (provide 'evil-matchit-ruby)
+;;; evil-matchit-ruby.el ends here

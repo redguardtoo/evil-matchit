@@ -1,4 +1,4 @@
-;;; evil-matchit-sql.el ---sql plugin of evil-matchit
+;;; evil-matchit-sql.el --- sql plugin of evil-matchit
 
 ;; Copyright (C) 2014-2020 Chen Bin <chenbin DOT sh AT gmail DOT com>
 
@@ -22,8 +22,9 @@
 ;;
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-
+;;
+;;; Commentary:
+;;
 ;;; Code:
 
 ;; OPTIONAL, you don't need SDK to write a plugin for evil-matchit
@@ -71,31 +72,30 @@
 ;;  WHEN OTHERS THEN
 ;;
 ;;  create[ or replace] procedure|function|event
-    ;;   '^\s*\<\%(do\|for\|while\|loop\)\>.*:'.
+    ;;   '^[ \t]*\<\%(do\|for\|while\|loop\)\>.*:'.
 ;; TODO for one howto, if it cannot match any keyword,
 ;; should try next howto, the purpose is avoid missing any howto
 (defvar evilmi-sql-extract-keyword-howtos
-  '(("^[ \t]*\\([a-zA-Z]+ [a-zA-Z]+\\)" 1)
+  '(("^[ \t]*\\([a-zA-Z]+[ \t][a-zA-Z]+\\)" 1)
     ("^[ \t]*\\([a-zA-Z]+\\)" 1)
-    ("^.* \\(loop\\)[;]? *$" 1)
-    ))
+    ("^.*[ \t]\\(loop\\)[;]?[ \t]*$" 1)))
 
 (defvar evilmi-sql-match-tags
   '(("if" ("elsif" "else" "elseif" "else *if") ("end" "end *if"))
     (("loop") ("leave" "break" "continue" "exit") ("end loop"))
     ("begin" () "end")
     ("case" ("when *others") ("end *case" "end"))
-    (("do") () "do *end")
-    ))
+    (("do") () "do *end")))
 
 ;;;###autoload
 (defun evilmi-sql-get-tag ()
-  (let (rlt)
-    (setq rlt (evilmi-sdk-get-tag evilmi-sql-match-tags evilmi-sql-extract-keyword-howtos))
-    rlt))
+  "Get tag at point."
+  (evilmi-sdk-get-tag evilmi-sql-match-tags evilmi-sql-extract-keyword-howtos))
 
 ;;;###autoload
-(defun evilmi-sql-jump (rlt NUM)
-  (evilmi-sdk-jump rlt NUM evilmi-sql-match-tags evilmi-sql-extract-keyword-howtos))
+(defun evilmi-sql-jump (info num)
+  "Use INFO returned by `evilmi-sql-get-tag' and NUM to jump to matched tag."
+  (evilmi-sdk-jump info num evilmi-sql-match-tags evilmi-sql-extract-keyword-howtos))
 
 (provide 'evil-matchit-sql)
+;;; evil-matchit-sql.el ends here

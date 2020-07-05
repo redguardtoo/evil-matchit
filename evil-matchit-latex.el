@@ -1,4 +1,4 @@
-;;; evil-matchit-latex.el ---latex plugin of evil-matchit
+;;; evil-matchit-latex.el --- latex plugin of evil-matchit
 
 ;; Copyright (C) 2014-2020 Chen Bin <chenbin DOT sh AT gmail DOT com>
 
@@ -22,31 +22,29 @@
 ;;
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-
+;;
+;;; Commentary:
+;;
 ;;; Code:
+
 (require 'evil-matchit-sdk)
 
 (defvar evilmi-latex-extract-keyword-howtos
-  '(("\\\\\\([a-zA-Z]+\\(\{[a-zA-Z0-9+*_-]+\}\\)?\\)" 1)
-    ))
-;; (defvar evilmi-latex-regexp "\\\\\\([a-zA-Z]+\\(\{[a-zA-Z0-9+*_-]+\}\\)?\\)")
+  '(("\\\\\\([a-zA-Z]+\\(\{[a-zA-Z0-9+*_-]+\}\\)?\\)" 1)))
 
 (defvar evilmi-latex-match-tags
   '((("if[a-zA-Z]+" "if") "else" "fi" "MONOGAMY")
     ("left" nil "right" "MONOGAMY")
     ("begin[a-z]+" nil "end[a-z]+")
-    ("begin\{[a-zA-Z0-9+*_-]+\}" nil "end\{[a-zA-Z0-9+*_-]+\}")
-    ))
+    ("begin\{[a-zA-Z0-9+*_-]+\}" nil "end\{[a-zA-Z0-9+*_-]+\}")))
 
 ;;;###autoload
 (defun evilmi-latex-get-tag ()
-  (let (rlt)
-    (setq rlt (evilmi-sdk-get-tag evilmi-latex-match-tags evilmi-latex-extract-keyword-howtos))
-    rlt))
+  (evilmi-sdk-get-tag evilmi-latex-match-tags evilmi-latex-extract-keyword-howtos))
 
 ;;;###autoload
-(defun evilmi-latex-jump (rlt NUM)
-  (evilmi-sdk-jump rlt NUM evilmi-latex-match-tags evilmi-latex-extract-keyword-howtos))
+(defun evilmi-latex-jump (rlt num)
+  (evilmi-sdk-jump rlt num evilmi-latex-match-tags evilmi-latex-extract-keyword-howtos))
 
 (provide 'evil-matchit-latex)
+;;; evil-matchit-latex.el ends here

@@ -1,4 +1,4 @@
-;;; evil-matchit-script.el ---script (ruby/lua) plugin of evil-matchit
+;;; evil-matchit-script.el --- script (vimrc/lua) plugin of evil-matchit
 
 ;; Copyright (C) 2014-2020 Chen Bin <chenbin DOT sh AT gmail DOT com>
 
@@ -23,6 +23,8 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+;;; Commentary:
+;;
 
 ;;; Code:
 
@@ -31,29 +33,30 @@
 ;; All you need to do is just define the match-tags for SDK algorithm to lookup.
 (require 'evil-matchit-sdk)
 
-;; ruby/bash/lua/vimrc
 (defvar evilmi-script-match-tags
   '((("unless" "if") ("elif" "elsif" "elseif" "else") ("end" "fi" "endif"))
     ("begin" ("rescue" "ensure") "end")
     ("case" ("when" "else") ("esac" "end"))
     ("for" () "end")
     (("fun!" "function!" "class" "def" "while" "function" "do") () ("end" "endfun" "endfunction"))
-    ("repeat" ()  "until")
-    ))
+    ("repeat" ()  "until")))
 
 (defvar evilmi-script-extract-keyword-howtos
-  '(("^.*\\(=\\|local\s\\)\s*\\(function\\)\s*.*$" 2)
-    ("^\s*\\([a-z]+\!?\\)\\(\s.*\\| *\\)$" 1)
-    ("^.*\s\\(do\\)\s|[a-z0-9A-Z,|]+|$" 1)))
+  '(("^.*\\(=\\|local[ \t]\\)[ \t]*\\(function\\)[ \t]*.*$" 2)
+    ;; lua code: "local thread = coroutine.create(function() ... )"
+    ("\\(function\\)([^()]*)[ \t]*$" 1)
+    ("^[ \t]*\\([a-z]+!?\\)[)]?\\([ \t].*\\| *\\)$" 1)
+    ("^.*[ \t]\\(do\\)[ \t]|[a-z0-9A-Z,|]+|$" 1)))
 
 ;;;###autoload
 (defun evilmi-script-get-tag ()
-  (evilmi-sdk-get-tag evilmi-script-match-tags evilmi-script-extract-keyword-howtos)
-  )
+  "Get tag at point."
+  (evilmi-sdk-get-tag evilmi-script-match-tags evilmi-script-extract-keyword-howtos))
 
 ;;;###autoload
-(defun evilmi-script-jump (rlt NUM)
-  (evilmi-sdk-jump rlt NUM evilmi-script-match-tags evilmi-script-extract-keyword-howtos)
-  )
+(defun evilmi-script-jump (info num)
+  "Use INFO returned by `evilmi-script-get-tag' and NUM to jump to matched tag."
+  (evilmi-sdk-jump info num evilmi-script-match-tags evilmi-script-extract-keyword-howtos))
 
 (provide 'evil-matchit-script)
+;;; evil-matchit-script.el ends here

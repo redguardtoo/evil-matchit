@@ -41,7 +41,6 @@ expression to match the current line. The second is the index of sub-matches
 to extract the keyword which starts from one. The sub-match is the match defined
 between '\\(' and '\\)' in regular expression.")
 
-;; ruby/bash/lua/vimrc
 (defvar evilmi-org-match-tags
   '((("begin_src") () ( "end_src") "MONOGAMY")
     (("begin_example") () ( "end_example") "MONOGAMY")

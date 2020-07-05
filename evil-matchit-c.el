@@ -27,16 +27,13 @@
 ;;; Code:
 (require 'evil-matchit-sdk)
 
-;; ruby/bash/lua/vimrc
 (defvar evilmi-c-match-tags
   '((("# *ifdef" "# *ifndef" "# *if") ("# *elif" "# *else")  "# *endif" "MONOGAMY")
-    ("switch" "case" "default" "MONOGAMY")
-    ))
+    ("switch" "case" "default" "MONOGAMY")))
 
 (defvar evilmi-c-extract-keyword-howtos
   '(("^[ \t]*\\(# *[a-z]+\\)" 1)
-    ("^[ \t]*\\([a-z]+\\)\\([ (:].*\\| *\\)$" 1)
-    ))
+    ("^[ \t]*\\([a-z]+\\)\\([ (:].*\\| *\\)$" 1)))
 
 ;;;###autoload
 (defun evilmi-c-get-tag ()

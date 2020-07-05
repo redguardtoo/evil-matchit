@@ -1,4 +1,4 @@
-;;; evil-matchit-verilog.el ---verilog plugin of evil-matchit
+;;; evil-matchit-verilog.el --- verilog plugin of evil-matchit
 
 ;; Copyright (C) 2014-2020 Chen Bin <chenbin DOT sh AT gmail DOT com>
 
@@ -22,8 +22,9 @@
 ;;
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-
+;;
+;;; Commentary:
+;;
 ;;; Code:
 
 ;; OPTIONAL, you don't need SDK to write a plugin for evil-matchit
@@ -93,11 +94,12 @@
 
 ;;;###autoload
 (defun evilmi-verilog-get-tag ()
-  (let* ((orig-info (evilmi-sdk-get-tag evilmi-verilog-match-tags
+  "Get tag at point."
+  (let* ((info (evilmi-sdk-get-tag evilmi-verilog-match-tags
                                         evilmi-verilog-extract-keyword-howtos)))
-    (if evilmi-debug (message "evilmi-verilog-get-tag called => %s" orig-info))
+    (if evilmi-debug (message "evilmi-verilog-get-tag called => %s" info))
     ;; hack if current line is `if' or `else if'
-    (unless orig-info
+    (unless info
       (let* ((cur-line (evilmi-sdk-curline))
              next-line
              (pos (line-beginning-position)))
@@ -105,19 +107,20 @@
           ;; second chance for if else statement
           (save-excursion
             (forward-line 1)
-            (setq orig-info (evilmi-sdk-get-tag evilmi-verilog-match-tags
+            (setq info (evilmi-sdk-get-tag evilmi-verilog-match-tags
                                                 evilmi-verilog-extract-keyword-howtos)))
           ;; move to the next line now. maybe there exist end statement
-          (when orig-info
+          (when info
             (forward-line 1)
-            (setq orig-info (cons pos (cdr orig-info)))))))
-    orig-info))
+            (setq info (cons pos (cdr info)))))))
+    info))
 
 ;;;###autoload
-(defun evilmi-verilog-jump (orig-info num)
-  (let* ((orig-keyword (evilmi-sdk-keyword (cadr orig-info))))
-    (if evilmi-debug (message "evilmi-verilog-jump called => %s" orig-info))
-    (evilmi-sdk-jump orig-info
+(defun evilmi-verilog-jump (info num)
+  "Use INFO returned by `evilmi-verlog-get-tag' and NUM to jump to matched tag."
+  (let* ((orig-keyword (evilmi-sdk-keyword (cadr info))))
+    (if evilmi-debug (message "evilmi-verilog-jump called => %s" info))
+    (evilmi-sdk-jump info
                      num
                      evilmi-verilog-match-tags
                      evilmi-verilog-extract-keyword-howtos)))

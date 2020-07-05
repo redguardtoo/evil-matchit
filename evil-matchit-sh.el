@@ -1,4 +1,4 @@
-;;; evil-matchit-sh.el ---sh (bash/zsh) plugin of evil-matchit
+;;; evil-matchit-sh.el --- sh (bash/zsh) plugin of evil-matchit
 
 ;; Copyright (C) 2014-2020 Chen Bin <chenbin DOT sh AT gmail DOT com>
 
@@ -22,8 +22,9 @@
 ;;
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-
+;;
+;;; Commentary:
+;;
 ;;; Code:
 
 ;; OPTIONAL, you don't need SDK to write a plugin for evil-matchit
@@ -31,7 +32,6 @@
 ;; All you need to do is just define the match-tags for SDK algorithm to lookup.
 (require 'evil-matchit-sdk)
 
-;; ruby/bash/lua/vimrc
 (defvar evilmi-sh-match-tags
   '((("if") ("elif" "else") ("fi") "MONOGAMY")
     ("case" (";;") ("esac") "MONOGAMY")
@@ -51,3 +51,4 @@
   (evilmi-sdk-jump rlt NUM evilmi-sh-match-tags evilmi-sh-extract-keyword-howtos))
 
 (provide 'evil-matchit-sh)
+;;; evil-matchit-sh.el ends here

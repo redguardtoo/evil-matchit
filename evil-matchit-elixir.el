@@ -1,4 +1,4 @@
-;;; evil-matchit-elixir.el ---elixir plugin of evil-matchit
+;;; evil-matchit-elixir.el --- elixir plugin of evil-matchit
 
 ;; Copyright (C) 2018-2020 Chen Bin <chenbin DOT sh AT gmail DOT com>
 
@@ -22,8 +22,9 @@
 ;;
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-
+;;
+;;; Commentary:
+;;
 ;;; Code:
 
 ;; OPTIONAL, you don't need SDK to write a plugin for evil-matchit
@@ -64,13 +65,13 @@
     rlt))
 
 ;;;###autoload
-(defun evilmi-elixir-jump (rlt NUM)
+(defun evilmi-elixir-jump (rlt num)
   (cond
    ((integerp rlt)
     (goto-char rlt))
    (t
     (evilmi-sdk-jump rlt
-                     NUM
+                     num
                      evilmi-elixir-match-tags
                      evilmi-elixir-extract-keyword-howtos))))
 

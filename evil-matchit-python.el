@@ -1,4 +1,4 @@
-;;; evil-matchit-python.el ---python plugin of evil-matchit
+;;; evil-matchit-python.el --- python plugin of evil-matchit
 
 ;; Copyright (C) 2014-2020 Chen Bin <chenbin DOT sh AT gmail DOT com>
 
@@ -24,12 +24,16 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+
+;;; Commentary:
+;;
+
 ;;; Code:
 
 (require 'evil-matchit-sdk)
 
-;; @return number of indent
 (defun evilmi--python-calculate-indent (line)
+  "Return number of indent of LINE."
   (let* (prefix)
     (cond
      ((string-match "^[ \t]*$" line)
@@ -47,9 +51,10 @@
       ;; line begin at the first column
       0))))
 
-;; jump from else to if, jump from finally to try
-;; only python need this hack, a weird language
 (defun evilmi--python-move-to-first-open-tag (cur-indent)
+ "Jump to the open tag based on CUR-INDENT.
+For example, jump from the tag \"finally\" to \"try\".
+Only python need this hack."
   (let* (out-of-loop
          keyword
          where-to-go
@@ -57,15 +62,15 @@
          (cur-line (evilmi-sdk-curline)))
 
     ;; extract keyword from current line
-    (if (string-match "^[ \t]*\\([a-z]+\\) *.*:\s*\\(#.*\\)?$" cur-line)
+    (if (string-match "^[ \t]*\\([a-z]+\\) *.*:[ \t]*\\(#.*\\)?$" cur-line)
         (setq keyword (match-string 1 cur-line)))
 
     (cond
      ((string= keyword "else")
-      (setq regexp "^[ \t]*\\(if\\) *.*:\s*\\(#.*\\)?$"))
+      (setq regexp "^[ \t]*\\(if\\) *.*:[ \t]*\\(#.*\\)?$"))
 
      ((or (string= keyword "finally") (string= keyword "except"))
-      (setq regexp "^[ \t]*\\(try\\) *.*:\s*\\(#.*\\)?$")))
+      (setq regexp "^[ \t]*\\(try\\) *.*:[ \t]*\\(#.*\\)?$")))
 
     (when regexp
       (save-excursion
@@ -86,6 +91,7 @@
         (skip-chars-forward " \t")))))
 
 (defun evilmi--python-move-to-next-open-tag (keyword cur-indent)
+  "Move to next open tag using KEYWORD and CUR-INDENT."
   (let* (out-of-loop
          where-to-go
          regexp
@@ -93,13 +99,13 @@
 
     (cond
      ((string= keyword "try")
-      (setq regexp "^[ \t]*\\(except\\) *.*:\s*\\(#.*\\)?$"))
+      (setq regexp "^[ \t]*\\(except\\) *.*:[ \t]*\\(#.*\\)?$"))
 
      ((string= keyword "except")
-      (setq regexp "^[ \t]*\\(except\\|finally\\) *.*:\s*\\(#.*\\)?$"))
+      (setq regexp "^[ \t]*\\(except\\|finally\\) *.*:[ \t]*\\(#.*\\)?$"))
 
      ((or (string= keyword "elif") (string= keyword "if"))
-      (setq regexp "^[ \t]*\\(elif\\|else\\) *.*:\s*\\(#.*\\)?$")))
+      (setq regexp "^[ \t]*\\(elif\\|else\\) *.*:[ \t]*\\(#.*\\)?$")))
 
     (save-excursion
       (while (not out-of-loop)
@@ -111,8 +117,8 @@
               (setq where-to-go (line-beginning-position)))
           (setq out-of-loop t))
         ;; if it's last line, we need get out of loop
-        (if (= (point-max) (line-end-position))
-            (setq out-of-loop t))))
+        (when (= (point-max) (line-end-position))
+          (setq out-of-loop t))))
 
     (when where-to-go
       (goto-char where-to-go)
@@ -120,9 +126,9 @@
 
 ;;;###autoload
 (defun evilmi-python-get-tag ()
-  "Reutrn '(start-position tag-type keyword)."
+  "Return '(start-position tag-type keyword)."
   (let* (rlt
-         (regexp "^[ \t]*\\([a-z]+\\) *.*:\s*\\(#.*\\)?$")
+         (regexp "^[ \t]*\\([a-z]+\\) *.*:[ \t]*\\(#.*\\)?$")
          (cur-line (evilmi-sdk-curline))
          next-line)
 
@@ -141,9 +147,7 @@
       ;; double check next line to make sure current line is close tag
       ;; if next line indention is less than current line or next line is empty line
       ;; we are at closed tag now, will jump backward
-      (setq rlt (list (line-end-position)
-                      1
-                      "")))
+      (setq rlt (list (line-end-position) 1 "")))
 
      (t
       (setq rlt nil)))
@@ -153,16 +157,16 @@
     rlt))
 
 ;;;###autoload
-(defun evilmi-python-jump (rlt NUM)
-  (let* ((p (nth 0 rlt))
-         (tag-type (nth 1 rlt))
-         (keyword (nth 2 rlt))
+(defun evilmi-python-jump (info num)
+  "Use INFO returned by `evilmi-python-get-tag' and NUM to jump to matched tag."
+  (ignore num)
+  (let* ((p (nth 0 info))
+         (tag-type (nth 1 info))
+         (keyword (nth 2 info))
          (cur-line (evilmi-sdk-curline))
-         cur-indent
+         (cur-indent (evilmi--python-calculate-indent cur-line))
          dendent
          rlt)
-
-    (setq cur-indent (evilmi--python-calculate-indent cur-line))
 
     (if evilmi-debug (message "evilmi-python-jump called. tag-type=%d p=%d" tag-type p))
     (cond
@@ -208,3 +212,4 @@
     rlt))
 
 (provide 'evil-matchit-python)
+;;; evil-matchit-python.el ends here

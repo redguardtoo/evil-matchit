@@ -1,4 +1,4 @@
-;;; evil-matchit-cmake.el ---cmake (ruby/lua) plugin of evil-matchit
+;;; evil-matchit-cmake.el --- cmake plugin of evil-matchit
 
 ;; Copyright (C) 2014-2020 Chen Bin <chenbin DOT sh AT gmail DOT com>
 
@@ -23,6 +23,10 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
+
+;;; Commentary:
+;;
 
 ;;; Code:
 
@@ -57,3 +61,6 @@
                    evilmi-cmake-extract-keyword-howtos))
 
 (provide 'evil-matchit-cmake)
+
+(provide 'evil-matchit-cmake)
+;;; evil-matchit-cmake.el ends here
