@@ -22,8 +22,9 @@
 ;;
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-
+;;
+;;; Commentary:
+;;
 ;;; Code:
 
 (require 'evil-matchit-sdk)
@@ -47,6 +48,7 @@
   "^[ \t]*[(}]?[$_a-zA-Z0-9]+.*\\([{(]\\)[ \t]*\\(\/\/.*\\|\/\*[^/]*\*\/\\)?$")
 
 (defun evilmi--javascript-find-open-brace (cur-line)
+  "Find open brace from CUR-LINE."
   (let* (rlt)
     (cond
      ((string-match evilmi-javascript-open-brace-pattern
@@ -61,6 +63,7 @@
 
 ;;;###autoload
 (defun evilmi-javascript-get-tag ()
+  "Get tag at point."
   ;; only handle open tag
   (let* (rlt)
     (cond
@@ -87,15 +90,15 @@
     rlt))
 
 ;;;###autoload
-(defun evilmi-javascript-jump (rlt num)
-  "Jump to the matching tag using RLT and NUM."
+(defun evilmi-javascript-jump (info num)
+  "Jump to the matching tag using INFO and NUM."
   (cond
-   ((not rlt)
+   ((not info)
     ;; don nothing
     )
    ((evilmi-sdk-get-tag evilmi-javascript-match-tags
                         evilmi-javascript-extract-keyword-howtos)
-    (evilmi-sdk-jump rlt
+    (evilmi-sdk-jump info
                      num
                      evilmi-javascript-match-tags
                      evilmi-javascript-extract-keyword-howtos))
@@ -110,3 +113,4 @@
         (1+ (point)))))))
 
 (provide 'evil-matchit-javascript)
+;;; evil-matchit-javascript.el ends here

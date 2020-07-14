@@ -52,11 +52,13 @@
 
 ;;;###autoload
 (defun evilmi-ruby-get-tag ()
+  "Get tag at point."
   (evilmi-sdk-get-tag evilmi-ruby-match-tags evilmi-ruby-extract-keyword-howtos))
 
 ;;;###autoload
-(defun evilmi-ruby-jump (rlt num)
-  (evilmi-sdk-jump rlt num evilmi-ruby-match-tags evilmi-ruby-extract-keyword-howtos))
+(defun evilmi-ruby-jump (info num)
+  "Use INFO to jump NUM times."
+  (evilmi-sdk-jump info num evilmi-ruby-match-tags evilmi-ruby-extract-keyword-howtos))
 
 (provide 'evil-matchit-ruby)
 ;;; evil-matchit-ruby.el ends here
