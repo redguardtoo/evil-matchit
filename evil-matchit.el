@@ -206,6 +206,9 @@ Some people prefer using \"m\" instead.")
   ;; Ruby
   (evilmi-load-plugin-rules '(ruby-mode enh-ruby-mode) '(simple ruby))
 
+  ;; terminal
+  (evilmi-load-plugin-rules '(term-mode shell-mode) '(simple terminal))
+
   ;; Elixir
   (evilmi-load-plugin-rules '(elixir-mode enh-elixir-mode) '(simple elixir)))
 

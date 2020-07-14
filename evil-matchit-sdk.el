@@ -193,8 +193,10 @@ If IS-FORWARD is t, jump forward; or else jump backward."
 
 ;;;###autoload
 (defun evilmi-sdk-curline ()
-  (buffer-substring-no-properties (line-beginning-position)
-                                  (line-end-position)))
+  "Get current line text."
+  (let* ((inhibit-field-text-motion t))
+    (buffer-substring-no-properties (line-beginning-position)
+                                    (line-end-position))))
 
 ;;;###autoload
 (defun evilmi-sdk-member (keyword keyword-list)
