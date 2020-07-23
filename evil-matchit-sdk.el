@@ -129,8 +129,8 @@ If IS-FORWARD is t, jump forward; or else jump backward."
 
 (defun evilmi-sdk-adjust-jumpto (is-forward rlt)
   ;; normal-state hack!
-  (unless (eq evil-state 'visual)
-    (if is-forward (setq rlt (- rlt 1))))
+  (when (and (not (eq evil-state 'visual)) rlt is-forward)
+    (setq rlt (- rlt 1)))
   (if evilmi-debug (message "evilmi-sdk-adjust-jumpto => %s" rlt))
   rlt)
 

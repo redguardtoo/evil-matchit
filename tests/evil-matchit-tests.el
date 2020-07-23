@@ -287,5 +287,61 @@
     (should (string= "line2" (evilmi-sdk-curline)))
     (should (eq major-mode 'diff-mode))))
 
+(ert-deftest evilmi-test-fortran ()
+  (with-temp-buffer
+    (insert "PROGRAM cows\n"
+            "IMPLICIT NONE\n"
+            "INTEGER :: func_name\n"
+            "PRINT *,func_name(2, 1.3)\n"
+            "END PROGRAM\n")
+    (f90-mode)
+
+    (goto-char (point-min))
+    ;; jump to end tag
+    (evilmi-jump-items)
+    (should (string= "END PROGRAM" (evilmi-sdk-curline)))
+    ;; jump back to open tags
+    (evilmi-jump-items)
+    (should (string= "PROGRAM cows" (evilmi-sdk-curline)))
+
+    ;; lower case conditional statement
+    (erase-buffer)
+    (insert "if (x < x1) then\n"
+            "  print 1\n"
+            "else\n"
+            "  print 2\n"
+            "end if\n")
+    (goto-char (point-min))
+    (evilmi-jump-items)
+    (should (string= "else" (evilmi-sdk-curline)))
+    (evilmi-jump-items)
+    (should (string= "end if" (evilmi-sdk-curline)))
+    (evilmi-jump-items)
+    (should (string= "if (x < x1) then" (evilmi-sdk-curline)))
+
+    ;; upper case conditional statement
+    (erase-buffer)
+    (insert "IF (x < 50) THEN\n"
+            "   Grade = 'F'\n"
+            "ELSE IF (x < 60) THEN\n"
+            "   Grade = 'D'\n"
+            "ELSE IF (x < 70) THEN\n"
+            "   Grade = 'C'\n"
+            "ELSE\n"
+            "   Grade = 'A'\n"
+            "END IF\n")
+    (goto-char (point-min))
+    (evilmi-jump-items)
+    (should (string= "ELSE IF (x < 60) THEN" (evilmi-sdk-curline)))
+    (evilmi-jump-items)
+    (should (string= "ELSE IF (x < 70) THEN" (evilmi-sdk-curline)))
+    (evilmi-jump-items)
+    (should (string= "ELSE" (evilmi-sdk-curline)))
+    (evilmi-jump-items)
+    (should (string= "END IF" (evilmi-sdk-curline)))
+
+    ;; upper case conditional statement
+    (should (eq major-mode 'f90-mode))))
+
 (ert-run-tests-batch-and-exit)
 ;;; evil-matchit-tests.el ends here

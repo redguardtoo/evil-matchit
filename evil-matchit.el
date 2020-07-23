@@ -4,7 +4,7 @@
 
 ;; Author: Chen Bin <chenbin DOT sh AT gmail DOT com>
 ;; URL: http://github.com/redguardtoo/evil-matchit
-;; Version: 2.3.6
+;; Version: 2.3.7
 ;; Keywords: matchit vim evil
 ;; Package-Requires: ((evil "1.2.0") (emacs "24.4"))
 ;;
@@ -186,7 +186,7 @@ Some people prefer using \"m\" instead.")
                             '(simple diff))
 
   ;; Fortran
-  (evilmi-load-plugin-rules '(f90 fortran-mode) '(fortran))
+  (evilmi-load-plugin-rules '(f90-mode fortran-mode) '(fortran))
 
   ;; CMake (http://www.cmake.org)
   (evilmi-load-plugin-rules '(cmake-mode) '(cmake))
@@ -307,7 +307,7 @@ If IS-INNER is t, the region is inner text object."
 (defun evilmi-version()
   "Print version."
   (interactive)
-  (message "2.3.6"))
+  (message "2.3.7"))
 
 (defvar evil-matchit-mode-map (make-sparse-keymap)
   "Keymap used by the minor mode.")
