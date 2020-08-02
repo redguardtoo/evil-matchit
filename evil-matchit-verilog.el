@@ -27,10 +27,9 @@
 ;;
 ;;; Code:
 
-;; OPTIONAL, you don't need SDK to write a plugin for evil-matchit
-;; but SDK do make you write less code, isn't it?
-;; All you need to do is just define the match-tags for SDK algorithm to lookup.
+(require 'cl-lib)
 (require 'evil-matchit-sdk)
+(require 'semantic/lex)
 
 ;; {{ Sample verilog code:
 ;; module dff_lab;
@@ -89,41 +88,58 @@
     ("fork" () ("join" "join_any" "join_none") "MONOGAMY")
     ("begin" () "end")
     ("`ifn?def" "`else" "`endif" "MONOGAMY")
-    ("`celldefine" () "`endcelldefine" "MONOGAMY")
-    ))
+    ("`celldefine" () "`endcelldefine" "MONOGAMY")))
+
+(defvar evilmi-verilog-block-begin-prefix
+  "^if\\(n?def\\)?\\|else\\( if\\)?\\|initial\\|always$"
+  "Keyword before the block \"begin\".")
+
+(defun evilmi-verilog-open-bracket-p (token)
+  (let* ((beg (cadr token))
+         (end (cddr token)))
+    (string= "begin" (buffer-substring-no-properties beg end))))
+
+(defun evilmi-verilog-parse-at-point ()
+  (let* ((range (evilmi-sdk-n-lines 3))
+         (tokens (semantic-lex (car range) (cdr range)))
+         info)
+    (when (and tokens (> (length tokens) 1))
+      (let* ((first-token (car tokens))
+             (beg (cadr first-token))
+             (end (cddr first-token))
+             start
+             bracket)
+        (when (and (string-match evilmi-verilog-block-begin-prefix
+                                 (buffer-substring-no-properties beg end))
+                   (setq bracket
+                         (cl-find-if #'evilmi-verilog-open-bracket-p (cdr tokens))))
+          (setq start (line-beginning-position))
+          ;; move focus to the "begin"
+          (goto-char (cadr bracket))
+          (setq info (evilmi-sdk-get-tag evilmi-verilog-match-tags
+                                         evilmi-verilog-extract-keyword-howtos))
+          (setq info (cons start (cdr info))))))
+    ;; "info" is as same type as `evil-sdk-get-tag' returns
+    info))
 
 ;;;###autoload
 (defun evilmi-verilog-get-tag ()
   "Get tag at point."
   (let* ((info (evilmi-sdk-get-tag evilmi-verilog-match-tags
-                                        evilmi-verilog-extract-keyword-howtos)))
+                                   evilmi-verilog-extract-keyword-howtos)))
     (if evilmi-debug (message "evilmi-verilog-get-tag called => %s" info))
-    ;; hack if current line is `if' or `else if'
-    (unless info
-      (let* ((cur-line (evilmi-sdk-curline))
-             next-line
-             (pos (line-beginning-position)))
-        (when (string-match "^[ \t]*\\(if\\(n?def\\)?\\|else\\( if\\)?\\).*" cur-line)
-          ;; second chance for if else statement
-          (save-excursion
-            (forward-line 1)
-            (setq info (evilmi-sdk-get-tag evilmi-verilog-match-tags
-                                                evilmi-verilog-extract-keyword-howtos)))
-          ;; move to the next line now. maybe there exist end statement
-          (when info
-            (forward-line 1)
-            (setq info (cons pos (cdr info)))))))
-    info))
+    (or info (evilmi-verilog-parse-at-point))))
 
 ;;;###autoload
 (defun evilmi-verilog-jump (info num)
   "Use INFO returned by `evilmi-verlog-get-tag' and NUM to jump to matched tag."
-  (let* ((orig-keyword (evilmi-sdk-keyword (cadr info))))
-    (if evilmi-debug (message "evilmi-verilog-jump called => %s" info))
-    (evilmi-sdk-jump info
-                     num
-                     evilmi-verilog-match-tags
-                     evilmi-verilog-extract-keyword-howtos)))
+  (when info
+    (let* ((orig-keyword (evilmi-sdk-keyword (cadr info))))
+      (if evilmi-debug (message "evilmi-verilog-jump called => %s" info))
+      (evilmi-sdk-jump info
+                       num
+                       evilmi-verilog-match-tags
+                       evilmi-verilog-extract-keyword-howtos))))
 
 (provide 'evil-matchit-verilog)
 ;;; evil-matchit-verilog.el ends here

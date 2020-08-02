@@ -340,8 +340,42 @@
     (evilmi-jump-items)
     (should (string= "END IF" (evilmi-sdk-curline)))
 
-    ;; upper case conditional statement
     (should (eq major-mode 'f90-mode))))
+
+(ert-deftest evilmi-test-verilog ()
+  (with-temp-buffer
+    (insert "`ifdef behavioral\n"
+            " `include \"groupA_beh.v \";\n"
+            " `include \"groupB_beh.v \";\n"
+            " `include \"ctrl_beh.v \";\n"
+            "`else\n"
+            " `include \"groupA_synth.v \";\n"
+            " `include \"groupB_ synth.v \";\n"
+            " `include \"ctrl_ synth.v \";\n"
+            "`endif\n"
+            )
+    (verilog-mode)
+
+    (goto-char (point-min))
+    (evilmi-jump-items)
+    (should (string= "`else" (evilmi-sdk-curline)))
+    (evilmi-jump-items)
+    (should (string= "`endif" (evilmi-sdk-curline)))
+    (evilmi-jump-items)
+    (should (string= "`ifdef behavioral" (evilmi-sdk-curline)))
+
+    (erase-buffer)
+    (insert "always @(WRITE or READ or STATUS) // test \n"
+            " /* hello */"
+            "  begin\n"
+            "  out = 9;\n"
+            "  end\n"
+            " // more comment\n")
+    (goto-char (point-min))
+    (evilmi-jump-items)
+    (should (string= "end" (thing-at-point 'symbol)))
+
+    (should (eq major-mode 'verilog-mode))))
 
 (ert-run-tests-batch-and-exit)
 ;;; evil-matchit-tests.el ends here

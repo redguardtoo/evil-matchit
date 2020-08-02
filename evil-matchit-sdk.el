@@ -18,7 +18,7 @@
 (defvar evilmi-sdk-extract-keyword-howtos
   '(("^[ \t]*\\([a-z]+\!?\\)\\( .*\\| *\\)$" 1)
     ("^.* \\(do\\) |[a-z0-9A-Z,|]+|$" 1))
-  "The list of HOWTO on extracting keyword from current line.
+  "The list of howto on extracting keyword from current line.
 Each howto is actually a pair. The first element of pair is the regular
 expression to match the current line. The second is the index of sub-matches
 to extract the keyword which starts from one.  The sub-match is the match defined
@@ -321,8 +321,8 @@ Rule is looked up in HOWTOS."
   "Use RLT, NUM, MATCH-TAGS and HOWTOS to jump.
 Return nil if no matching tag found.  Please note (point) is changed
 after calling this function."
-  (let* ((orig-tag-type (nth 1 (nth 1 rlt)))
-         (orig-tag-info (nth 1 rlt))
+  (let* ((orig-tag-info (nth 1 rlt))
+         (orig-tag-type (nth 1 orig-tag-info))
          cur-tag-type
          cur-tag-info
          (level 1)
@@ -457,5 +457,15 @@ after calling this function."
       (setq count (1+ count))
       (setq start (match-end 0)))
     count))
+
+(defun evilmi-sdk-n-lines (n)
+  "Return content of N lines from current position."
+  (unless (and n (> n 1)) (setq n 1))
+  (let* (beg end str)
+    (save-excursion
+      (setq beg (line-beginning-position))
+      (forward-line (1- n))
+      (setq end (line-end-position)))
+    (cons beg end)))
 
 (provide 'evil-matchit-sdk)
