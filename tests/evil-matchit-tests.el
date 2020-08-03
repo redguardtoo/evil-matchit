@@ -377,5 +377,36 @@
 
     (should (eq major-mode 'verilog-mode))))
 
+(ert-deftest evilmi-test-markdown ()
+  (with-temp-buffer
+    (insert "### test1\n"
+            "```java\n"
+            "Example 1\n"
+            "```\n\n"
+            "### test2\n"
+            "```c\n"
+            "Example 2\n"
+            "```\n")
+    (markdown-mode)
+
+    (goto-char (point-min))
+    (forward-line 1)
+    (evilmi-jump-items)
+    (should (string= "```" (evilmi-sdk-curline)))
+    (forward-line -1)
+    (should (string= "Example 1" (evilmi-sdk-curline)))
+    (forward-line 1)
+    (evilmi-jump-items)
+    (should (string= "```java" (evilmi-sdk-curline)))
+
+    (goto-char (point-min))
+    (search-forward "```c")
+    (evilmi-jump-items)
+    (should (string= "```" (evilmi-sdk-curline)))
+    (evilmi-jump-items)
+    (should (string= "```c" (evilmi-sdk-curline)))
+
+    (should (eq major-mode 'markdown-mode))))
+
 (ert-run-tests-batch-and-exit)
 ;;; evil-matchit-tests.el ends here

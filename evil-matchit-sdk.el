@@ -198,6 +198,10 @@ If IS-FORWARD is t, jump forward; or else jump backward."
     (buffer-substring-no-properties (line-beginning-position)
                                     (line-end-position))))
 
+(defun evilmi-sdk-text-before-current-line ()
+  "Text before current line."
+  (buffer-substring-no-properties (point-min) (line-beginning-position)))
+
 ;;;###autoload
 (defun evilmi-sdk-member (keyword keyword-list)
   "Check if KEYWORD exist in KEYWORD-LIST."
@@ -450,7 +454,7 @@ after calling this function."
     rlt))
 
 (defun evilmi-sdk-count-matches (regexp str)
-  "Count matches of regexp in STR."
+  "Count match of REGEXP in STR."
   (let* ((count 0)
          (start 0))
     (while (string-match regexp str start)

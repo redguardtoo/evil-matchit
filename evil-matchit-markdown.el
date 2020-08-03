@@ -26,54 +26,39 @@
 
 ;;; Code:
 
-;; OPTIONAL, you don't need SDK to write a plugin for evil-matchit
-;; but SDK don make you write less code, isn't it?
-;; All you need to do is just define the match-tags for SDK algorithm to lookup.
 (require 'evil-matchit-sdk)
 
 ;;;###autoload
 (defun evilmi-markdown-get-tag ()
-  "Get current tag.
-Return (list start-position tag)."
-  (let* ((cur-line (evilmi-sdk-curline))
-         rlt
-         forward-direction)
-    (if (string-match "^\\(```\\)" cur-line)
-        (let* ((str (match-string 1 cur-line))
-               (prefix (buffer-substring-no-properties (point-min)
-                                                       (line-beginning-position)))
-               (forward-direction (eq (% (evilmi-sdk-count-matches str prefix) 2) 0)))
-          (setq rlt (list (if forward-direction (line-beginning-position)
-                            (line-end-position))
-                          forward-direction
-                          str))))
-    rlt))
+  "Get current tag.  Return (list start-position tag)."
+  (when (string-match "^\\(```\\)" (evilmi-sdk-curline))
+    (let* ((str "```")
+           (text (evilmi-sdk-text-before-current-line))
+           (forward-p (eq (% (evilmi-sdk-count-matches str text) 2) 0)))
+      (list (if forward-p (line-beginning-position) (line-end-position))
+            forward-p
+            str))))
 
 ;;;###autoload
 (defun evilmi-markdown-jump (info num)
-  "Jump to the next tag."
-  (let* ((forward-direction (nth 1 info))
+  "Jump to the next tag using INFO and NUM."
+  (ignore num)
+  (let* ((forward-p (nth 1 info))
          (str (nth 2 info))
          (pos (point))
          (rlt pos))
-    (cond
-     ((string= str "```")
-      (let* ((prefix (buffer-substring-no-properties (point-min)
-                                                     (line-beginning-position))))
-        (cond
-         (forward-direction
-          ;; jump forward
-          (goto-char (+ pos (length str)))
-          (search-forward str)
-          (setq rlt (line-end-position)))
-         (t
-          ;; jump backward
-          (goto-char (- pos (length str)))
-          (search-backward str)
-          (setq rlt (line-beginning-position))))))
-     (t
-      ;; do nothing
-      ))
+    (when (string= str "```")
+      (cond
+       (forward-p
+        ;; jump forward
+        (goto-char (+ pos (length str)))
+        (search-forward str)
+        (setq rlt (line-end-position)))
+       (t
+        ;; jump backward
+        (goto-char (- pos (length str)))
+        (search-backward str)
+        (setq rlt (line-beginning-position)))))
     rlt))
 
 (provide 'evil-matchit-markdown)
