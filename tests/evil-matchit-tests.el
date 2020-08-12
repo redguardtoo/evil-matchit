@@ -408,5 +408,29 @@
 
     (should (eq major-mode 'markdown-mode))))
 
+(ert-deftest evilmi-test-emacs-lisp ()
+  (with-temp-buffer
+    (insert ";; test1\n"
+            ";; {{\n"
+            ";; java\n"
+            ";; }}\n"
+            "test\n")
+    (emacs-lisp-mode)
+    (font-lock-ensure)
+
+    (goto-char (point-min))
+    (forward-char 2)
+    (evilmi-jump-items)
+    ;; still at the same line if there is no bracket at point
+    (should (string= ";; test1" (evilmi-sdk-curline)))
+    ;; test matched brackets
+    (search-forward "{")
+    (evilmi-jump-items)
+    (should (string= ";; }}" (evilmi-sdk-curline)))
+    (evilmi-jump-items)
+    (should (string= ";; {{" (evilmi-sdk-curline)))
+
+    (should (eq major-mode 'emacs-lisp-mode))))
+
 (ert-run-tests-batch-and-exit)
 ;;; evil-matchit-tests.el ends here

@@ -103,11 +103,10 @@ If IS-FORWARD is t, jump forward; or else jump backward."
      ((evilmi-sdk-comment-p (point))
       ;; Matching tag in comment.
       ;; Use own algorithm instead of `scan-sexps'
-      ;; because `scan-sexps' not work in some major-mode
+      ;; because `scan-sexps' does not work in some major modes
       (save-excursion
         (setq start-pos (point))
-        (while (and (not (= start-pos limit))
-                    (> lvl 0))
+        (while (and e (not (= start-pos limit)) (> lvl 0))
           (goto-char (setq start-pos (+ start-pos arg)))
           (when (evilmi-sdk-comment-p start-pos)
             (cond
@@ -117,6 +116,7 @@ If IS-FORWARD is t, jump forward; or else jump backward."
               (setq lvl (1- lvl))))))
         (when (= lvl 0)
           (setq rlt (+ start-pos (if is-forward 1 0))))))
+
      (t
       ;; not comment
       ;; search but ignore comments
