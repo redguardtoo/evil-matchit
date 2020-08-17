@@ -416,19 +416,20 @@
             ";; }}\n"
             "test\n")
     (emacs-lisp-mode)
-    (font-lock-ensure)
+    (when (fboundp 'font-lock-ensure)
+      (font-lock-ensure)
 
-    (goto-char (point-min))
-    (forward-char 2)
-    (evilmi-jump-items)
-    ;; still at the same line if there is no bracket at point
-    (should (string= ";; test1" (evilmi-sdk-curline)))
-    ;; test matched brackets
-    (search-forward "{")
-    (evilmi-jump-items)
-    (should (string= ";; }}" (evilmi-sdk-curline)))
-    (evilmi-jump-items)
-    (should (string= ";; {{" (evilmi-sdk-curline)))
+      (goto-char (point-min))
+      (forward-char 2)
+      (evilmi-jump-items)
+      ;; still at the same line if there is no bracket at point
+      (should (string= ";; test1" (evilmi-sdk-curline)))
+      ;; test matched brackets
+      (search-forward "{")
+      (evilmi-jump-items)
+      (should (string= ";; }}" (evilmi-sdk-curline)))
+      (evilmi-jump-items)
+      (should (string= ";; {{" (evilmi-sdk-curline))))
 
     (should (eq major-mode 'emacs-lisp-mode))))
 
