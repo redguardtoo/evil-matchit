@@ -433,5 +433,27 @@
 
     (should (eq major-mode 'emacs-lisp-mode))))
 
+(ert-deftest evilmi-test-ocaml ()
+  (with-temp-buffer
+    (require 'tuareg)
+
+    (insert "if foo\n"
+            "then 1 else 2\n")
+    (tuareg-mode)
+
+    (when (fboundp 'font-lock-ensure)
+      (font-lock-ensure)
+
+      (goto-char (point-min))
+
+      (should (string= "if" (thing-at-point 'word)))
+      (evilmi-jump-items)
+      (should (string= "then" (thing-at-point 'word)))
+      ;; jump back
+      (evilmi-jump-items)
+      (should (string= "if" (thing-at-point 'word))))
+
+    (should (eq major-mode 'tuareg-mode))))
+
 (ert-run-tests-batch-and-exit)
 ;;; evil-matchit-tests.el ends here
