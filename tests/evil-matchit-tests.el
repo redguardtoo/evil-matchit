@@ -433,5 +433,19 @@
 
     (should (eq major-mode 'emacs-lisp-mode))))
 
+(ert-deftest evilmi-test-ocaml ()
+  (with-temp-buffer
+    (require 'tuareg)
+    (tuareg-mode)
+
+    (insert "if foo then 1 else 2")
+
+    (goto-char (point-min))
+
+    (evilmi-jump-items)
+    (should (string= "8" (number-to-string (current-column))))
+
+    (should (eq major-mode 'tuareg-mode))))
+
 (ert-run-tests-batch-and-exit)
 ;;; evil-matchit-tests.el ends here
