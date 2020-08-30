@@ -37,30 +37,43 @@
 (require 'evil-matchit-sdk)
 
 (defvar evilmi-terminal-primary-prompt "^\\$ "
-  "The primary prompt of terminal")
+  "The primary prompt of terminal.")
 
 (defvar evilmi-terminal-ps1-line-number 1
   "The line containing PS1.")
 
+(defun evilmi-prompt-line-p (&optional position)
+  "If line at POSITION has prompt at the beginning."
+  (let* (rlt)
+    ;; user can't move the cursor to the first column in prompt line
+    (save-excursion
+      (goto-char (or position (point)))
+      (goto-char (line-beginning-position))
+      (setq rlt (> (current-column) 1)))
+
+    ;; another round if we can't decide fromc cusor movement
+    (unless rlt
+      (setq rlt (string-match-p evilmi-terminal-primary-prompt
+                                (evilmi-sdk-curline))))
+    rlt))
+
 ;;;###autoload
 (defun evilmi-terminal-get-tag ()
   "Get tag at point."
-  (let* ((curline (evilmi-sdk-curline))
-         (prompt evilmi-terminal-primary-prompt)
-         line1
-         line2)
+  (let* (nl1 nl2)
     (cond
-     ((string-match prompt curline)
+     ((evilmi-prompt-line-p)
       ;; open tag
       (list (line-beginning-position) 0))
      (t
       (save-excursion
         (forward-line)
-        (setq line1 (evilmi-sdk-curline))
+        (setq nl1 (evilmi-prompt-line-p))
         (forward-line)
-        (setq line2 (evilmi-sdk-curline)))
-      (when (and line1 line2 (or (string-match prompt line1)
-                                 (string-match prompt line2)))
+        (setq nl2 (evilmi-prompt-line-p)))
+      ;; if either of next two lines are prompt line
+      ;; current line is closed tag
+      (when (or nl1 nl2)
         (list (line-end-position) 1))))))
 
 ;;;###autoload
