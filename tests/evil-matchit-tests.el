@@ -436,22 +436,78 @@
 (ert-deftest evilmi-test-ocaml ()
   (with-temp-buffer
     (require 'tuareg)
-
-    (insert "if foo\n"
-            "then 1 else 2\n")
     (tuareg-mode)
 
+    (defun prepare (&rest text)
+      (progn
+             (erase-buffer)
+             (apply 'insert text)
+             (goto-char (point-min))
+             (font-lock-ensure)))
+
+    (defun expect (text)
+      (progn
+           (insert "|")
+           (should (string= text (thing-at-point 'line)))
+           (delete-backward-char 1)))
+
     (when (fboundp 'font-lock-ensure)
-      (font-lock-ensure)
+      ;; if then
+      ;; TODO: doesn't work if there's no whitespace before if
+      (prepare " if foo then 1 else 2")
 
-      (goto-char (point-min))
+      (evilmi-jump-items)
+      (expect " if foo |then 1 else 2")
 
-      (should (string= "if" (thing-at-point 'word)))
       (evilmi-jump-items)
-      (should (string= "then" (thing-at-point 'word)))
-      ;; jump back
+      (expect " |if foo then 1 else 2")
+
+      ;; parentheses
+      (prepare "let x = (1, 2) in 3")
+
       (evilmi-jump-items)
-      (should (string= "if" (thing-at-point 'word))))
+      (expect "let x = (1, 2|) in 3" )
+
+      (evilmi-jump-items)
+      (expect "let x = |(1, 2) in 3" )
+
+      ;; struct end
+      (prepare "module X = struct type t = int end")
+
+      (evilmi-jump-items)
+      (expect "module X = struct type t = int |end" )
+
+      (evilmi-jump-items)
+      (expect "module X = |struct type t = int end" )
+
+      ;; TODO: begin end doesn't seem to be working
+      (prepare "begin 1 end ;;")
+
+      (evilmi-jump-items)
+      (expect "|begin 1 end ;;")
+
+      ;; match with
+      (prepare "let _ = match x with _ -> ()")
+
+      (evilmi-jump-items)
+      (expect "let _ = match x |with _ -> ()" )
+
+      (evilmi-jump-items)
+      (expect "let _ = |match x with _ -> ()" )
+
+      ;; let in
+      (prepare
+         "let () =\n"
+         "  let x = foo in bar")
+
+      (goto-char 10)
+      (expect "|  let x = foo in bar" )
+
+      (evilmi-jump-items)
+      (expect "  let x = foo |in bar" )
+
+      (evilmi-jump-items)
+      (expect "  |let x = foo in bar" ))
 
     (should (eq major-mode 'tuareg-mode))))
 
