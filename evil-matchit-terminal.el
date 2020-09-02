@@ -42,6 +42,7 @@
 (defvar evilmi-terminal-ps1-line-number 1
   "The line containing PS1.")
 
+;;;###autoload
 (defun evilmi-prompt-line-p (&optional position)
   "If line at POSITION has prompt at the beginning."
   (let* (rlt)
