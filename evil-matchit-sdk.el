@@ -130,17 +130,17 @@ If IS-FORWARD is t, jump forward; or else jump backward."
 (defun evilmi-sdk-adjust-jumpto (is-forward rlt)
   ;; normal-state hack!
   (when (and (not (eq evil-state 'visual)) rlt is-forward)
-    (setq rlt (- rlt 1)))
-  (if evilmi-debug (message "evilmi-sdk-adjust-jumpto => %s" rlt))
+    (setq rlt (1- rlt)))
+  (if evilmi-debug (message "evilmi-sdk-adjust-jumpto => is-forward=%s rlt=%s" is-forward rlt))
   rlt)
 
 ;; @see http://emacs.stackexchange.com/questions/13222/a-elisp-function-to-jump-between-matched-pair
 (defun evilmi-sdk-jumpto-where (ff is-forward ch)
   "Non-nil ff means jumping between quotes"
-  (let* ((rlt (if ff (evilmi-sdk-the-other-quote-char ff is-forward ch)
+  (let* ((dst (if ff (evilmi-sdk-the-other-quote-char ff is-forward ch)
                 (evilmi-sdk-scan-sexps is-forward))))
-    (if evilmi-debug (message "evilmi-sdk-jumpto-where => %s" (evilmi-sdk-adjust-jumpto is-forward rlt)))
-    (evilmi-sdk-adjust-jumpto is-forward rlt)))
+    (if evilmi-debug (message "evilmi-sdk-jumpto-where => %s" (evilmi-sdk-adjust-jumpto is-forward dst)))
+    (evilmi-sdk-adjust-jumpto is-forward dst)))
 
 (defun evilmi-sdk-tweak-selected-region (font-face jump-forward)
   "Tweak selected region using FONT-FACE and JUMP-FORWARD."
@@ -158,9 +158,11 @@ If IS-FORWARD is t, jump forward; or else jump backward."
          ;; if ff is not nil, it's jump between quotes
          ;; so we should not use (scan-sexps)
          (ff (nth 1 tmp))
-         (ch (nth 2 tmp)))
-    (goto-char (evilmi-sdk-jumpto-where ff jump-forward ch))
-    (evilmi-sdk-tweak-selected-region ff jump-forward)))
+         (ch (nth 2 tmp))
+         (dst (evilmi-sdk-jumpto-where ff jump-forward ch)))
+    (when dst
+      (goto-char dst)
+      (evilmi-sdk-tweak-selected-region ff jump-forward))))
 
 (defun evilmi-sdk-strictly-type-p (crt orig)
   (or (evilmi-sdk-monogamy-p crt) (evilmi-sdk-monogamy-p orig)))
