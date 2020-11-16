@@ -72,6 +72,8 @@ between '\\(' and '\\)' in regular expression.")
         (setq rlt '(-1)))
     rlt))
 
+(defvar evilmi-plugins)
+
 ;;;###autoload
 (defun evilmi-org-jump (rlt num)
   (cond
