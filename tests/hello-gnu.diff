@@ -1,0 +1,8 @@
+--- a/1.c
++++ b/1.c
+line1
+line2
+--- a/2.c
++++ b/2.c
+line3
+line4

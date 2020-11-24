@@ -1,0 +1,11 @@
+diff 1
+index abed2b7
+--- a/1.c
++++ b/1.c
+line1
+line2
+diff 2index abed2b7
+--- a/2.c
++++ b/2.c
+line3
+line4

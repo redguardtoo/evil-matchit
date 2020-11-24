@@ -4,9 +4,9 @@
 
 ;; Author: Chen Bin <chenbin DOT sh AT gmail DOT com>
 ;; URL: http://github.com/redguardtoo/evil-matchit
-;; Version: 2.3.9
+;; Version: 2.3.10
 ;; Keywords: matchit vim evil
-;; Package-Requires: ((evil "1.2.0") (emacs "24.4"))
+;; Package-Requires: ((evil "1.2.0") (emacs "25.1"))
 ;;
 ;; This file is not part of GNU Emacs.
 
@@ -172,6 +172,9 @@ Some people prefer using \"m\" instead.")
   ;; Ocaml
   (evilmi-load-plugin-rules '(tuareg-mode) '(simple ocaml))
 
+  ;; Octave
+  (evilmi-load-plugin-rules '(octave-mode) '(simple octave))
+
   ;; Python
   (evilmi-load-plugin-rules '(python-mode) '(simple python))
 
@@ -310,7 +313,7 @@ If IS-INNER is t, the region is inner text object."
 (defun evilmi-version()
   "Print version."
   (interactive)
-  (message "2.3.9"))
+  (message "2.3.10"))
 
 (defvar evil-matchit-mode-map (make-sparse-keymap)
   "Keymap used by the minor mode.")

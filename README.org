@@ -19,6 +19,7 @@ Many modern languages are supported:
 - Markdown
 - Perl
 - Latex
+- MATLAB/Octave
 - CMake
 - Org-mode (match tag of org-mode and tags of other languages embedded in org file)
 - Ruby
@@ -37,7 +38,7 @@ Many modern languages are supported:
 
 This package uses Evil as its vi layer!
 
-Tested on Emacs 24.4, 24.5, 25.1, 26, 27, 28
+Tested on Emacs 25.1, 26, 27, 28
 
 * Why use evil-matchit
 - No learning curve. Press "%" to jump. That's all!
