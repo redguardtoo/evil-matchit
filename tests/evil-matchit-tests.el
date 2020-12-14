@@ -471,5 +471,17 @@
 
     (should (eq major-mode 'octave-mode))))
 
+(ert-deftest evilmi-test-simplejump-space ()
+  "`evilmi-sdk-simple-jump' should skip spaces."
+  (with-temp-buffer
+    (insert "    {
+    }")
+    (goto-char (point-min))
+    (evilmi-sdk-simple-jump)
+    (should (= (char-after) ?}))
+    (goto-line 2)
+    (evilmi-sdk-simple-jump)
+    (should (= (char-after) ?{))))
+
 (ert-run-tests-batch-and-exit)
 ;;; evil-matchit-tests.el ends here
