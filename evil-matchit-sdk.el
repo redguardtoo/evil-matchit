@@ -153,6 +153,7 @@ If IS-FORWARD is t, jump forward; or else jump backward."
 (defun evilmi-sdk-simple-jump ()
   "Alternative for `evil-jump-item'."
   (if evilmi-debug (message "evilmi-sdk-simple-jump called (point)=%d" (point)))
+  (skip-syntax-forward " ")
   (let* ((tmp (evilmi-sdk-jump-forward-p))
          (jump-forward (car tmp))
          ;; if ff is not nil, it's jump between quotes
