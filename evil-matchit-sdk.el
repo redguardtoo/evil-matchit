@@ -153,7 +153,17 @@ If IS-FORWARD is t, jump forward; or else jump backward."
 (defun evilmi-sdk-simple-jump ()
   "Alternative for `evil-jump-item'."
   (if evilmi-debug (message "evilmi-sdk-simple-jump called (point)=%d" (point)))
-  (skip-syntax-forward " ")
+  (let ((old (point)))
+    (skip-syntax-forward " ")
+    ;; If we move from a non-comment to before a comment,
+    ;; `evilmi-sdk-jumpto-where' wont skip it:
+    ;;
+    ;; <point> /* comment */ {}
+    ;;
+    ;; Is skipped because we go back, but wouldn't be if we didn't (due to
+    ;; checking for `evilmi-sdk-comment-p').
+    (when (and (not (evilmi-sdk-comment-p old)) (evilmi-sdk-comment-p (point)))
+      (goto-char old)))
   (let* ((tmp (evilmi-sdk-jump-forward-p))
          (jump-forward (car tmp))
          ;; if ff is not nil, it's jump between quotes
