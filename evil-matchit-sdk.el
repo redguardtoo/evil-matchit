@@ -136,7 +136,7 @@ If IS-FORWARD is t, jump forward; or else jump backward."
 
 ;; @see http://emacs.stackexchange.com/questions/13222/a-elisp-function-to-jump-between-matched-pair
 (defun evilmi-sdk-jumpto-where (ff is-forward ch)
-  "Non-nil ff means jumping between quotes"
+  "Non-nil ff means jumping between quotes."
   (let* ((dst (if ff (evilmi-sdk-the-other-quote-char ff is-forward ch)
                 (evilmi-sdk-scan-sexps is-forward))))
     (if evilmi-debug (message "evilmi-sdk-jumpto-where => %s" (evilmi-sdk-adjust-jumpto is-forward dst)))
@@ -150,9 +150,8 @@ If IS-FORWARD is t, jump forward; or else jump backward."
     ;; so hack to workaround scan-sexps is NOT necessary
     (evil-backward-char)))
 
-(defun evilmi-sdk-simple-jump ()
-  "Alternative for `evil-jump-item'."
-  (if evilmi-debug (message "evilmi-sdk-simple-jump called (point)=%d" (point)))
+(defun evilmi-sdk-skip-whitespace ()
+  "Skip whitespace characters at point."
   (let ((old (point)))
     (skip-syntax-forward " ")
     ;; If we move from a non-comment to before a comment,
@@ -163,7 +162,14 @@ If IS-FORWARD is t, jump forward; or else jump backward."
     ;; Is skipped because we go back, but wouldn't be if we didn't (due to
     ;; checking for `evilmi-sdk-comment-p').
     (when (and (not (evilmi-sdk-comment-p old)) (evilmi-sdk-comment-p (point)))
-      (goto-char old)))
+      (goto-char old))))
+
+(defun evilmi-sdk-simple-jump ()
+  "Alternative for `evil-jump-item'."
+  (if evilmi-debug (message "evilmi-sdk-simple-jump called (point)=%d" (point)))
+
+  (evilmi-sdk-skip-whitespace)
+
   (let* ((tmp (evilmi-sdk-jump-forward-p))
          (jump-forward (car tmp))
          ;; if ff is not nil, it's jump between quotes
