@@ -48,6 +48,8 @@
 
 ;;; Code:
 
+(eval-when-compile
+  (require 'evil-macros))
 (require 'evil-matchit-sdk)
 
 (defvar evilmi-plugins '(emacs-lisp-mode ((evilmi-simple-get-tag evilmi-simple-jump)))
