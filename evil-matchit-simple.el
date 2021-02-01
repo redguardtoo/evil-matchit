@@ -42,16 +42,16 @@ If it's t, use simple jump.")
   (let (rlt)
     (cond
 
-     ;; code "(function(...) { ..."
-     ;; code "} else {"
-     ;; css-mode use characters ".:-"
-     ((or (string-match-p "^[ \t]*[\(\}]?[.:_a-zA-Z0-9-]+.*{ *\\(\/\/.*\\)?$" cur-line)
-          (string-match-p "^[ \t]*[\(\}]?[.:_a-zA-Z0-9-]+.*{ *\\(\/\*[^/]*\*\/\\)?$" cur-line))
+     ;; code: function(...) { ...
+     ;; code: } else {'
+     ;; code: "jsonField": {
+     ;; Please note css-mode use characters ".:-"
+     ((string-match "^[ \t]*[\(\}]?[.:_a-zA-Z0-9\"-]+.*{ *\\(\/\/.*\\|\/\*[^/]*\*\/\\)?$" cur-line)
       (setq rlt 1))
 
     ;; code "} if (...) {"
     ;; code "} else (...) {"
-     ((and (string-match-p "^[ \t]*[\}]? \\(if\\|el[a-z]*\\) *.*{ *?$" cur-line)
+     ((and (string-match "^[ \t]*[\}]? \\(if\\|el[a-z]*\\) *.*{ *?$" cur-line)
            (not (eq (following-char) ?})))
       (setq rlt 1))
 
@@ -60,7 +60,7 @@ If it's t, use simple jump.")
       (save-excursion
         (forward-line)
         (setq cur-line (evilmi-sdk-curline))
-        (if (string-match-p "^[ \t]*{ *$" cur-line)
+        (if (string-match "^[ \t]*{ *$" cur-line)
             (setq rlt 2)))))
 
     rlt))
