@@ -503,5 +503,6 @@
     (should (string= "#+begin_quote" (evilmi-sdk-curline)))
 
     (should (eq major-mode 'org-mode))))
+
 (ert-run-tests-batch-and-exit)
 ;;; evil-matchit-tests.el ends here
