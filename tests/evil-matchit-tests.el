@@ -483,5 +483,25 @@
     (evilmi-sdk-simple-jump)
     (should (= (char-after) ?{))))
 
+(ert-deftest evilmi-test-org ()
+  (with-temp-buffer
+    (evilmi-test-read-file "hello.org")
+    (org-mode)
+    (font-lock-ensure)
+
+    (goto-char (point-min))
+    (search-forward "#+begin_src")
+    (evilmi-jump-items)
+    (should (string= "#+end_src" (evilmi-sdk-curline)))
+    (evilmi-jump-items)
+    (should (string= "#+begin_src javascript" (evilmi-sdk-curline)))
+
+    (search-forward "#+begin_quote")
+    (evilmi-jump-items)
+    (should (string= "#+end_quote" (evilmi-sdk-curline)))
+    (evilmi-jump-items)
+    (should (string= "#+begin_quote" (evilmi-sdk-curline)))
+
+    (should (eq major-mode 'org-mode))))
 (ert-run-tests-batch-and-exit)
 ;;; evil-matchit-tests.el ends here

@@ -1,0 +1,23 @@
+#+OPTIONS: ^:{} toc:nil H:3
+* myproject (v0.0.1)
+One liner to describe this program.
+* Why
+- feature1
+- feature2
+* Install
+Install it through [[http://melpa.org]].
+* Setup
+#+begin_src javascript
+console.log('hello world);
+while(true) {
+  console('bye');
+}
+#+end_src
+
+some random text
+#+begin_quote
+console.log('hello world);
+while(true) {
+  console('bye');
+}
+#+end_quote
