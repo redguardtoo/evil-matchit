@@ -32,19 +32,38 @@ between '\\(' and '\\)' in regular expression.")
   "Get character at POSITION."
   (char-after position))
 
+(defun evilmi-sdk-guess-jump-direction-of-quote (ch ff)
+  "Guess jump direction by quote character CH and font face FF.
+Return t if jump forward."
+  (cond
+   (ff
+    (eq ff (get-text-property (+ 1 (point)) 'face)))
+
+   (t
+    (let* ((i 0)
+           (cnt 0)
+           (str (buffer-substring (point-min) (point)))
+           (len (length str)))
+      ;; count quote character
+      (while (< i len)
+        (when (eq ch (seq-elt str i))
+          (setq cnt (1+ cnt)))
+        (setq i (1+ i)))
+      (eq (% cnt 2) 0)))))
+
 (defun evilmi-sdk-jump-forward-p ()
   "Return: (forward-direction font-face-under-cursor character-under-cursor).
 If font-face-under-cursor is NOT nil, the quoted string is being processed."
   (let* ((ch (following-char))
-         (p (point))
-         ff
+         ff ; font-face
          (rlt t))
     (cond
      ((memq ch evilmi-backward-chars)
       (setq rlt nil))
+
      ((and (memq ch evilmi-quote-chars))
-      (setq rlt (eq (setq ff (get-text-property p 'face))
-                    (get-text-property (+ 1 p) 'face)))))
+      (setq ff (get-text-property (point) 'face))
+      (setq rlt (evilmi-sdk-guess-jump-direction-of-quote ch ff))))
 
     (if evilmi-debug (message "evilmi-sdk-jump-forward-p => (%s %s %s)" rlt ff (string ch)))
     (list rlt ff ch)))
@@ -80,46 +99,57 @@ If font-face-under-cursor is NOT nil, the quoted string is being processed."
     (evilmi-among-fonts-p pos '(font-lock-comment-face
                                 font-lock-comment-delimiter-face)))))
 
-(defun evilmi-sdk-scan-sexps (is-forward)
-  "Get the position of matching tag.
+(defun evilmi-sdk-scan-sexps (is-forward character)
+  "Get the position of matching tag with CHARACTER at point.
 If IS-FORWARD is t, jump forward; or else jump backward."
+  (if evilmi-debug (message "evilmi-sdk-scan-sexps called => (%s)" is-forward character))
   (let* ((start-pos (if is-forward (point) (+ 1 (point))))
          (arg (if is-forward 1 -1))
          (limit (if is-forward (point-max) (point-min)))
          (lvl 1)
-         (b (following-char))
-         (e (cond
-             ;; {}
-             ((= b 123) 125)
-             ((= b 125) 123)
-             ;; ()
-             ((= b 40) 41)
-             ((= b 41) 40)
-             ;; []
-             ((= b 91) 93)
-             ((= b 93) 91)))
+         (dest-ch (cond
+                     ;; {}
+                     ((= character 123) 125)
+                     ((= character 125) 123)
+                     ;; ()
+                     ((= character 40) 41)
+                     ((= character 41) 40)
+                     ;; []
+                     ((= character 91) 93)
+                     ((= character 93) 91)))
          (rlt start-pos))
+
     (cond
+     ;; search another quote character
+     ((memq character evilmi-quote-chars)
+      (save-excursion
+        (setq start-pos (if is-forward (1+ (point)) (1- (point))))
+        (goto-char start-pos)
+        (while (and (not (= start-pos limit))
+                    (not (eq (following-char) character)))
+          (goto-char (setq start-pos (+ start-pos arg))))
+        (when (eq (following-char) character)
+          (setq rlt (+ start-pos (if is-forward 1 0))))))
+
      ((evilmi-sdk-comment-p (point))
       ;; Matching tag in comment.
       ;; Use own algorithm instead of `scan-sexps'
       ;; because `scan-sexps' does not work in some major modes
       (save-excursion
         (setq start-pos (point))
-        (while (and e (not (= start-pos limit)) (> lvl 0))
+        (while (and dest-ch (not (= start-pos limit)) (> lvl 0))
           (goto-char (setq start-pos (+ start-pos arg)))
           (when (evilmi-sdk-comment-p start-pos)
             (cond
-             ((= (following-char) b)
+             ((= (following-char) character)
               (setq lvl (1+ lvl)))
-             ((= (following-char) e)
+             ((= (following-char) dest-ch)
               (setq lvl (1- lvl))))))
         (when (= lvl 0)
           (setq rlt (+ start-pos (if is-forward 1 0))))))
 
      (t
-      ;; not comment
-      ;; search but ignore comments
+      ;; jump inside code and ignore comments
       (let* ((parse-sexp-ignore-comments t))
         (setq rlt (scan-sexps start-pos arg)))))
 
@@ -136,11 +166,13 @@ If IS-FORWARD is t, jump forward; or else jump backward."
 
 ;; @see http://emacs.stackexchange.com/questions/13222/a-elisp-function-to-jump-between-matched-pair
 (defun evilmi-sdk-jumpto-where (ff is-forward ch)
-  "Non-nil ff means jumping between quotes."
+  "Use font face FF, jump direction IS-FORWARD and character CH to jump."
+  (if evilmi-debug (message "evilmi-sdk-jumpto-where => %s %s %s" ff is-forward ch))
   (let* ((dst (if ff (evilmi-sdk-the-other-quote-char ff is-forward ch)
-                (evilmi-sdk-scan-sexps is-forward))))
-    (if evilmi-debug (message "evilmi-sdk-jumpto-where => %s" (evilmi-sdk-adjust-jumpto is-forward dst)))
-    (evilmi-sdk-adjust-jumpto is-forward dst)))
+                (evilmi-sdk-scan-sexps is-forward ch)))
+         (rlt (evilmi-sdk-adjust-jumpto is-forward dst)))
+    (if evilmi-debug (message "dst=%s rlt=%s" dst rlt))
+    rlt))
 
 (defun evilmi-sdk-tweak-selected-region (font-face jump-forward)
   "Tweak selected region using FONT-FACE and JUMP-FORWARD."

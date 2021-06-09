@@ -502,6 +502,32 @@
     (evilmi-jump-items)
     (should (string= "#+begin_quote" (evilmi-sdk-curline)))
 
+    ;; This is test string: "'hello world'"
+    (search-forward "test quotes begin ")
+
+    ;; test double quote
+    (should (eq (following-char) 34))
+    (let* ((start-pos (point)))
+      (evilmi-jump-items)
+      (should (eq (following-char) 34))
+      (should (> (point) start-pos))
+      ;; jump back
+      (evilmi-jump-items)
+      (should (eq (following-char) 34))
+      (should (eq (point) start-pos))
+
+      ;; test single quote
+      (forward-char)
+      (should (eq (following-char) 39))
+      (setq start-pos (point))
+      (evilmi-jump-items)
+      (should (eq (following-char) 39))
+      (should (> (point) start-pos))
+      ;; jump back
+      (evilmi-jump-items)
+      (should (eq (following-char) 39))
+      (should (eq (point) start-pos)))
+
     (should (eq major-mode 'org-mode))))
 
 (ert-run-tests-batch-and-exit)
