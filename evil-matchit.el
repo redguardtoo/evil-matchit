@@ -163,7 +163,7 @@ Some people prefer using \"m\" instead.")
                             '(template simple html))
 
   ;; Emacs Org-mode
-  (evilmi-load-plugin-rules '(org-mode) '(org))
+  (evilmi-load-plugin-rules '(org-mode) '(simple org))
 
   ;; Markdown
   (evilmi-load-plugin-rules '(markdown-mode) '(markdown))
