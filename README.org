@@ -1,6 +1,7 @@
 * evil-matchit
-[[https://travis-ci.org/redguardtoo/evil-matchit][https://travis-ci.org/redguardtoo/evil-matchit.svg?branch=master]]
-[[http://melpa.org/#/evil-matchit][file:http://melpa.org/packages/evil-matchit-badge.svg]] [[http://stable.melpa.org/#/evil-matchit][file:http://stable.melpa.org/packages/evil-matchit-badge.svg]]
+[[https://github.com/redguardtoo/evil-matchit/actions/workflows/test.yml][https://github.com/redguardtoo/evil-matchit/actions/workflows/test.yml/badge.svg]]
+[[http://melpa.org/#/evil-matchit][file:http://melpa.org/packages/evil-matchit-badge.svg]]
+[[http://stable.melpa.org/#/evil-matchit][file:http://stable.melpa.org/packages/evil-matchit-badge.svg]]
 
 Vim [[http://www.vim.org/scripts/script.php?script_id=39][matchit.vim]] by Benji Fisher is ported into Emacs.
 
@@ -38,11 +39,11 @@ Many modern languages are supported:
 
 This package uses Evil as its vi layer!
 
-Tested on Emacs 25.1, 26, 27, 28
+Tested on Emacs 25, 26, 27, 28
 
 * Why use evil-matchit
 - No learning curve. Press "%" to jump. That's all!
-- Stable. Usage of Evil API is minimized
+- Stable. Usage of Evil API is minimised
 - Perfect integration with Evil
 - Support any modern languages (html/java/c/c++/python/latex/javascript ...)
 - Powerful. If you mix jsp, freemarker, html, jquery template or any weird syntax into one file, it still works!
@@ -76,7 +77,7 @@ Press "da%" to delete line(s) wrapped by tags including tags themselves. =M-x ev
 
 All commands support numeric argument like "3%", "5va%" or "9da%"
 
-Pressing "3%" jumps to a line 3 percentage down the file. It's the default behavior in original =evil-mode=. You can =(setq evilmi-may-jump-by-percentage nil)= to turn off this feature. Then "3%" will jump 3 times.
+Pressing "3%" jumps to a line 3 percentage down the file. It's the default behaviour in original =evil-mode=. You can =(setq evilmi-may-jump-by-percentage nil)= to turn off this feature. Then "3%" will jump 3 times.
 
 Please note *only =evil-visual-state= and =evil-normal-state= are supported*.
 
@@ -86,7 +87,7 @@ This is actually an advantage of Emacs, you can tweak the select region without 
 
 * Advanced tips
 ** Support new major modes
-In order to apply three matching rules =evilmi-template=, =evilmi-simple=, and =evilmi-html= on =mhtml-mode=, please insert below code *after* your evil-nerd-commenter setup:
+In order to apply three matching rules =evilmi-template=, =evilmi-simple=, and =evilmi-html= on =mhtml-mode=, please insert below code *after* your evil-matchit setup:
 #+begin_src elisp
 (evilmi-load-plugin-rules '(mhtml-mode) '(template simple html))
 #+end_src
