@@ -4,9 +4,9 @@
 
 ;; Author: Chen Bin <chenbin DOT sh AT gmail DOT com>
 ;; URL: http://github.com/redguardtoo/evil-matchit
-;; Version: 2.3.12
+;; Version: 2.3.13
 ;; Keywords: matchit vim evil
-;; Package-Requires: ((evil "1.2.0") (emacs "25.1"))
+;; Package-Requires: ((evil "1.14.0") (emacs "25.1"))
 ;;
 ;; This file is not part of GNU Emacs.
 
@@ -63,6 +63,12 @@ If nil, `50%' jumps 50 times.")
 (defvar evilmi-shortcut "%"
   "The keybinding of `evilmi-jump-items' and then text object shortcut.
 Some people prefer using \"m\" instead.")
+
+;; {{ make linter happy
+(defvar evil-visual-char)
+(defvar evil-visual-direction)
+(defvar evil-this-type-modified)
+;; }}
 
 (defun evilmi--operate-on-item (num &optional func)
   "Jump NUM times and apply function FUNC."
@@ -315,7 +321,7 @@ If IS-INNER is t, the region is inner text object."
 (defun evilmi-version()
   "Print version."
   (interactive)
-  (message "2.3.12"))
+  (message "2.3.13"))
 
 (defvar evil-matchit-mode-map (make-sparse-keymap)
   "Keymap used by the minor mode.")
