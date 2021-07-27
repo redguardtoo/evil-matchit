@@ -45,7 +45,8 @@
 ;; React JS code: " return ("
 ;; line could ends with C++ or C comment
 (defvar evilmi-javascript-open-brace-pattern
-  "^[ \t]*[(}]?[$_a-zA-Z0-9]+.*\\([{(]\\)[ \t]*\\(\/\/.*\\|\/\*[^/]*\*\/\\)?$")
+  "^[ \t]*[(}]?[$_a-zA-Z0-9]+.*\\([{(\[]\\)[ \t]*\\(\/\/.*\\|\/\*[^/]*\*\/\\)?$"
+  "Pattern to match line which ends with brace or bracket character.")
 
 (defun evilmi--javascript-find-open-brace (cur-line)
   "Find open brace from CUR-LINE."
@@ -54,6 +55,7 @@
      ((string-match evilmi-javascript-open-brace-pattern
                     cur-line)
       (setq rlt (list 1 (match-string 1 cur-line))))
+
      (t
       (save-excursion
         (forward-line)
@@ -94,7 +96,7 @@
   "Jump to the matching tag using INFO and NUM."
   (cond
    ((not info)
-    ;; don nothing
+    ;; do nothing
     )
    ((evilmi-sdk-get-tag evilmi-javascript-match-tags
                         evilmi-javascript-extract-keyword-howtos)

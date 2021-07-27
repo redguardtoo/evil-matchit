@@ -108,6 +108,30 @@
       (evilmi-jump-items)
       (should (eq (point) beg)))
 
+    (search-forward "test1" (point-max) t)
+    (backward-word)
+    (should (string= (evilmi-sdk-curline) "const test1 = ["))
+    (evilmi-jump-items)
+    (should (string= (evilmi-sdk-curline) "];"))
+    (evilmi-jump-items)
+    (should (string= (evilmi-sdk-curline) "const test1 = ["))
+
+    (search-forward "test2" (point-max) t)
+    (backward-word)
+    (should (string= (evilmi-sdk-curline) "const test2 = {"))
+    (evilmi-jump-items)
+    (should (string= (evilmi-sdk-curline) "};"))
+    (evilmi-jump-items)
+    (should (string= (evilmi-sdk-curline) "const test2 = {"))
+
+    (search-forward "test3" (point-max) t)
+    (backward-word)
+    (should (string= (evilmi-sdk-curline) "const test3 = hello("))
+    (evilmi-jump-items)
+    (should (string= (evilmi-sdk-curline) ");"))
+    (evilmi-jump-items)
+    (should (string= (evilmi-sdk-curline) "const test3 = hello("))
+
     (should (eq major-mode 'js-mode))))
 
 (ert-deftest evilmi-test-html ()
