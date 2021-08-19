@@ -182,6 +182,7 @@ Some people prefer using \"m\" instead.")
 
   ;; Octave
   (evilmi-load-plugin-rules '(octave-mode) '(simple octave))
+  (evilmi-load-plugin-rules '(matlab-mode) '(simple octave))
 
   ;; Python
   (evilmi-load-plugin-rules '(python-mode) '(simple python))
