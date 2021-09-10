@@ -81,6 +81,10 @@ Some people prefer using \"m\" instead.")
 
     (unless num (setq num 1))
 
+    (when (derived-mode-p 'prog-mode)
+      (setq jump-rules
+            (append (plist-get evilmi-plugins 'prog-mode) jump-rules)))
+
     (when jump-rules
       (dolist (rule jump-rules)
         ;; execute evilmi-xxxx-get-tag
@@ -140,6 +144,10 @@ Some people prefer using \"m\" instead.")
 (defun evilmi-init-plugins ()
   "Load plugins."
   (interactive)
+
+  ;; rules for `prog-mode'
+  (evilmi-load-plugin-rules '(prog-mode) '(prog))
+
   ;; simple matching for languages containing brackets
   (evilmi-load-plugin-rules '(java-mode perl-mode cperl-mode go-mode)
                             '(simple))

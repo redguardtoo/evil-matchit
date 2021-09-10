@@ -554,5 +554,20 @@
 
     (should (eq major-mode 'org-mode))))
 
+(ert-deftest evilmi-test-merge-conflict ()
+  (with-temp-buffer
+    (evilmi-test-read-file "conflict.js")
+    (js-mode)
+
+    (goto-char (point-min))
+    (re-search-forward "^<<<<<<")
+    (evilmi-jump-items)
+    (should (string-match "^======" (evilmi-sdk-curline)))
+    (evilmi-jump-items)
+    (should (string-match "^>>>>>>" (evilmi-sdk-curline)))
+    (evilmi-jump-items)
+    (should (string-match "^<<<<<<" (evilmi-sdk-curline)))
+
+    (should (eq major-mode 'js-mode))))
 (ert-run-tests-batch-and-exit)
 ;;; evil-matchit-tests.el ends here

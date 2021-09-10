@@ -468,6 +468,9 @@ after calling this function."
               (= (line-beginning-position) (point-min)))
           (setq found t)))
 
+    (when evilmi-debug
+      (message "evilmi-sdk-jump was called. ideal-dest=%s" ideal-dest))
+
     ideal-dest))
 
 
