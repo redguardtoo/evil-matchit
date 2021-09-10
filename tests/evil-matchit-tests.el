@@ -569,5 +569,6 @@
     (should (string-match "^<<<<<<" (evilmi-sdk-curline)))
 
     (should (eq major-mode 'js-mode))))
+
 (ert-run-tests-batch-and-exit)
 ;;; evil-matchit-tests.el ends here

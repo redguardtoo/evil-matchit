@@ -27,9 +27,7 @@
 ;;
 ;;; Code:
 
-(require 'cl-lib)
 (require 'evil-matchit-sdk)
-(require 'semantic/lex)
 
 ;; {{ Sample verilog code:
 ;; module dff_lab;
@@ -94,28 +92,27 @@
   "^if\\(n?def\\)?\\|else\\( if\\)?\\|initial\\|always$"
   "Keyword before the block \"begin\".")
 
-(defun evilmi-verilog-open-bracket-p (token)
-  (let* ((beg (cadr token))
-         (end (cddr token)))
-    (string= "begin" (buffer-substring-no-properties beg end))))
+(defun evilmi-verilog-open-tag-p (token)
+  "TOKEN is the open tag."
+  (string= "begin" (buffer-substring-no-properties (cadr token)
+                                                   (cddr token))))
 
 (defun evilmi-verilog-parse-at-point ()
-  (let* ((range (evilmi-sdk-n-lines 3))
-         (tokens (semantic-lex (car range) (cdr range)))
+  (let* ((tokens (evilmi-sdk-tokens 3))
          info)
     (when (and tokens (> (length tokens) 1))
       (let* ((first-token (car tokens))
-             (beg (cadr first-token))
-             (end (cddr first-token))
+             (b (cadr first-token))
+             (e (cddr first-token))
              start
-             bracket)
+             tag)
         (when (and (string-match evilmi-verilog-block-begin-prefix
-                                 (buffer-substring-no-properties beg end))
-                   (setq bracket
-                         (cl-find-if #'evilmi-verilog-open-bracket-p (cdr tokens))))
+                                 (buffer-substring-no-properties b e))
+                   (setq tag
+                         (cl-find-if #'evilmi-verilog-open-tag-p (cdr tokens))))
           (setq start (line-beginning-position))
           ;; move focus to the "begin"
-          (goto-char (cadr bracket))
+          (goto-char (cadr tag))
           (setq info (evilmi-sdk-get-tag evilmi-verilog-match-tags
                                          evilmi-verilog-extract-keyword-howtos))
           (setq info (cons start (cdr info))))))

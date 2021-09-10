@@ -7,7 +7,7 @@ Vim [[http://www.vim.org/scripts/script.php?script_id=39][matchit.vim]] by Benji
 
 Press "%" to jump between matched tags in Emacs. For example, in HTML "<div>" and "</div>" are a pair of tags.
 
-Many modern languages are supported:
+Supported programming languages and major modes:
 - HTML
 - Python
 - Java
@@ -36,6 +36,7 @@ Many modern languages are supported:
 - Diff/Patch
 - Shell/Terminal bundled in Emacs
 - Emacs email (message-mode)
+- VCS (Git/Subversion/Perforce ...) merge conflicts
 
 This package uses Evil as its vi layer!
 
@@ -43,7 +44,7 @@ Tested on Emacs 25, 26, 27, 28
 
 * Why use evil-matchit
 - No learning curve. Press "%" to jump. That's all!
-- Stable. Usage of Evil API is minimised
+- Stable
 - Perfect integration with Evil
 - Support any modern languages (html/java/c/c++/python/latex/javascript ...)
 - Powerful. If you mix jsp, freemarker, html, jquery template or any weird syntax into one file, it still works!
@@ -77,7 +78,7 @@ Press "da%" to delete line(s) wrapped by tags including tags themselves. =M-x ev
 
 All commands support numeric argument like "3%", "5va%" or "9da%"
 
-Pressing "3%" jumps to a line 3 percentage down the file. It's the default behaviour in original =evil-mode=. You can =(setq evilmi-may-jump-by-percentage nil)= to turn off this feature. Then "3%" will jump 3 times.
+Pressing "3%" jumps to a line 3 percentage down the file. It's the default behavior in original =evil-mode=. You can =(setq evilmi-may-jump-by-percentage nil)= to turn off this feature. Then "3%" will jump 3 times.
 
 Please note *only =evil-visual-state= and =evil-normal-state= are supported*.
 

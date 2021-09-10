@@ -1,5 +1,7 @@
 (require 'evil nil t)
 (require 'subr-x)
+(require 'cl-lib)
+(require 'semantic/lex)
 
 (defvar evilmi-debug nil
   "Debug flag.")
@@ -98,6 +100,20 @@ If font-face-under-cursor is NOT nil, the quoted string is being processed."
    (t
     (evilmi-among-fonts-p pos '(font-lock-comment-face
                                 font-lock-comment-delimiter-face)))))
+
+(defun evilmi-sdk-defun-p ()
+  "At the beginning of function definition."
+  (let ((e (line-end-position))
+        (b (line-beginning-position))
+       defun-p)
+    (save-excursion
+      (goto-char b)
+      (while (and (< (point) e)
+                  (not (setq defun-p
+                             (evilmi-among-fonts-p (point)
+                                                   '(font-lock-function-name-face)))))
+        (forward-word)))
+    defun-p))
 
 (defun evilmi-sdk-scan-sexps (is-forward character)
   "Get the position of matching tag with CHARACTER at point.
@@ -516,14 +532,14 @@ after calling this function."
       (setq start (match-end 0)))
     count))
 
-(defun evilmi-sdk-n-lines (n)
-  "Return content of N lines from current position."
+(defun evilmi-sdk-tokens (n)
+  "Get semantic tokens of current N lines."
   (unless (and n (> n 1)) (setq n 1))
-  (let* (beg end str)
+  (let* (b e)
     (save-excursion
-      (setq beg (line-beginning-position))
+      (setq b (line-beginning-position))
       (forward-line (1- n))
-      (setq end (line-end-position)))
-    (cons beg end)))
+      (setq e (line-end-position)))
+    (semantic-lex b e)))
 
 (provide 'evil-matchit-sdk)

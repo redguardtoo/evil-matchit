@@ -1,6 +1,6 @@
 ;;; evil-matchit-simple.el --- simple match plugin of evil-matchit
 
-;; Copyright (C) 2014-2020 Chen Bin <chenbin DOT sh AT gmail DOT com>
+;; Copyright (C) 2014-2021 Chen Bin <chenbin DOT sh AT gmail DOT com>
 
 
 ;; Author: Chen Bin <chenbin DOT sh AT gmail DOT com>
@@ -36,34 +36,57 @@
   "`major-mode' like `python-mode' use optimized algorithm by default.
 If it's t, use simple jump.")
 
+(defvar evilmi-simple-supported-major-modes
+  '(java-mode c-mode c++-mode go-mode js-mode cperl-mode perl-mode)
+  "Major mode the simple rule supports.")
+
+(defun evilmi-simple-open-tag-p (token)
+  "TOKEN is the open tag."
+  (and (eq (car token) 'semantic-list)
+       (string= "{"
+                (buffer-substring-no-properties (cadr token)
+                                                (1+ (cadr token))))))
+
 (defun evilmi--simple-find-open-brace (cur-line)
   "Find open brace from CUR-LINE."
   (if evilmi-debug (message "evilmi--simple-find-open-brace called => cur-line=%s (point)=%d" cur-line (point)))
-  (let (rlt)
-    (cond
+  (cond
 
-     ;; code: function(...) { ...
-     ;; code: } else {'
-     ;; code: "jsonField": {
-     ;; Please note css-mode use characters ".:-"
-     ((string-match "^[ \t]*[\(\}]?[.:_a-zA-Z0-9\"-]+.*{ *\\(\/\/.*\\|\/\*[^/]*\*\/\\)?$" cur-line)
-      (setq rlt 1))
+   ;; code: function(...) { ...
+   ;; code: } else {'
+   ;; code: "jsonField": {
+   ;; Please note css-mode use characters ".:-"
+   ((string-match "^[ \t]*[\(\}]?[.:_a-zA-Z0-9\"-]+.*{ *\\(\/\/.*\\|\/\*[^/]*\*\/\\)?$" cur-line)
+    (evilmi-forward-and-locate 1))
 
-    ;; code "} if (...) {"
-    ;; code "} else (...) {"
-     ((and (string-match "^[ \t]*[\}]? \\(if\\|el[a-z]*\\) *.*{ *?$" cur-line)
-           (not (eq (following-char) ?})))
-      (setq rlt 1))
+   ;; code "} if (...) {"
+   ;; code "} else (...) {"
+   ((and (string-match "^[ \t]*[\}]? \\(if\\|el[a-z]*\\) *.*{ *?$" cur-line)
+         (not (eq (following-char) ?})))
+    (evilmi-forward-and-locate 1))
 
-     ;; next line is "{"
-     (t
-      (save-excursion
-        (forward-line)
-        (setq cur-line (evilmi-sdk-curline))
-        (if (string-match "^[ \t]*{ *$" cur-line)
-            (setq rlt 2)))))
+   ;; If current line has text in `font-lock-function-name-face' and it's C like
+   ;; programming language, find the open brace character in next lines
+   ((and (apply 'derived-mode-p evilmi-simple-supported-major-modes)
+         (evilmi-sdk-defun-p))
+    (let* ((tokens (evilmi-sdk-tokens 5))
+           tag
+           info)
+      (when (and tokens
+                 (> (length tokens) 1)
+                 (setq tag
+                       (cl-find-if #'evilmi-simple-open-tag-p (cdr tokens))))
+        (goto-char (cadr tag))
+        ;; find the bracket
+        (list (cadr tag)))))
 
-    rlt))
+   ;; next line is "{"
+   (t
+    (let ((found (save-excursion
+                   (forward-line)
+                   (string-match "^[ \t]*{ *$" (evilmi-sdk-curline)))))
+      (when found
+        (evilmi-forward-and-locate 1))))))
 
 (defun evilmi--char-is-simple (ch)
   "Special handling of character CH for `python-mode'."
@@ -106,6 +129,16 @@ If it's t, use simple jump.")
 
     (following-char)))
 
+(defun evilmi-forward-and-locate (n)
+  "Forward N lines and locate the open tag character."
+  (let ((rlt (list (line-beginning-position))))
+    ;; need handle case "if () \n { ... }".
+    ;; move cursor over "{", prepare for `evil-jump-item'
+    (forward-line (1- n))
+    (search-forward "{" nil nil)
+    (backward-char)
+    rlt))
+
 ;;;###autoload
 (defun evilmi-simple-get-tag ()
   "Get current tag in simple language."
@@ -116,19 +149,15 @@ If it's t, use simple jump.")
     (cond
      ;; In evil-visual-state, the (preceding-char) is actually the character under cursor
      ((not (evilmi--char-is-simple ch))
-      (when (setq forward-line-num (evilmi--simple-find-open-brace (evilmi-sdk-curline)))
-        (setq rlt (list (line-beginning-position)))
-        ;; need handle case "if () \n { ... }".
-        ;; move cursor over "{", prepare for `evil-jump-item'
-        (forward-line (1- forward-line-num))
-        (search-forward "{" nil nil)
-        (backward-char)))
+      (evilmi--simple-find-open-brace (evilmi-sdk-curline)))
+
      ((and (memq ch evilmi-quote-chars)
            (eq ch ?/)
            (not (eq ?* (evilmi-sdk-get-char (1- (point)))))
            (not (eq ?* (evilmi-sdk-get-char (1+ (point))))))
       ;; character at point is not "/*" or "*/"
       (setq rlt nil))
+
      (t
       ;; use evil's own evilmi-sdk-simple-jump
       (setq rlt (list (point)))))
@@ -140,14 +169,15 @@ If it's t, use simple jump.")
 (defun evilmi-simple-jump (info num)
   "Use INFO of current tag to jump to matching tag.  NUM is ignored."
   (ignore num)
+  (when evilmi-debug
+    (message "evilmi-simple-jump: info=%s (point)=%s" info (point)))
   (when info
-    (if evilmi-debug (message "evilmi-simple-jump called (point)=%d" (point)))
-
     ;; In latex-mode `scan-sexps' does NOT work properly between "[]"
     ;; so we have to fallback to evil's API.
     (cond
      ((memq major-mode '(latex-mode))
       (evil-jump-item))
+
      (t
       (evilmi-sdk-simple-jump)))
 
