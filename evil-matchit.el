@@ -4,7 +4,7 @@
 
 ;; Author: Chen Bin <chenbin DOT sh AT gmail DOT com>
 ;; URL: http://github.com/redguardtoo/evil-matchit
-;; Version: 2.4.0
+;; Version: 2.4.1
 ;; Keywords: matchit vim evil
 ;; Package-Requires: ((evil "1.14.0") (emacs "25.1"))
 ;;
@@ -127,9 +127,15 @@ Some people prefer using \"m\" instead.")
              (fn-prefix (concat "evilmi-" (symbol-name rule)))
              (get-tag-function (intern (concat fn-prefix "-get-tag")))
              (jump-function (intern (concat fn-prefix "-jump"))))
-        (autoload get-tag-function rule-filename nil)
-        (autoload jump-function rule-filename nil)
+
+        ;; functions might be defined in another file
+        (unless (and (fboundp get-tag-function) (fboundp jump-function))
+          (autoload get-tag-function rule-filename nil)
+          (autoload jump-function rule-filename nil))
+
+        ;; load function
         (push (list get-tag-function jump-function) rlt)))
+
     (nreverse rlt)))
 
 ;;;###autoload
@@ -330,7 +336,7 @@ If IS-INNER is t, the region is inner text object."
 (defun evilmi-version()
   "Print version."
   (interactive)
-  (message "2.4.0"))
+  (message "2.4.1"))
 
 (defvar evil-matchit-mode-map (make-sparse-keymap)
   "Keymap used by the minor mode.")

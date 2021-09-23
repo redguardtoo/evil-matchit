@@ -156,7 +156,7 @@ Thus, you disable our *advanced algorithm* which I highly recommend.
 Some people may prefer simpler algorithm in =python-mode=.
 * Developer guide
 ** Create plugin to support new language
-Simple. You only need define two functions and tell evil-matchit in which major-mode they should be used.
+Simple. You only need define two functions and tell evil-matchit in which major mode they should be used.
 
 A complete setup:
 #+BEGIN_SRC elisp
@@ -193,6 +193,7 @@ A complete setup:
 #+END_SRC
 
 Place above code into your =~/.emacs=, after the line "(global-evil-matchit-mode 1)"
+
 ** Use SDK
 For example, it only takes 3 steps to create a new rule =script= to match tags in script like Ruby/Lua/Bash/VimScript,
 
