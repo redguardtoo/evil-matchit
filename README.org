@@ -168,10 +168,10 @@ A complete setup:
 ;;         the first element of the list is the position of cursor before jump
 ;;         we use it to select/delete tag. The other elements of the list could
 ;;         be any data type
-(defun evilmi-mylang-find-tag ()
+(defun evilmi-mylang-get-tag ()
   (list position-of-open-end "anything-you-like" "anything-you-like"))
 
-;; @parama rlt result from evilmi-mylang-find-tag
+;; @parama rlt result from evilmi-mylang-get-tag
 ;; @param NUM numeric argument when user press "%" to match tag
 ;; @return the matching tag position in theory, useful only for
 ;;         selecting or deleting text between matching tags and tags
