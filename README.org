@@ -80,9 +80,7 @@ All commands support numeric argument like "3%", "5va%" or "9da%"
 
 Pressing "3%" jumps to a line 3 percentage down the file. It's the default behavior in original =evil-mode=. You can =(setq evilmi-may-jump-by-percentage nil)= to turn off this feature. Then "3%" will jump 3 times.
 
-Please note *only =evil-visual-state= and =evil-normal-state= are supported*.
-
-If you need visually select lines, I *strongly recommend* using =evilmi-select-items= instead.
+If you need visually select lines, you could use  =evilmi-select-items=.
 
 This is actually an advantage of Emacs, you can tweak the select region without go into visual state at all.
 
