@@ -1,5 +1,6 @@
 * evil-matchit
 [[https://github.com/redguardtoo/evil-matchit/actions/workflows/test.yml][https://github.com/redguardtoo/evil-matchit/actions/workflows/test.yml/badge.svg]]
+[[https://elpa.nongnu.org/nongnu/evil-matchit.html][file:https://elpa.nongnu.org/nongnu/evil-matchit.svg]]
 [[http://melpa.org/#/evil-matchit][file:http://melpa.org/packages/evil-matchit-badge.svg]]
 [[http://stable.melpa.org/#/evil-matchit][file:http://stable.melpa.org/packages/evil-matchit-badge.svg]]
 
