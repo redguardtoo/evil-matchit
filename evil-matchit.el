@@ -4,7 +4,7 @@
 
 ;; Author: Chen Bin <chenbin DOT sh AT gmail DOT com>
 ;; URL: http://github.com/redguardtoo/evil-matchit
-;; Version: 2.4.1
+;; Version: 2.4.2
 ;; Keywords: matchit vim evil
 ;; Package-Requires: ((evil "1.14.0") (emacs "25.1"))
 ;;
@@ -201,6 +201,9 @@ Some people prefer using \"m\" instead.")
   ;; Python
   (evilmi-load-plugin-rules '(python-mode) '(simple python))
 
+  ;; Yaml
+  (evilmi-load-plugin-rules '(yaml-mode) '(simple yaml))
+
   ;; SQL
   (evilmi-load-plugin-rules '(sql-mode) '(simple sql))
 
@@ -336,7 +339,7 @@ If IS-INNER is t, the region is inner text object."
 (defun evilmi-version()
   "Print version."
   (interactive)
-  (message "2.4.1"))
+  (message "2.4.2"))
 
 (defvar evil-matchit-mode-map (make-sparse-keymap)
   "Keymap used by the minor mode.")

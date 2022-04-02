@@ -20,6 +20,7 @@ Supported programming languages and major modes:
 - OCaml
 - Markdown
 - Perl
+- Yaml
 - Latex
 - MATLAB/Octave
 - CMake
@@ -154,10 +155,10 @@ Thus, you disable our *advanced algorithm* which I highly recommend.
 
 Some people may prefer simpler algorithm in =python-mode=.
 * Developer guide
-** Create plugin to support new language
+** Quick start to support new language
 Simple. You only need define two functions and tell evil-matchit in which major mode they should be used.
 
-A complete setup:
+A complete setup to insert into "~/.emacs":
 #+BEGIN_SRC elisp
 ;; detect tag in current line and return the result in variable rlt
 ;; the rlt will be used by evilmi-mylang-jump as the first parameter.
@@ -235,6 +236,22 @@ Step 3, add below code to =~/.emacs.=,
 #+BEGIN_SRC lisp
 (evilmi-load-plugin-rules '(ruby-mode lua-mode) '(script))
 #+END_SRC
+*** Support languages using indentation to indentify a block of code
+It's easy to support such language (Python, Yaml, ...).
+
+Here is a minimum example to support yaml,
+#+begin_src elisp
+(require 'evil-matchit-indent)
+
+(defun evilmi-yaml-get-tag ()
+  (evilmi-indent-get-tag))
+
+(defun evilmi-yaml-jump (info num)
+  (let* ((evilmi-spaces-per-tab 2))
+    (evilmi-indent-jump info)))
+
+(evilmi-load-plugin-rules '(yaml-mode) '(yaml))
+#+end_src
 ** APIs
 - evilmi-load-plugin-rules
 * Contact me

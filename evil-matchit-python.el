@@ -30,40 +30,17 @@
 
 ;;; Code:
 
-(require 'evil-matchit-sdk)
+(require 'evil-matchit-indent)
 
-(defun evilmi--python-calculate-indent (line)
-  "Return number of indent of LINE."
-  (let* (prefix)
-    (cond
-     ((string-match "^[ \t]*$" line)
-      ;; empty line
-      9999)
-
-     ((string-match "^\\([ \t]+\\).*$" line)
-      (setq prefix (match-string 1 line))
-      ;; char code of tab is 9
-      (if (= (elt prefix 0) 9)
-          (length prefix)
-        ;; Python developers always indent 4 spaces
-        (/ (length prefix) 4)))
-     (t
-      ;; line begin at the first column
-      0))))
-
-(defun evilmi--python-move-to-first-open-tag (cur-indent)
+(defun evilmi-python-back-to-first-tag (cur-indent)
  "Jump to the open tag based on CUR-INDENT.
 For example, jump from the tag \"finally\" to \"try\".
 Only python need this hack."
   (let* (out-of-loop
-         keyword
          where-to-go
          regexp
-         (cur-line (evilmi-sdk-curline)))
-
-    ;; extract keyword from current line
-    (if (string-match "^[ \t]*\\([a-z]+\\) *.*:[ \t]*\\(#.*\\)?$" cur-line)
-        (setq keyword (match-string 1 cur-line)))
+         (cur-line (evilmi-sdk-curline))
+         (keyword (evilmi-indent-extract-keyword cur-line)))
 
     (cond
      ((string= keyword "else")
@@ -78,7 +55,7 @@ Only python need this hack."
           (forward-line -1)
           (setq cur-line (evilmi-sdk-curline))
 
-          (when (and (= cur-indent (evilmi--python-calculate-indent cur-line))
+          (when (and (= cur-indent (evilmi-indent-tab-count cur-line))
                      (string-match regexp cur-line))
             (setq where-to-go (line-beginning-position))
             (setq out-of-loop t))
@@ -90,7 +67,7 @@ Only python need this hack."
         (goto-char where-to-go)
         (skip-chars-forward " \t")))))
 
-(defun evilmi--python-move-to-next-open-tag (keyword cur-indent)
+(defun evilmi-python-goto-next-tag (keyword cur-indent)
   "Move to next open tag using KEYWORD and CUR-INDENT."
   (let* (out-of-loop
          where-to-go
@@ -112,9 +89,9 @@ Only python need this hack."
         (forward-line)
         (setq cur-line (evilmi-sdk-curline))
 
-        (when (= cur-indent (evilmi--python-calculate-indent cur-line))
-          (if (and regexp (string-match regexp cur-line))
-              (setq where-to-go (line-beginning-position)))
+        (when (= cur-indent (evilmi-indent-tab-count cur-line))
+          (when (and regexp (string-match regexp cur-line))
+            (setq where-to-go (line-beginning-position)))
           (setq out-of-loop t))
         ;; if it's last line, we need get out of loop
         (when (= (point-max) (line-end-position))
@@ -127,88 +104,45 @@ Only python need this hack."
 ;;;###autoload
 (defun evilmi-python-get-tag ()
   "Return '(start-position tag-type keyword)."
-  (let* (rlt
-         (regexp "^[ \t]*\\([a-z]+\\) *.*:[ \t]*\\(#.*\\)?$")
-         (cur-line (evilmi-sdk-curline))
-         next-line)
-
-    (if evilmi-debug (message "evilmi-python-get-tag called"))
-
-    (cond
-     ((string-match regexp cur-line)
-      ;; we are at open tag now, and will jump forward
-      (setq rlt (list (line-beginning-position)
-                      0
-                      (match-string 1 cur-line))))
-
-     ((or (not (setq next-line (evilmi-next-non-empty-line)))
-          (< (evilmi--python-calculate-indent next-line)
-             (evilmi--python-calculate-indent cur-line)))
-      ;; double check next line to make sure current line is close tag
-      ;; if next line indention is less than current line or next line is empty line
-      ;; we are at closed tag now, will jump backward
-      (setq rlt (list (line-end-position) 1 "")))
-
-     (t
-      (setq rlt nil)))
-
-    (if (and evilmi-debug rlt) (message "evilmi-python-get-tag called. rlt=%s" rlt))
+  (let ((rlt (evilmi-indent-get-tag)))
+    (when evilmi-debug
+      (message "evilmi-python-get-tag called. rlt=%s" rlt))
 
     rlt))
 
+(defun evilmi-python-match-first-tag (keyword)
+  "Generate first tag's regexp from KEYWORD."
+  (cond
+   ((string= keyword "else")
+    "^[ \t]*\\(if\\) *.*:[ \t]*\\(#.*\\)?$")
+
+   ((or (string= keyword "finally")
+        (string= keyword "except"))
+    "^[ \t]*\\(try\\) *.*:[ \t]*\\(#.*\\)?$")))
+
+(defun evilmi-python-match-next-tag (keyword)
+  "Generate next tag's regexp from KEYWORD."
+  (cond
+   ((string= keyword "try")
+    "^[ \t]*\\(except\\) *.*:[ \t]*\\(#.*\\)?$")
+
+   ((string= keyword "except")
+    "^[ \t]*\\(except\\|finally\\) *.*:[ \t]*\\(#.*\\)?$")
+
+   ((or (string= keyword "elif") (string= keyword "if"))
+    "^[ \t]*\\(elif\\|else\\) *.*:[ \t]*\\(#.*\\)?$")))
+
 ;;;###autoload
 (defun evilmi-python-jump (info num)
-  "Use INFO returned by `evilmi-python-get-tag' and NUM to jump to matched tag."
+  "Use INFO from `evilmi-python-get-tag' to jump to matched tag.
+NUM is ignored."
   (ignore num)
-  (let* ((p (nth 0 info))
-         (tag-type (nth 1 info))
-         (keyword (nth 2 info))
-         (cur-line (evilmi-sdk-curline))
-         (cur-indent (evilmi--python-calculate-indent cur-line))
-         dendent
-         rlt)
+  (let* ((evilmi-indent-first-tag-function 'evilmi-python-match-first-tag)
+         (evilmi-indent-next-tag-function 'evilmi-python-match-next-tag)
+         (rlt (evilmi-indent-jump info)))
 
-    (if evilmi-debug (message "evilmi-python-jump called. tag-type=%d p=%d" tag-type p))
-    (cond
-     ;; start from closed tag
-     ((=  1 tag-type)
-      ;; jump to back to open tag when current indentation is NOT zero
-      (unless (= cur-indent 0)
-        (goto-char p)
-        (while (not dendent)
-          (forward-line -1)
-          ;; first line
-          (setq cur-line (evilmi-sdk-curline))
-
-          (if evilmi-debug (message "cur-line=%s" cur-line))
-
-          ;; skip empty lines
-          (when (and (not (string-match "^[ \t]*$" cur-line))
-                     (< (evilmi--python-calculate-indent cur-line) cur-indent))
-            (setq dendent t)
-            (skip-chars-forward " \t")
-            (evilmi--python-move-to-first-open-tag (1- cur-indent))
-            (setq rlt (point))))))
-
-     ;; start from open tag
-     ((=  0 tag-type)
-      ;; jump to closed tag
-      (while (not dendent)
-        (forward-line)
-        (setq cur-line (evilmi-sdk-curline))
-
-        ;; just skip empty line
-        (if (not (string-match "^[ \t]*$" cur-line))
-            (if (<= (evilmi--python-calculate-indent cur-line) cur-indent)
-                (setq dendent t)
-              ;; record the latest indented line info
-              (setq rlt (line-end-position))))
-        ;; last line
-        (if (= (point-max) (line-end-position)) (setq dendent t)))
-
-      (if rlt (goto-char rlt))
-
-      (evilmi--python-move-to-next-open-tag keyword cur-indent)))
+    (when evilmi-debug
+      (message "evilmi-python-jump called. rlt=%s" rlt))
     rlt))
 
 (provide 'evil-matchit-python)

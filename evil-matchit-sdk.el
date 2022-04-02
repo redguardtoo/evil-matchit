@@ -1,10 +1,37 @@
+;;; evil-matchit-sd.el --- evil-matchit SDK
+
+;; Copyright (C) 2014-2022 Chen Bin <chenbin DOT sh AT gmail DOT com>
+
+;; Author: Chen Bin <chenbin DOT sh AT gmail DOT com>
+
+;; This file is not part of GNU Emacs.
+
+;;; License:
+
+;; This file is part of evil-matchit
+;;
+;; evil-matchit is free software: you can redistribute it and/or
+;; modify it under the terms of the GNU General Public License as published
+;; by the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+;;
+;; evil-matchit is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+;;; Code:
+
 (require 'evil nil t)
 (require 'subr-x)
 (require 'cl-lib)
 (require 'semantic/lex)
 
-(defvar evilmi-debug nil
-  "Debug flag.")
+(defvar evilmi-debug nil "Debug flag.")
 
 (defvar evilmi-forward-chars (string-to-list "[{("))
 (defvar evilmi-backward-chars (string-to-list "]})"))
@@ -21,10 +48,10 @@
   '(("^[ \t]*\\([a-z]+\!?\\)\\( .*\\| *\\)$" 1)
     ("^.* \\(do\\) |[a-z0-9A-Z,|]+|$" 1))
   "The list of howto on extracting keyword from current line.
-Each howto is actually a pair. The first element of pair is the regular
-expression to match the current line. The second is the index of sub-matches
-to extract the keyword which starts from one.  The sub-match is the match defined
-between '\\(' and '\\)' in regular expression.")
+Each item is a pair.  First element of pair is the regular expression
+to match the current line.
+Second is the index of sub-matches to extract the keyword.
+Sub-match is defined between '\\(' and '\\)' in regular expression.")
 
 (defun evilmi-sdk-keyword (info)
   "Get keyword from INFO."
@@ -501,28 +528,6 @@ after calling this function."
                     (member f fonts))
                   fontfaces))))
 
-(defun evilmi-next-non-empty-line ()
-  "Return next non-empty line content or nil."
-  (let* ((b (line-beginning-position))
-         (e (line-end-position))
-         (cur-pos (point))
-         (continue t)
-         line
-         rlt)
-    (save-excursion
-      (forward-line)
-      (while (and continue (> (point) e))
-        (setq line (evilmi-sdk-curline))
-        (cond
-         ((string-blank-p line)
-          (setq b (line-beginning-position))
-          (setq e (line-end-position))
-          (forward-line))
-         (t
-          (setq continue nil)
-          (setq rlt line)))))
-    rlt))
-
 (defun evilmi-sdk-count-matches (regexp str)
   "Count match of REGEXP in STR."
   (let* ((count 0)
@@ -543,3 +548,4 @@ after calling this function."
     (semantic-lex b e)))
 
 (provide 'evil-matchit-sdk)
+;;; evil-matchit-sdk.el ends here

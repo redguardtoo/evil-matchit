@@ -570,5 +570,44 @@
 
     (should (eq major-mode 'js-mode))))
 
+(ert-deftest evilmi-test-python ()
+  (with-temp-buffer
+    (evilmi-test-read-file "hello.py")
+    (python-mode)
+
+    (goto-char (point-min))
+    ;; test if else
+    (should (string= "if" (thing-at-point 'symbol)))
+    (evilmi-jump-items)
+    (should (string= "elif" (thing-at-point 'symbol)))
+    (evilmi-jump-items)
+    (should (string= "else" (thing-at-point 'symbol)))
+    ;; go to end of last indent line
+    (evilmi-jump-items)
+    (should (string= "pass" (string-trim (evilmi-sdk-curline))))
+    ;; no back to the beginning
+    (evilmi-jump-items)
+    (should (eq (point) (point-min)))
+
+    ;; test function
+    (search-forward "def get_git_dir")
+    ;; jump to the end of function
+    (evilmi-jump-items)
+    (should (string= "return output.strip()" (string-trim (evilmi-sdk-curline))))
+    ;; go back to the function beginning
+    (evilmi-jump-items)
+    (should (string= "def get_git_dir ():" (string-trim (evilmi-sdk-curline))))
+
+    ;; test try statement
+    (search-forward "try:")
+    (evilmi-jump-items)
+    (should (string= "except" (thing-at-point 'symbol)))
+    (evilmi-jump-items)
+    (should (string= "return" (string-trim (evilmi-sdk-curline))))
+    (evilmi-jump-items)
+    (should (string= "try:" (string-trim (evilmi-sdk-curline))))
+
+    (should (eq major-mode 'python-mode))))
+
 (ert-run-tests-batch-and-exit)
 ;;; evil-matchit-tests.el ends here
