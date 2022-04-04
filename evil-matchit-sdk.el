@@ -1,8 +1,8 @@
 ;;; evil-matchit-sd.el --- evil-matchit SDK
 
-;; Copyright (C) 2014-2022 Chen Bin <chenbin DOT sh AT gmail DOT com>
+;; Copyright (C) 2014-2022 Chen Bin
 
-;; Author: Chen Bin <chenbin DOT sh AT gmail DOT com>
+;; Author: Chen Bin
 
 ;; This file is not part of GNU Emacs.
 

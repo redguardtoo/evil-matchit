@@ -1,8 +1,8 @@
 ;;; evil-matchit-terminal.el --- terminal plugin of evil-matchit
 
-;; Copyright (C) 2020 Chen Bin <chenbin DOT sh AT gmail DOT com>
+;; Copyright (C) 2020 Chen Bin
 
-;; Author: Chen Bin <chenbin DOT sh AT gmail DOT com>
+;; Author: Chen Bin
 
 ;; This file is not part of GNU Emacs.
 

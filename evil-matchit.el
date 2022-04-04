@@ -1,10 +1,10 @@
 ;;; evil-matchit.el --- Vim matchit ported to Evil
 
-;; Copyright (C) 2014-2020 Chen Bin <chenbin DOT sh AT gmail DOT com>
+;; Copyright (C) 2014-2020 Chen Bin
 
-;; Author: Chen Bin <chenbin DOT sh AT gmail DOT com>
+;; Author: Chen Bin <chenbin.sh@gmail.com>
 ;; URL: http://github.com/redguardtoo/evil-matchit
-;; Version: 2.4.2
+;; Version: 2.4.3
 ;; Keywords: matchit vim evil
 ;; Package-Requires: ((evil "1.14.0") (emacs "25.1"))
 ;;
@@ -339,7 +339,7 @@ If IS-INNER is t, the region is inner text object."
 (defun evilmi-version()
   "Print version."
   (interactive)
-  (message "2.4.2"))
+  (message "2.4.3"))
 
 (defvar evil-matchit-mode-map (make-sparse-keymap)
   "Keymap used by the minor mode.")

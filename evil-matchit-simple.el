@@ -1,9 +1,9 @@
 ;;; evil-matchit-simple.el --- simple match plugin of evil-matchit
 
-;; Copyright (C) 2014-2021 Chen Bin <chenbin DOT sh AT gmail DOT com>
+;; Copyright (C) 2014-2021 Chen Bin
 
 
-;; Author: Chen Bin <chenbin DOT sh AT gmail DOT com>
+;; Author: Chen Bin
 
 ;; This file is not part of GNU Emacs.
 

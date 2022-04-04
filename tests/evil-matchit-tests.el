@@ -1,6 +1,6 @@
 ;;; evil-matchit-tests.el ---  unit tests for evil-matchit -*- coding: utf-8 -*-
 
-;; Author: Chen Bin <chenbin DOT sh AT gmail DOT com>
+;; Author: Chen Bin
 
 ;;; License:
 
