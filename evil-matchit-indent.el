@@ -113,44 +113,55 @@ SPACES-PER-TAB defines the number of spaces of one tab character."
       (setq rlt (list (line-end-position) 1 "")))
 
      (t
+      (message "next-line=%s" next-line)
+      (message "(evilmi-indent-tab-count next-line)=%s" (evilmi-indent-tab-count next-line))
+      (message "(evilmi-indent-tab-count cur-line)=%s" (evilmi-indent-tab-count cur-line))
       (setq rlt nil)))
 
     rlt))
 
+;;;###autoload
+(defun evilmi-indent-extract-keyword (line)
+  "Extract keyword from LINE."
+  (let* (keyword)
+    (when (string-match evilmi-indent-open-tag-regexp line)
+      (setq keyword (match-string 1 line)))
+    keyword))
+
 (defun evilmi-indent-back-to-first-tag (cur-indent)
- "Jump to the open tag based on CUR-INDENT.
+  "Jump to the open tag based on CUR-INDENT.
 For example, jump from the tag \"finally\" to \"try\"."
- (let (out-of-loop
-       where-to-go
-       (cur-line (evilmi-sdk-curline))
-       (keyword (evilmi-indent-extract-keyword cur-line))
-       regexp)
+  (let* (out-of-loop
+         where-to-go
+         (cur-line (evilmi-sdk-curline))
+         (keyword (evilmi-indent-extract-keyword cur-line))
+         regexp)
 
-   (setq regexp
-         (and evilmi-indent-first-tag-function
-              (funcall evilmi-indent-first-tag-function keyword)))
+    (setq regexp
+          (and evilmi-indent-first-tag-function
+               (funcall evilmi-indent-first-tag-function keyword)))
 
-   (when evilmi-debug
-     (message "evilmi-indent-back-to-first-tag called. keyword=%s regexp=%s cur-line=%s"
-              keyword regexp cur-line))
+    (when evilmi-debug
+      (message "evilmi-indent-back-to-first-tag called. keyword=%s regexp=%s cur-line=%s"
+               keyword regexp cur-line))
 
-   (when regexp
-     (save-excursion
-       (while (not out-of-loop)
-         (forward-line -1)
-         (setq cur-line (evilmi-sdk-curline))
+    (when regexp
+      (save-excursion
+        (while (not out-of-loop)
+          (forward-line -1)
+          (setq cur-line (evilmi-sdk-curline))
 
-         (when (and (= cur-indent (evilmi-indent-tab-count cur-line))
-                    (string-match regexp cur-line))
-           (setq where-to-go (line-beginning-position))
-           (setq out-of-loop t))
+          (when (and (= cur-indent (evilmi-indent-tab-count cur-line))
+                     (string-match regexp cur-line))
+            (setq where-to-go (line-beginning-position))
+            (setq out-of-loop t))
 
-         ;; if it's first line, we need get out of loop
-         (if (= (point-min) (line-beginning-position))
-             (setq out-of-loop t))))
-     (when where-to-go
-       (goto-char where-to-go)
-       (skip-chars-forward " \t")))))
+          ;; if it's first line, we need get out of loop
+          (if (= (point-min) (line-beginning-position))
+              (setq out-of-loop t))))
+      (when where-to-go
+        (goto-char where-to-go)
+        (skip-chars-forward " \t")))))
 
 (defun evilmi-indent-goto-next-tag (keyword cur-indent)
   "Move to next open tag using KEYWORD and CUR-INDENT."
@@ -185,7 +196,6 @@ For example, jump from the tag \"finally\" to \"try\"."
 ;;;###autoload
 (defun evilmi-indent-jump (info)
   "Use INFO from `evilmi-indent-get-tag' to jump to matched tag."
-  (ignore num)
   (let* ((p (nth 0 info))
          (tag-type (nth 1 info))
          (keyword (nth 2 info))
@@ -238,7 +248,7 @@ For example, jump from the tag \"finally\" to \"try\"."
             ;; record the previous line which indents more than original line
             (setq rlt (line-end-position)))))
 
-        ;; stop the loop at the end of hte buffer
+        ;; stop the loop at the end of the buffer
         (when (= (point-max) (line-end-position))
           (setq dendent t)))
 
@@ -248,13 +258,5 @@ For example, jump from the tag \"finally\" to \"try\"."
 
     rlt))
 
-;;;###autoload
-(defun evilmi-indent-extract-keyword (line)
-  "Extract keyword from LINE."
-  (let (keyword)
-    (when (string-match evilmi-indent-open-tag-regexp line)
-      (setq keyword (match-string 1 cur-line)))
-    keyword))
-
 (provide 'evil-matchit-indent)
-;;; evil-matchit-indent ends here
+;;; evil-matchit-indent.el ends here

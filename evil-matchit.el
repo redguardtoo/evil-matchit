@@ -4,7 +4,7 @@
 
 ;; Author: Chen Bin <chenbin.sh@gmail.com>
 ;; URL: http://github.com/redguardtoo/evil-matchit
-;; Version: 2.4.3
+;; Version: 2.4.4
 ;; Keywords: matchit vim evil
 ;; Package-Requires: ((evil "1.14.0") (emacs "25.1"))
 ;;
@@ -48,21 +48,33 @@
 
 ;;; Code:
 
+(defgroup evil-matchit nil
+  "Matchit.vim for Emacs."
+  :group 'evil
+  :prefix "evil-matchit")
+
 (eval-when-compile
   (require 'evil-macros))
 (require 'evil-matchit-sdk)
 
-(defvar evilmi-plugins '(emacs-lisp-mode ((evilmi-simple-get-tag evilmi-simple-jump)))
-  "The Matrix to of algorithms.")
+(defcustom evilmi-plugins
+  '(emacs-lisp-mode ((evilmi-simple-get-tag evilmi-simple-jump)))
+  "The Matrix of algorithms."
+  :group 'evil-matchit
+  :type '(repeat sexp))
 
-(defvar evilmi-may-jump-by-percentage t
+(defcustom evilmi-may-jump-by-percentage t
   "Simulate `evil-jump-item'.
 For example, `50%' jumps to 50 percentage of buffer.
-If nil, `50%' jumps 50 times.")
+If nil, `50%' jumps 50 times."
+  :group 'evil-matchit
+  :type 'boolean)
 
-(defvar evilmi-shortcut "%"
+(defcustom evilmi-shortcut "%"
   "The keybinding of `evilmi-jump-items' and then text object shortcut.
-Some people prefer using \"m\" instead.")
+Some people prefer using \"m\" instead."
+  :group 'evil-matchit
+  :type 'string)
 
 ;; {{ make linter happy
 (defvar evil-visual-char)
@@ -273,13 +285,13 @@ If IS-INNER is t, the region is inner text object."
     (list b e)))
 
 (evil-define-text-object evilmi-inner-text-object (&optional num begin end type)
-  "Inner text object describing the region selected when you press % from evil-matchit"
+  "Inner text object describing the region selected when pressing %."
   :type line
   (let* ((selected-region (evilmi--region-to-select-or-delete num t)))
     (evil-range (car selected-region) (cadr selected-region) 'line)))
 
 (evil-define-text-object evilmi-outer-text-object (&optional num begin end type)
-  "Outer text object describing the region selected when you press % from evil-matchit"
+  "Outer text object describing the region selected when pressing %."
   :type line
   (let ((selected-region (evilmi--region-to-select-or-delete num)))
     (evil-range (car selected-region) (cadr selected-region) 'line)))
@@ -339,7 +351,7 @@ If IS-INNER is t, the region is inner text object."
 (defun evilmi-version()
   "Print version."
   (interactive)
-  (message "2.4.3"))
+  (message "2.4.4"))
 
 (defvar evil-matchit-mode-map (make-sparse-keymap)
   "Keymap used by the minor mode.")
@@ -348,6 +360,7 @@ If IS-INNER is t, the region is inner text object."
 (define-minor-mode evil-matchit-mode
   "Buffer-local minor mode to emulate matchit.vim."
   :keymap (make-sparse-keymap)
+  :group 'evil-matchit
   ;; get correct value of `(point)` in visual-line mode
   ;; @see https://bitbucket.org/lyro/evil/issues/540/get-the-char-under-cusor-in-visual-line
   (evil-set-command-property 'evilmi-jump-items :keep-visual t)

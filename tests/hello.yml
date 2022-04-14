@@ -1,0 +1,6 @@
+mysql-database:
+  hostname:
+    test: localhost
+  port: 3012
+  username: root
+  password: hello

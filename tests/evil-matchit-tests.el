@@ -609,5 +609,26 @@
 
     (should (eq major-mode 'python-mode))))
 
+(ert-deftest evilmi-test-yaml ()
+  (with-temp-buffer
+    (evilmi-test-read-file "hello.yml")
+    (yaml-mode)
+
+    (goto-char (point-min))
+    (should (string= "mysql-database" (thing-at-point 'symbol)))
+    (evilmi-jump-items)
+    (should (string= "hello" (thing-at-point 'symbol)))
+    (evilmi-jump-items)
+    (should (string= "mysql-database" (thing-at-point 'symbol)))
+
+    (search-forward "hostname:")
+    (should (string= "hostname:" (string-trim (evilmi-sdk-curline))))
+    (evilmi-jump-items)
+    (should (string= "localhost" (thing-at-point 'symbol)))
+    (evilmi-jump-items)
+    (should (string= "hostname:" (string-trim (evilmi-sdk-curline))))
+
+    (should (eq major-mode 'yaml-mode))))
+
 (ert-run-tests-batch-and-exit)
 ;;; evil-matchit-tests.el ends here

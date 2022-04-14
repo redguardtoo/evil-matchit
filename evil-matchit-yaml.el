@@ -35,9 +35,8 @@
 ;;;###autoload
 (defun evilmi-yaml-get-tag ()
   "Return '(start-position tag-type keyword)."
-  (if evilmi-debug (message "evilmi-yaml-get-tag called"))
-
-  (let ((rlt (evilmi-indent-get-tag)))
+  (let* ((evilmi-spaces-per-tab 2)
+         (rlt (evilmi-indent-get-tag)))
     (when (and evilmi-debug rlt)
       (message "evilmi-yaml-get-tag called. rlt=%s" rlt))
     rlt))
