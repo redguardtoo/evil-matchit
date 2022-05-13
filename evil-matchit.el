@@ -64,7 +64,7 @@
   :type '(repeat sexp))
 
 (defcustom evilmi-may-jump-by-percentage t
-  "Simulate `evil-jump-item'.
+  "Simulate built-in jump item command in evil.
 For example, `50%' jumps to 50 percentage of buffer.
 If nil, `50%' jumps 50 times."
   :group 'evil-matchit

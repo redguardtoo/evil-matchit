@@ -98,6 +98,7 @@
                                                    (cddr token))))
 
 (defun evilmi-verilog-parse-at-point ()
+  "Parse tokens at point."
   (let* ((tokens (evilmi-sdk-tokens 3))
          info)
     (when (and tokens (> (length tokens) 1))
@@ -116,7 +117,7 @@
           (setq info (evilmi-sdk-get-tag evilmi-verilog-match-tags
                                          evilmi-verilog-extract-keyword-howtos))
           (setq info (cons start (cdr info))))))
-    ;; "info" is as same type as `evil-sdk-get-tag' returns
+    ;; "info" is the same type as `evilmi-sdk-get-tag' returns
     info))
 
 ;;;###autoload
@@ -129,7 +130,7 @@
 
 ;;;###autoload
 (defun evilmi-verilog-jump (info num)
-  "Use INFO returned by `evilmi-verlog-get-tag' and NUM to jump to matched tag."
+  "Use INFO returned by `evilmi-verilog-get-tag' and NUM to jump to matched tag."
   (when info
     (let* ((orig-keyword (evilmi-sdk-keyword (cadr info))))
       (if evilmi-debug (message "evilmi-verilog-jump called => %s" info))

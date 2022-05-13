@@ -240,7 +240,7 @@ If IS-FORWARD is t, jump forward; or else jump backward."
       (goto-char old))))
 
 (defun evilmi-sdk-simple-jump ()
-  "Alternative for `evil-jump-item'."
+  "Alternative of built-in jump item command in evil'."
   (if evilmi-debug (message "evilmi-sdk-simple-jump called (point)=%d" (point)))
 
   (evilmi-sdk-skip-whitespace)
