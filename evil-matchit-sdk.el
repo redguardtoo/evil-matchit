@@ -23,10 +23,11 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+;;; Commentary:
+;;
 
 ;;; Code:
 
-(require 'evil nil t)
 (require 'subr-x)
 (require 'cl-lib)
 (require 'semantic/lex)
@@ -121,11 +122,11 @@ If font-face-under-cursor is NOT nil, the quoted string is being processed."
   (cond
    ;; @see https://github.com/redguardtoo/evil-matchit/issues/92
    ((eq major-mode 'tuareg-mode)
-    (evilmi-among-fonts-p pos '(font-lock-comment-face
+    (evilmi-sdk-font-p pos '(font-lock-comment-face
                                 font-lock-comment-delimiter-face
                                 font-lock-doc-face)))
    (t
-    (evilmi-among-fonts-p pos '(font-lock-comment-face
+    (evilmi-sdk-font-p pos '(font-lock-comment-face
                                 font-lock-comment-delimiter-face)))))
 
 (defun evilmi-sdk-defun-p ()
@@ -137,7 +138,7 @@ If font-face-under-cursor is NOT nil, the quoted string is being processed."
       (goto-char b)
       (while (and (< (point) e)
                   (not (setq defun-p
-                             (evilmi-among-fonts-p (point)
+                             (evilmi-sdk-font-p (point)
                                                    '(font-lock-function-name-face)))))
         (forward-word)))
     defun-p))
@@ -145,7 +146,8 @@ If font-face-under-cursor is NOT nil, the quoted string is being processed."
 (defun evilmi-sdk-scan-sexps (is-forward character)
   "Get the position of matching tag with CHARACTER at point.
 If IS-FORWARD is t, jump forward; or else jump backward."
-  (if evilmi-debug (message "evilmi-sdk-scan-sexps called => (%s)" is-forward character))
+  (when evilmi-debug
+    (message "evilmi-sdk-scan-sexps called => %s %s" is-forward character))
   (let* ((start-pos (if is-forward (point) (+ 1 (point))))
          (arg (if is-forward 1 -1))
          (limit (if is-forward (point-max) (point-min)))
@@ -200,9 +202,15 @@ If IS-FORWARD is t, jump forward; or else jump backward."
       (message "evilmi-sdk-scan-sexps => rlt=%s lvl=%s is-forward=%s" rlt lvl is-forward))
     rlt))
 
+(defmacro evilmi-sdk-visual-state-p ()
+  "Test if it's evil visual state."
+  `(and (boundp 'evil-state) (eq evil-state 'visual)))
+
 (defun evilmi-sdk-adjust-jumpto (is-forward rlt)
   ;; normal-state hack!
-  (when (and (not (eq evil-state 'visual)) rlt is-forward)
+  (when (and (not (evilmi-sdk-visual-state-p))
+             rlt
+             is-forward)
     (setq rlt (1- rlt)))
   (if evilmi-debug (message "evilmi-sdk-adjust-jumpto => is-forward=%s rlt=%s" is-forward rlt))
   rlt)
@@ -220,17 +228,17 @@ If IS-FORWARD is t, jump forward; or else jump backward."
 (defun evilmi-sdk-tweak-selected-region (font-face jump-forward)
   "Tweak selected region using FONT-FACE and JUMP-FORWARD."
   ;; visual-state hack!
-  (when (and jump-forward (eq evil-state 'visual) (not font-face))
-    ;; if font-face is non-nil, I control the jump flow from character level,
-    ;; so hack to workaround scan-sexps is NOT necessary
-    (evil-backward-char)))
+  (when (and jump-forward (evilmi-sdk-visual-state-p) (not font-face))
+    ;; If font-face is non-nil, control the jump flow from character level.
+    ;; So hack `scan-sexps` is NOT necessary.
+    (backward-char)))
 
 (defun evilmi-sdk-skip-whitespace ()
   "Skip whitespace characters at point."
   (let ((old (point)))
     (skip-syntax-forward " ")
-    ;; If we move from a non-comment to before a comment,
-    ;; `evilmi-sdk-jumpto-where' wont skip it:
+    ;; When moving from a non-comment to position before the comment,
+    ;; `evilmi-sdk-jumpto-where' will not skip it:
     ;;
     ;; <point> /* comment */ {}
     ;;
@@ -362,7 +370,7 @@ is-function-exit-point could be unknown status"
     (save-excursion
       (goto-char begin)
       (while (search-forward keyword end t)
-        (when (not (evilmi-among-fonts-p (point)
+        (when (not (evilmi-sdk-font-p (point)
                                          evilmi-ignored-fonts))
           (setq rlt keyword))))
     rlt))
@@ -518,7 +526,7 @@ after calling this function."
 
 
 ;;;###autoload
-(defun evilmi-among-fonts-p (pos fonts)
+(defun evilmi-sdk-font-p (pos fonts)
   "If current font at POS is among FONTS."
   (let* ((fontfaces (get-text-property pos 'face)))
     (when (not (listp fontfaces))
@@ -537,7 +545,8 @@ after calling this function."
       (setq start (match-end 0)))
     count))
 
-(defun evilmi-semantic-flex (start end &optional depth length)
+;;;###autoload
+(defun evilmi-sdk-semantic-flex (start end &optional depth length)
   "Using the syntax table, do something roughly equivalent to flex.
 Semantically check between START and END.  Optional argument DEPTH
 indicates at what level to scan over entire lists.
@@ -667,6 +676,7 @@ The last argument, LENGTH specifies that only LENGTH tokens are returned."
     ;;(message "Flexing muscles...done")
     (nreverse ts)))
 
+;;;###autoload
 (defun evilmi-sdk-tokens (n)
   "Get semantic tokens of current N lines."
   (unless (and n (> n 1)) (setq n 1))
@@ -677,7 +687,7 @@ The last argument, LENGTH specifies that only LENGTH tokens are returned."
       (setq e (line-end-position)))
     (save-restriction
       (narrow-to-region b e)
-      (setq tokens (evilmi-semantic-flex b e)))
+      (setq tokens (evilmi-sdk-semantic-flex b e)))
     tokens))
 
 (provide 'evil-matchit-sdk)

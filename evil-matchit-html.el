@@ -106,7 +106,7 @@ Use CHAR at POSITION."
       ;; `sgml-skip-tag-forward' can't handle the open html tag whose attribute containing "<" or ">" character
       ;; unless the start position is above "<" character
       (goto-char position) ; move to the closest "<"
-      (when (or (evilmi-among-fonts-p (point) evilmi-ignored-fonts)
+      (when (or (evilmi-sdk-font-p (point) evilmi-ignored-fonts)
                 ;; In `rjsx-mode', the attribute value's font face could be nil
                 ;; like <Component a1={3 > 2} />
                 (and (eq ?< (following-char))

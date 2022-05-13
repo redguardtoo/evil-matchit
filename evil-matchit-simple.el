@@ -147,7 +147,7 @@ If it's t, use simple jump.")
          rlt)
 
     (cond
-     ;; In evil-visual-state, the (preceding-char) is actually the character under cursor
+     ;; In `evil-visual-state', (preceding-char) is the character under cursor
      ((not (evilmi--char-is-simple ch))
       (evilmi--simple-find-open-brace (evilmi-sdk-curline)))
 
@@ -175,8 +175,10 @@ If it's t, use simple jump.")
     ;; In latex-mode `scan-sexps' does NOT work properly between "[]"
     ;; so we have to fallback to evil's API.
     (cond
-     ((memq major-mode '(latex-mode))
-      (evil-jump-item))
+     ((and (memq major-mode '(latex-mode))
+           (functionp 'evil-jump-item))
+      ;; I'm sorry for non-evil users
+      (funcall 'evil-jump-item))
 
      (t
       (evilmi-sdk-simple-jump)))

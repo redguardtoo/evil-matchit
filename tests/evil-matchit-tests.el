@@ -25,6 +25,7 @@
 
 (require 'ert)
 (require 'evil-matchit)
+(require 'evil-matchit-evil-setup)
 
 (setq evilmi-may-jump-by-percentage nil)
 (setq evilmi-debug nil) ; debug

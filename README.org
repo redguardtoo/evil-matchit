@@ -6,9 +6,9 @@
 
 Vim [[http://www.vim.org/scripts/script.php?script_id=39][matchit.vim]] by Benji Fisher is ported into Emacs.
 
-Press "%" to jump between matched tags in Emacs. For example, in HTML "<div>" and "</div>" are a pair of tags.
+Press "%" to jump between matched tags ("<div>" and "</div>" in html, etc).
 
-Supported programming languages and major modes:
+Built-in supported languages and documents:
 - HTML
 - Python
 - Java
@@ -18,13 +18,13 @@ Supported programming languages and major modes:
 - React JSX (rjsx-mode, react-mode)
 - JSON
 - OCaml
-- Markdown
 - Perl
 - Yaml
 - Latex
 - MATLAB/Octave
 - CMake
-- Org-mode (match tag of org-mode and tags of other languages embedded in org file)
+- Markdown
+- Org (matching tags of other languages embedded in org file is also supported!)
 - Ruby
 - Elixir
 - Bash
@@ -40,14 +40,13 @@ Supported programming languages and major modes:
 - Emacs email (message-mode)
 - VCS (Git/Subversion/Perforce ...) merge conflicts
 
-This package uses Evil as its vi layer!
+If [[https://www.emacswiki.org/emacs/Evil][EVIL]] is installed, this package use EVIL as its vi layer.
+
+If EVIL is not installed, most commands still work. So *EVIL is only optional dependency*.
 
 Tested on Emacs 25, 26, 27, 28
 
 * Why use evil-matchit
-- No learning curve. Press "%" to jump. That's all!
-- Stable
-- Perfect integration with Evil
 - Support any modern languages (html/java/c/c++/python/latex/javascript ...)
 - Powerful. If you mix jsp, freemarker, html, jquery template or any weird syntax into one file, it still works!
 - Extendable. Write a plugin for it takes only 5 minutes
@@ -59,16 +58,21 @@ Screen cast for python:
 It's already uploaded to [[http://melpa.org/]].
 
 * Set up
-Insert below code into =~/.emacs=:
+** EVIL is used
+Insert below code into =~/.emacs= to setup key bindings:
 #+BEGIN_SRC lisp
-(require 'evil-matchit)
 (global-evil-matchit-mode 1)
 #+END_SRC
 
 Alternatively, you can enable =evil-matchit-mode= along a major mode by adding =turn-on-evil-matchit-mode= to the mode hook.
+** EVIL is not used
+No setup is required.
 
 * Usage
-Press "%" to jump inside between tag pair in normal mode or visual mode (you press "v" to switch to visual mode). Please note evil-matchit is smart enough to *detect the tag automatically*.
+** EVIL is used
+You can press "%" or =M-x evilmi-jump-items= to jump between tag pair in normal mode or visual mode (you press "v" to switch to visual mode).
+
+Please note evil-matchit is smart enough to *detect the tag automatically*.
 
 Tag pair could be open/closed html tag, or character pair like "{}" "[]" "()", or the single/double quote(s) at the two ends of the string.
 
@@ -85,6 +89,11 @@ Pressing "3%" jumps to a line 3 percentage down the file. It's the default behav
 If you need visually select lines, you could use  =evilmi-select-items=.
 
 This is actually an advantage of Emacs, you can tweak the select region without go into visual state at all.
+
+** EVIL is not used
+Use =evilmi-jump-items-native= to replace =evilmi-jump-items=. Evil text object "%" is de-activated.
+
+But all the other commands like =evilmi-delete-items= and =evilmi-select-items= still work.
 
 * Advanced tips
 ** Support new major modes
@@ -236,7 +245,7 @@ Step 3, add below code to =~/.emacs.=,
 #+BEGIN_SRC lisp
 (evilmi-load-plugin-rules '(ruby-mode lua-mode) '(script))
 #+END_SRC
-*** Support languages using indentation to indentify a block of code
+*** Support languages using indentation to identify a block of code
 It's easy to support such language (Python, Yaml, ...).
 
 Here is a minimum example to support yaml,

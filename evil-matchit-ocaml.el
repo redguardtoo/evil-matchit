@@ -57,7 +57,7 @@
 
 (defun evilmi-ocaml-in-keyword-p (pos)
   "Check character at POS is keyword by comparing font face."
-  (evilmi-among-fonts-p pos
+  (evilmi-sdk-font-p pos
                         '(tuareg-font-lock-governing-face
                           tuareg-font-lock-operator-face  ; for parentheses
                           tuareg-font-double-colon-face   ; for double semicolon
