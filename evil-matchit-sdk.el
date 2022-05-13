@@ -537,15 +537,148 @@ after calling this function."
       (setq start (match-end 0)))
     count))
 
+(defun evilmi-semantic-flex (start end &optional depth length)
+  "Using the syntax table, do something roughly equivalent to flex.
+Semantically check between START and END.  Optional argument DEPTH
+indicates at what level to scan over entire lists.
+The return value is a token stream.  Each element is a list, such of
+the form (symbol start-expression .  end-expression) where SYMBOL
+denotes the token type.
+END does not mark the end of the text scanned, only the end of the
+beginning of text scanned.  Thus, if a string extends past END, the
+end of the return token will be larger than END.  To truly restrict
+scanning, use `narrow-to-region'.
+The last argument, LENGTH specifies that only LENGTH tokens are returned."
+  (if (not semantic-flex-keywords-obarray)
+      (setq semantic-flex-keywords-obarray [ nil ]))
+  (let ((ts nil)
+        (pos (point))
+        (ep nil)
+        (curdepth 0)
+        (cs (if comment-start-skip
+                (concat "\\(\\s<\\|" comment-start-skip "\\)")
+              (concat "\\(\\s<\\)")))
+        (number-expression "\\(\\<[0-9]+[.][0-9]+\\([eE][-+]?[0-9]+\\)?[fFdD]?\\>\\|\\<[0-9]+[.][eE][-+]?[0-9]+[fFdD]?\\>\\|\\<[0-9]+[.][fFdD]\\>\\|\\<[0-9]+[.]\\|[.][0-9]+\\([eE][-+]?[0-9]+\\)?[fFdD]?\\>\\|\\<[0-9]+[eE][-+]?[0-9]+[fFdD]?\\>\\|\\<0[xX][[:xdigit:]]+[lL]?\\>\\|\\<[0-9]+[lLfFdD]?\\>\\)")
+        ;; Use the default depth if it is not specified.
+        (depth (or depth 0)))
+
+    (goto-char start)
+    (while (and (< (point) end) (or (not length) (<= (length ts) length)))
+      (cond
+       ;; skip newlines
+       ((looking-at "\\s-*\\(\n\\|\\s>\\)"))
+
+       ;; skip whitespace
+       ((looking-at "\\s-+"))
+
+       ;; numbers
+       ((looking-at number-expression)
+        (setq ts (cons (cons 'number
+                             (cons (match-beginning 0)
+                                   (match-end 0)))
+                       ts)))
+       ;; symbols
+       ((looking-at "\\(\\sw\\|\\s_\\)+")
+        (setq ts (cons (cons
+                        ;; Get info on if this is a keyword or not
+                        (or (semantic-lex-keyword-p (match-string 0))
+                            'symbol)
+                        (cons (match-beginning 0) (match-end 0)))
+                       ts)))
+
+       ;; Character quoting characters (ie, \n as newline)
+       ((looking-at "\\s\\+")
+        (setq ts (cons (cons 'charquote
+                             (cons (match-beginning 0) (match-end 0)))
+                       ts)))
+
+       ;; Open parens, or semantic-lists.
+       ((looking-at "\\s(")
+        (if (or (not depth) (< curdepth depth))
+            (progn
+              (setq curdepth (1+ curdepth))
+              (setq ts (cons (cons 'open-paren
+                                   (cons (match-beginning 0) (match-end 0)))
+                             ts)))
+          (setq ts (cons
+                    (cons 'semantic-list
+                          (cons (match-beginning 0)
+                                (save-excursion
+                                  (condition-case nil
+                                      (forward-list 1)
+                                    ;; This case makes flex robust
+                                    ;; to broken lists.
+                                    (error
+                                     (goto-char end)))
+                                  (setq ep (point)))))
+                    ts))))
+       ;; Close parens
+       ((looking-at "\\s)")
+        (setq ts (cons (cons 'close-paren
+                             (cons (match-beginning 0) (match-end 0)))
+                       ts))
+        (setq curdepth (1- curdepth)))
+
+       ;; String initiators
+       ((looking-at "\\s\"")
+        ;; Zing to the end of this string.
+        (setq ts (cons (cons 'string
+                             (cons (match-beginning 0)
+                                   (save-excursion
+                                     (condition-case nil
+                                         (forward-sexp 1)
+                                       ;; This case makes flex
+                                       ;; robust to broken strings.
+                                       (error
+                                        (goto-char end)))
+                                     (setq ep (point)))))
+                       ts)))
+
+       ;; comments
+       ((looking-at cs)
+        ;; If the language doesn't deal with comments nor
+        ;; whitespaces, ignore them here.
+        (let ((comment-start-point (point)))
+          (forward-comment 1)
+          (if (eq (point) comment-start-point)
+              ;; In this case our start-skip string failed
+              ;; to work properly.  Lets try and move over
+              ;; whatever white space we matched to begin
+              ;; with.
+              (skip-syntax-forward "-.'" (point-at-eol)))
+          (if (eq (point) comment-start-point)
+              (error "Strange comment syntax prevents lexical analysis"))
+          (setq ep (point))))
+
+       ;; punctuation
+       ((looking-at "\\(\\s.\\|\\s$\\|\\s'\\)")
+        (setq ts (cons (cons 'punctuation
+                             (cons (match-beginning 0) (match-end 0)))
+                       ts)))
+
+       ;; unknown token
+       (t
+        (error "What is that?")))
+
+      (goto-char (or ep (match-end 0)))
+      (setq ep nil))
+
+    (goto-char pos)
+    ;;(message "Flexing muscles...done")
+    (nreverse ts)))
+
 (defun evilmi-sdk-tokens (n)
   "Get semantic tokens of current N lines."
   (unless (and n (> n 1)) (setq n 1))
-  (let* (b e)
+  (let* (b e tokens)
     (save-excursion
       (setq b (line-beginning-position))
       (forward-line (1- n))
       (setq e (line-end-position)))
-    (semantic-lex b e)))
+    (save-restriction
+      (narrow-to-region b e)
+      (setq tokens (evilmi-semantic-flex b e)))
+    tokens))
 
 (provide 'evil-matchit-sdk)
 ;;; evil-matchit-sdk.el ends here
