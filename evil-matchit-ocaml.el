@@ -98,7 +98,7 @@ such keyword is available."
 
 (defun evilmi-ocaml-is-keyword (l keyword)
   "Checks if the keyword belongs to a row."
-  (cl-find-if (lambda (w) (string-equal w keyword)) (apply 'append l)))
+  (cl-find-if (lambda (w) (string= w keyword)) (apply 'append l)))
 
 (defun evilmi-ocaml-get-tag-info (keyword)
   "Find the row in the evilmi-ocaml-keywords."
