@@ -76,7 +76,8 @@ Return t if jump forward."
            (len (length str)))
       ;; count quote character
       (while (< i len)
-        (when (eq ch (seq-elt str i))
+        ;; `seq-elt' is from emacs27+
+        (when (eq ch (aref str i))
           (setq cnt (1+ cnt)))
         (setq i (1+ i)))
       (eq (% cnt 2) 0)))))
