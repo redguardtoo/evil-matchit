@@ -1,4 +1,4 @@
-;;; evil-matchit-ocaml.el -- tuareg-mode  plugin of evil-matchit
+;;; evil-matchit-ocaml.el -- tuareg-mode  plugin of evil-matchit -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2014-2020 Chen Bin
 
@@ -96,12 +96,12 @@ such keyword is available."
   "Get keyword assuming we're at the begging of it"
   (buffer-substring-no-properties (point) (evilmi-ocaml-end-word)))
 
-(defun evilmi-ocaml-is-keyword (l keyword)
-  "Checks if the keyword belongs to a row."
-  (cl-find-if (lambda (w) (string= w keyword)) (apply 'append l)))
+(defun evilmi-ocaml-is-keyword (row keyword)
+  "Check if the KEYWORD belongs to a ROW."
+  (cl-find-if (lambda (w) (string= w keyword)) (apply 'append row)))
 
 (defun evilmi-ocaml-get-tag-info (keyword)
-  "Find the row in the evilmi-ocaml-keywords."
+  "Find the row in the `evilmi-ocaml-keywords' by KEYWORD."
   (cl-find-if (lambda (l) (evilmi-ocaml-is-keyword l keyword)) evilmi-ocaml-keywords))
 
 ;; 0 - forward
@@ -130,17 +130,24 @@ such keyword is available."
   "Return information of current tag: (list position-of-word word)."
   (save-excursion
     (evilmi-ocaml-goto-word-beginning)
-    (list (point) (evilmi-ocaml-get-word))))
+    (let* ((rlt (list (point) (evilmi-ocaml-get-word))))
+      (when evilmi-debug
+        (message "evilmi-ocaml-get-tag called => %s" rlt))
+      rlt)))
 
 ;;;###autoload
 (defun evilmi-ocaml-jump (rlt num)
+  (ignore num)
   (let* ((keyword (cadr rlt))
          (tag-info (evilmi-ocaml-get-tag-info keyword))
          (direction (if (member keyword (car tag-info)) 0 1)))
-    (if tag-info
+    (when evilmi-debug
+      (message "evilmi-ocaml-jump called => direction=%s, tag-info=%s, keyword=%s" direction tag-info keyword))
+    (when tag-info
         (let ((new-point (save-excursion
                            (evilmi-ocaml-goto-word-beginning)
                            (evilmi-ocaml-go tag-info 1 direction))))
           (if new-point (goto-char new-point))))))
 
 (provide 'evil-matchit-ocaml)
+;;; evil-matchit-ocaml.el ends here
