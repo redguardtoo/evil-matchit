@@ -95,7 +95,20 @@ Use =evilmi-jump-items-native= to replace =evilmi-jump-items=. Evil text object 
 
 But all the other commands like =evilmi-delete-items= and =evilmi-select-items= still work.
 
-* Advanced tips
+* Tips
+** Toggle other modes before&after jumping to the matched tag
+It's reported [[https://github.com/redguardtoo/evil-matchit/issues/138][some mode is not compatible with this package]].
+
+You can use =evilmi-jump-hook= to turn off the mode before jumping to the matched tag.
+
+Then turn on it after the jump using the same hook.
+
+Here is an example to toggle =global-tree-sitter-mode=,
+#+begin_src elisp
+(add-hook 'evilmi-jump-hook
+          (lambda (before-jump-p)
+            (global-tree-sitter-mode (not before-jump-p))))
+#+end_src
 ** Support new major modes
 In order to apply three matching rules =evilmi-template=, =evilmi-simple=, and =evilmi-html= on =mhtml-mode=, please insert below code *after* your evil-matchit setup:
 #+begin_src elisp

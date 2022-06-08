@@ -124,11 +124,11 @@ If font-face-under-cursor is NOT nil, the quoted string is being processed."
    ;; @see https://github.com/redguardtoo/evil-matchit/issues/92
    ((eq major-mode 'tuareg-mode)
     (evilmi-sdk-font-p pos '(font-lock-comment-face
-                                font-lock-comment-delimiter-face
-                                font-lock-doc-face)))
+                             font-lock-comment-delimiter-face
+                             font-lock-doc-face)))
    (t
     (evilmi-sdk-font-p pos '(font-lock-comment-face
-                                font-lock-comment-delimiter-face)))))
+                             font-lock-comment-delimiter-face)))))
 
 (defun evilmi-sdk-defun-p ()
   "At the beginning of function definition."
@@ -257,7 +257,7 @@ If IS-FORWARD is t, jump forward; or else jump backward."
   (let* ((tmp (evilmi-sdk-jump-forward-p))
          (jump-forward (car tmp))
          ;; if ff is not nil, it's jump between quotes
-         ;; so we should not use (scan-sexps)
+         ;; so we should not use `scan-sexps'
          (ff (nth 1 tmp))
          (ch (nth 2 tmp))
          (dst (evilmi-sdk-jumpto-where ff jump-forward ch)))

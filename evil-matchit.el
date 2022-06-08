@@ -47,9 +47,21 @@
 ;; If EVIL is NOT installed,
 ;;  - Use `evilmi-jump-items-native' to replace `evilmi-jump-items'
 ;;
-;;  - Forget `evilmi-shortcut' and `global-evil-matchit-mode'
+;;  - `evilmi-shortcut' and `global-evil-matchit-mode' are not used
 ;;
-;; See https://github.com/redguardtoo/evil-matchit/ for help.
+;; Tips:
+;;   It's reported some mode is not compatible with this package.
+;;   You can use `evilmi-jump-hook' to turn off the mode before
+;;   jumping to the matched tag.
+;;   Then turn on it after the jump using the same hook.
+;;
+;;   An example to toggle `global-tree-sitter-mode',
+;;
+;;   (add-hook 'evilmi-jump-hook
+;;             (lambda (before-jump-p)
+;;               (global-tree-sitter-mode (not before-jump-p))))
+;;
+;; See https://github.com/redguardtoo/evil-matchit/ for more information
 ;;
 ;; This program requires EVIL (https://github.com/emacs-evil/evil)
 ;;
@@ -64,6 +76,14 @@
   :prefix "evil-matchit")
 
 (require 'evil-matchit-sdk)
+
+(defcustom evilmi-jump-hook nil
+  "Hook run before&after jump to the matched tag.
+If the parameter of hook is t, the hook runs before jump.
+Or else, the hook runs after jump.
+Some modes can be toggle on/off in the hook"
+  :group 'evil-matchit
+  :type 'hook)
 
 (defcustom evilmi-plugins
   '(emacs-lisp-mode ((evilmi-simple-get-tag evilmi-simple-jump)))
@@ -82,6 +102,9 @@
          ideal-dest)
 
     (unless num (setq num 1))
+
+
+    (run-hook-with-args 'evilmi-jump-hook t)
 
     (when (derived-mode-p 'prog-mode)
       (setq jump-rules
@@ -115,6 +138,8 @@
       (setq ideal-dest (point)))
 
     (if evilmi-debug (message "evilmi-jump-items-internal called. Return: %s" ideal-dest))
+
+    (run-hook-with-args 'evilmi-jump-hook nil)
     ideal-dest))
 
 ;;;###autoload
