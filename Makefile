@@ -29,9 +29,6 @@ deps:
 	@if [ ! -f deps/tuareg-2.2.0/tuareg.el ]; then curl -L https://stable.melpa.org/packages/tuareg-2.2.0.tar | tar x -C deps/; fi;
 	@if [ ! -f deps/yaml-mode.el ]; then curl -L https://stable.melpa.org/packages/yaml-mode-0.0.15.el > deps/yaml-mode.el; fi;
 
-lint: deps
-	@$(EMACS) $(EMACS_BATCH_OPTS) -l tests/my-elint.el 2>&1 | grep -E "([Ee]rror|[Ww]arning):" && exit 1 || exit 0
-
 compile: deps
 	$(RM) *.elc
 	@$(EMACS) $(EMACS_BATCH_OPTS) -l tests/my-byte-compile.el 2>&1 | grep -E "([Ee]rror|[Ww]arning):" && exit 1 || exit 0
