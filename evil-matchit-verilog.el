@@ -64,7 +64,7 @@
   '(("^[ \t]*\\(while\\|module\\|primitive\\|case\\|function\\|specify\\|table\\|class\\|program\\|clocking\\|property\\|sequence\\|package\\|covergroup\\|generate\\|interface\\|task\\|fork\\|join[a-z]*\\)" 1)
     ("^[ \t]*\\(end[a-z]+\\)" 1)
     ("^[ \t]*\\(`[a-z]+\\)" 1) ; macro
-    ("\\([^a-z]\\|^\\)\\(begin\\|end\\)\\([^a-z]\\|$\\)" 2)))
+    ("\\([^a-zA-Z_]\\|^\\)\\(begin\\|end\\)\\([^a-zA-Z_]\\|$\\)" 2)))
 
 (defvar evilmi-verilog-match-tags
   '(("module" () "endmodule" "MONOGAMY")
