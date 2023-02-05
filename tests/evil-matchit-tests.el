@@ -429,13 +429,13 @@
     (expect " |if foo then 1 else 2")
 
     ;; parentheses
-    (prepare "let x = (1, 2) in 3")
+    (prepare "(1, 2) in 3")
 
     (evilmi-jump-items)
-    (expect "let x = (1, 2|) in 3" )
+    (expect "(1, 2|) in 3" )
 
     (evilmi-jump-items)
-    (expect "let x = |(1, 2) in 3" )
+    (expect "|(1, 2) in 3" )
 
     ;; struct end
     (prepare "module X = struct type t = int end")
