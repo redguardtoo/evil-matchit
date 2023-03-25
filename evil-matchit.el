@@ -273,7 +273,7 @@ Some modes can be toggle on/off in the hook"
   (evilmi-load-plugin-rules '(term-mode shell-mode) '(simple terminal))
 
   ;; Elixir
-  (evilmi-load-plugin-rules '(elixir-mode enh-elixir-mode) '(simple elixir)))
+  (evilmi-load-plugin-rules '(elixir-mode elixir-ts-mode enh-elixir-mode) '(simple elixir)))
 
 
 (defun evilmi--region-to-select-or-delete (num &optional is-inner)
