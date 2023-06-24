@@ -4,7 +4,7 @@
 
 ;; Author: Chen Bin <chenbin.sh@gmail.com>
 ;; URL: http://github.com/redguardtoo/evil-matchit
-;; Version: 3.0.0
+;; Version: 3.0.1
 ;; Keywords: matchit vim evil
 ;; Package-Requires: ((emacs "25.1"))
 ;;
@@ -95,7 +95,7 @@ Some modes can be toggle on/off in the hook"
 (defun evilmi-jump-items-internal (num &optional func)
   "Jump between items NUM times and apply function FUNC."
   (when evilmi-debug
-    (message "evilmi-jump-items-internal called => %s (point)=%d" num (point)))
+    (message "evilmi-jump-items-internal called => %s (point)=%d func=%s" num (point) func))
   (let* ((jump-rules (plist-get evilmi-plugins major-mode))
          rlt
          jumped
@@ -123,7 +123,7 @@ Some modes can be toggle on/off in the hook"
           (setq ideal-dest (funcall (nth 1 rule) rlt num))
           ;; jump only once if the jump is successful
           (setq jumped t))
-        (when evilmi-debug
+        (when (and evilmi-debug rlt)
           (message "rlt=%s rule=%s p=%s jumped=%s idea-dest=%s"
                    rlt
                    rule
@@ -137,9 +137,7 @@ Some modes can be toggle on/off in the hook"
       (evilmi-sdk-simple-jump)
       (setq ideal-dest (point)))
 
-    (if evilmi-debug (message "evilmi-jump-items-internal called. Return: %s" ideal-dest))
-
-    (run-hook-with-args 'evilmi-jump-hook nil)
+    (if evilmi-debug (message "evilmi-jump-items-internal returned: %s" ideal-dest))
     ideal-dest))
 
 ;;;###autoload
@@ -327,7 +325,7 @@ If IS-INNER is t, the region is inner text object."
 (defun evilmi-version()
   "Print version."
   (interactive)
-  (message "3.0.0"))
+  (message "3.0.1"))
 
 ;; initialize evilmi-plugins only once
 (evilmi-init-plugins)

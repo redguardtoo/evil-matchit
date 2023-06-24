@@ -32,7 +32,7 @@
 ;; should try next howto, the purpose is avoid missing any howto
 (defvar evilmi-javascript-extract-keyword-howtos
   '(("const .* *= *\\(styled\\)[^`]*` *$" 1) ; styled component
-    ("^[ \t]*\\(`\\); *$" 1)))
+    ("^[ \t]*\\(`\\);? *$" 1)))
 
 (defvar evilmi-javascript-match-tags
   '((("styled") () "`")))
@@ -67,24 +67,33 @@
 (defun evilmi-javascript-get-tag ()
   "Get tag at point."
   ;; only handle open tag
+  (when evilmi-debug
+    (message "evilmi-javascript-get-tag called"))
   (let* (rlt)
     (cond
      ;; bracket
      ((memq (following-char)
             evilmi-javascript-matching-chars)
+      (when evilmi-debug
+        (message "evilmi-javascript-get-tag. following char=%s is in `evilmi-javascript-matching-chars'"
+                 (following-char)))
       (setq rlt (list (point))))
 
      ;; use defined tag
      ((setq rlt (evilmi-sdk-get-tag evilmi-javascript-match-tags
                                     evilmi-javascript-extract-keyword-howtos))
-      ;; do nothing
-      )
+
+      (when evilmi-debug
+        (message "evilmi-javascript-get-tag. current line has tag=%s in `evilmi-javascript-extract-keyword-howtos'"
+                 rlt)))
 
      ;; other javascript statements containing brackets
      (t
       (let* ((r (evilmi--javascript-find-open-brace (evilmi-sdk-curline)))
              (p (line-beginning-position)))
         (when r
+          (when evilmi-debug
+            (message "evilmi-javascript-get-tag. open brace=%s" r))
           (forward-line (1- (car r)))
           (search-forward (cadr r) nil nil)
           (backward-char)
