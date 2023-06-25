@@ -40,8 +40,12 @@
 
 (defvar evilmi-ignored-fonts
   '(web-mode-html-attr-value-face
+    tree-sitter-hl-face:string
+    tree-sitter-hl-face:doc
+    tree-sitter-hl-face:comment
     font-lock-string-face
     font-lock-doc-face
+    font-lock-comment-delimiter-face
     font-lock-comment-face)
   "Text with ignored fonts has no string keyword.")
 
@@ -123,11 +127,13 @@ If font-face-under-cursor is NOT nil, the quoted string is being processed."
   (cond
    ;; @see https://github.com/redguardtoo/evil-matchit/issues/92
    ((eq major-mode 'tuareg-mode)
-    (evilmi-sdk-font-p pos '(font-lock-comment-face
+    (evilmi-sdk-font-p pos '(tree-sitter-hl-face:comment
+                             font-lock-comment-face
                              font-lock-comment-delimiter-face
                              font-lock-doc-face)))
    (t
-    (evilmi-sdk-font-p pos '(font-lock-comment-face
+    (evilmi-sdk-font-p pos '(tree-sitter-hl-face:comment
+                             font-lock-comment-face
                              font-lock-comment-delimiter-face)))))
 
 (defun evilmi-sdk-defun-p ()

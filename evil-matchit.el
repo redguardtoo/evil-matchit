@@ -4,7 +4,7 @@
 
 ;; Author: Chen Bin <chenbin.sh@gmail.com>
 ;; URL: http://github.com/redguardtoo/evil-matchit
-;; Version: 3.0.1
+;; Version: 3.0.2
 ;; Keywords: matchit vim evil
 ;; Package-Requires: ((emacs "25.1"))
 ;;
@@ -325,7 +325,7 @@ If IS-INNER is t, the region is inner text object."
 (defun evilmi-version()
   "Print version."
   (interactive)
-  (message "3.0.1"))
+  (message "3.0.2"))
 
 ;; initialize evilmi-plugins only once
 (evilmi-init-plugins)
