@@ -271,6 +271,14 @@ If IS-FORWARD is t, jump forward; or else jump backward."
       (goto-char dst)
       (evilmi-sdk-tweak-selected-region ff jump-forward))))
 
+;; @see https://github.com/redguardtoo/evil-matchit/issues/143
+;; need record indent info into tag-info
+(defun evilmi-sdk-same-indent-p (tag-info)
+  (and (nth 2 tag-info) (string= (nth 2 tag-info) "SAME-INDENT")))
+
+(defun evilmi-sdk-monogamy-p (tag-info)
+  (and (nth 2 tag-info) (string= (nth 2 tag-info) "MONOGAMY")))
+
 (defun evilmi-sdk-strictly-type-p (crt orig)
   (or (evilmi-sdk-monogamy-p crt) (evilmi-sdk-monogamy-p orig)))
 
@@ -282,6 +290,14 @@ If IS-FORWARD is t, jump forward; or else jump backward."
          (cur-row-idx (nth 0 cur-tag-info))
          (orig-type (nth 1 orig-tag-info))
          (cur-type (nth 1 cur-tag-info)))
+
+    (when evilmi-debug
+      (message "evilmi-sdk-tags-matched-p called. level=%s orig-keyword=%s cur-keyword=%s cur-tag-info=%s orig-tag-info=%s"
+               level
+               orig-keyword
+               cur-keyword
+               cur-tag-info
+               orig-tag-info))
 
     ;; handle function exit point
     (when (= 1 level)
@@ -402,9 +418,6 @@ Rule is looked up in HOWTOS."
          (evilmi--sdk-check-keyword keyword
                                     (line-beginning-position)
                                     (line-end-position)))))
-
-(defun evilmi-sdk-monogamy-p (tag-info)
-  (and (nth 2 tag-info) (string= (nth 2 tag-info) "MONOGAMY")))
 
 (defun evilmi-sdk-exactly-same-type-p (crt orig)
   (eq (nth 0 crt) (nth 0 orig)))

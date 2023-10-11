@@ -48,7 +48,7 @@
   '((("unless" "if") ("elsif" "else") "end")
     ("begin" ("rescue" "ensure") "end")
     ("case" ("when" "else") "end")
-    (("class" "def" "while" "do" "module" "for" "until") () "end" "ENDLESS")))
+    (("class" "def" "while" "do" "module" "for" "until") () "end" "SAME-INDENT")))
 
 ;;;###autoload
 (defun evilmi-ruby-get-tag ()
