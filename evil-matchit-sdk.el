@@ -282,22 +282,25 @@ If IS-FORWARD is t, jump forward; or else jump backward."
          (cur-row-idx (nth 0 cur-tag-info))
          (orig-type (nth 1 orig-tag-info))
          (cur-type (nth 1 cur-tag-info)))
+
     ;; handle function exit point
     (when (= 1 level)
-      ;; end tag could be the same
-      (if (and (evilmi-sdk-strictly-type-p cur-tag-info orig-tag-info)
-               (not (evilmi-sdk-exactly-same-type-p cur-tag-info orig-tag-info)))
-          ;; just pass
-          (setq rlt nil)
-        (cond
-         ((and (< orig-type 2) (= cur-type 2))
-          (setq rlt (evilmi-sdk-member cur-keyword (nth 2 (nth orig-row-idx match-tags)))))
+      ;; multiple open tags might share the same end tag
+      (cond
+       ((and (evilmi-sdk-strictly-type-p cur-tag-info orig-tag-info)
+             (not (evilmi-sdk-exactly-same-type-p cur-tag-info orig-tag-info)))
+        ;; just pass
+        (setq rlt nil))
 
-         ((and (< cur-type 2) (= orig-type 2))
-          (setq rlt (evilmi-sdk-member orig-keyword (nth 2 (nth cur-row-idx match-tags)))))
+       ((and (< orig-type 2) (= cur-type 2))
+        (setq rlt (evilmi-sdk-member cur-keyword (nth 2 (nth orig-row-idx match-tags)))))
 
-         (t
-          (setq rlt (= (nth 0 orig-tag-info) (nth 0 cur-tag-info)))))))
+       ((and (< cur-type 2) (= orig-type 2))
+        (setq rlt (evilmi-sdk-member orig-keyword (nth 2 (nth cur-row-idx match-tags)))))
+
+       (t
+        (setq rlt (= (nth 0 orig-tag-info) (nth 0 cur-tag-info))))))
+
     rlt))
 
 ;;;###autoload

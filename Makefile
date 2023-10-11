@@ -24,10 +24,10 @@ clean:
 deps:
 	@mkdir -p deps;
 	@if [ ! -f deps/evil-1.14.2/evil.el ]; then curl -L https://stable.melpa.org/packages/evil-1.14.2.tar | tar x -C deps/; fi;
-	@if [ ! -f deps/lua-mode.el ]; then curl -L https://stable.melpa.org/packages/lua-mode-20210802.el > deps/lua-mode.el; fi;
-	@if [ ! -f deps/markdown-mode.el ]; then curl -L https://stable.melpa.org/packages/markdown-mode-2.5.el > deps/markdown-mode.el; fi;
+	@if [ ! -f deps/lua-mode.el ]; then curl -L https://raw.githubusercontent.com/immerrr/lua-mode/master/lua-mode.el > deps/lua-mode.el; fi;
+	@if [ ! -f deps/markdown-mode.el ]; then curl -L https://raw.githubusercontent.com/jrblevin/markdown-mode/master/markdown-mode.el > deps/markdown-mode.el; fi;
 	@if [ ! -f deps/tuareg-3.0.1/tuareg.el ]; then curl -L https://stable.melpa.org/packages/tuareg-3.0.1.tar | tar x -C deps/; fi;
-	@if [ ! -f deps/yaml-mode.el ]; then curl -L https://stable.melpa.org/packages/yaml-mode-0.0.15.el > deps/yaml-mode.el; fi;
+	@if [ ! -f deps/yaml-mode.el ]; then curl -L https://raw.githubusercontent.com/yoshiki/yaml-mode/master/yaml-mode.el > deps/yaml-mode.el; fi;
 
 compile: deps
 	$(RM) *.elc
