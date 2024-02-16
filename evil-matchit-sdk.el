@@ -431,12 +431,16 @@ Rule is looked up in HOWTOS."
                                     (line-end-position)))))
 
 (defun evilmi-sdk-monogamy-p (tag-info)
+  "Test TAG-INFO."
+  ;; "MONOGAMY" means open and closed tags are one to one match
   (and (nth 2 tag-info) (string= (nth 2 tag-info) "MONOGAMY")))
 
 (defun evilmi-sdk-exactly-same-type-p (crt orig)
+  "CRT and ORIG is exactly same type."
   (eq (nth 0 crt) (nth 0 orig)))
 
 (defun evilmi-sdk-same-type (crt orig)
+  "Test if CRT and ORIG are same type."
   (when (and crt orig)
     ;; crt and orig should be at same row if either of them is monogamy
     (if (evilmi-sdk-strictly-type-p crt orig)
@@ -444,8 +448,9 @@ Rule is looked up in HOWTOS."
       t)))
 
 ;;;###autoload
+;; Return '(start-point (row column is-function-exit-point keyword))
 (defun evilmi-sdk-get-tag (match-tags howtos)
-  "Return '(start-point ((row column is-function-exit-point keyword))."
+  "Use MATCH-TAGS and HOWTOS to return information for jump."
   (let* ((cur-line (evilmi-sdk-curline))
          (keyword (evilmi--sdk-extract-keyword cur-line match-tags howtos))
          (tag-info (if keyword (evilmi-sdk-get-tag-info keyword match-tags))))
