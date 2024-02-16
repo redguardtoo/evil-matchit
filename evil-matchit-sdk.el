@@ -692,7 +692,7 @@ The last argument, LENGTH specifies that only LENGTH tokens are returned."
               ;; to work properly.  Lets try and move over
               ;; whatever white space we matched to begin
               ;; with.
-              (skip-syntax-forward "-.'" (point-at-eol)))
+              (skip-syntax-forward "-.'" (line-end-position)))
           (if (eq (point) comment-start-point)
               (error "Strange comment syntax prevents lexical analysis"))
           (setq ep (point))))

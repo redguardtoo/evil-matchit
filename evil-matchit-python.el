@@ -103,7 +103,7 @@ Only python need this hack."
 
 ;;;###autoload
 (defun evilmi-python-get-tag ()
-  "Return '(start-position tag-type keyword)."
+  "Return a list containing start-position, tag-type, keyword."
   (let ((rlt (evilmi-indent-get-tag)))
     (when evilmi-debug
       (message "evilmi-python-get-tag called. rlt=%s" rlt))

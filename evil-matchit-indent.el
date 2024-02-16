@@ -89,7 +89,7 @@ SPACES-PER-TAB defines the number of spaces of one tab character."
 
 ;;;###autoload
 (defun evilmi-indent-get-tag ()
-  "Return '(start-position tag-type keyword)."
+  "Return a list containing start-position, tag-type, keyword."
   (let* (rlt
          (cur-line (evilmi-sdk-curline))
          next-line)
