@@ -34,6 +34,10 @@
 
 (defvar evilmi-debug nil "Debug flag.")
 
+(defvar evilmi-raw-scan-sexps-major-modes
+  '(lisp-interaction-mode)
+  "Major modes which using raw algorithm for forward&backward characters.")
+
 (defvar evilmi-forward-chars (string-to-list "[{("))
 (defvar evilmi-backward-chars (string-to-list "]})"))
 (defvar evilmi-quote-chars (string-to-list "'\"/"))
@@ -150,6 +154,45 @@ If font-face-under-cursor is NOT nil, the quoted string is being processed."
         (forward-word)))
     defun-p))
 
+(defun evilmi-sdk-raw-scan-sexps (is-forward character comment-p)
+  "Get the position of matching tag with CHARACTER at point.
+If IS-FORWARD is t, jump forward; or else jump backward.
+Raw algorithm is implemented, no use of native api.
+If COMMENT-P is t, non-comment is ignored.
+If COMMENT-P is nil, comment is ignored."
+  (when evilmi-debug
+    (message "evilmi-sdk-raw-scan-sexps called => %s %s %s"
+             is-forward character comment-p))
+
+  (let* ((start-pos (point))
+         (lvl 1)
+         (limit (if is-forward (point-max) (point-min)))
+         (dest-ch (cond
+                   ;; {}
+                   ((= character 123) 125)
+                   ((= character 125) 123)
+                   ;; ()
+                   ((= character 40) 41)
+                   ((= character 41) 40)
+                   ;; []
+                   ((= character 91) 93)
+                   ((= character 93) 91)))
+         (arg (if is-forward 1 -1))
+         rlt)
+    (save-excursion
+      (while (and dest-ch (not (= start-pos limit)) (> lvl 0))
+        (goto-char (setq start-pos (+ start-pos arg)))
+        (when (or (and comment-p (evilmi-sdk-comment-p start-pos))
+                  (and (not comment-p) (not (evilmi-sdk-comment-p start-pos))))
+          (cond
+           ((= (following-char) character)
+            (setq lvl (1+ lvl)))
+           ((= (following-char) dest-ch)
+            (setq lvl (1- lvl))))))
+      (when (= lvl 0)
+        (setq rlt (+ start-pos (if is-forward 1 0)))))
+    rlt))
+
 (defun evilmi-sdk-scan-sexps (is-forward character)
   "Get the position of matching tag with CHARACTER at point.
 If IS-FORWARD is t, jump forward; or else jump backward."
@@ -158,17 +201,6 @@ If IS-FORWARD is t, jump forward; or else jump backward."
   (let* ((start-pos (if is-forward (point) (+ 1 (point))))
          (arg (if is-forward 1 -1))
          (limit (if is-forward (point-max) (point-min)))
-         (lvl 1)
-         (dest-ch (cond
-                     ;; {}
-                     ((= character 123) 125)
-                     ((= character 125) 123)
-                     ;; ()
-                     ((= character 40) 41)
-                     ((= character 41) 40)
-                     ;; []
-                     ((= character 91) 93)
-                     ((= character 93) 91)))
          (rlt start-pos))
 
     (cond
@@ -187,18 +219,13 @@ If IS-FORWARD is t, jump forward; or else jump backward."
       ;; Matching tag in comment.
       ;; Use own algorithm instead of `scan-sexps'
       ;; because `scan-sexps' does not work in some major modes
-      (save-excursion
-        (setq start-pos (point))
-        (while (and dest-ch (not (= start-pos limit)) (> lvl 0))
-          (goto-char (setq start-pos (+ start-pos arg)))
-          (when (evilmi-sdk-comment-p start-pos)
-            (cond
-             ((= (following-char) character)
-              (setq lvl (1+ lvl)))
-             ((= (following-char) dest-ch)
-              (setq lvl (1- lvl))))))
-        (when (= lvl 0)
-          (setq rlt (+ start-pos (if is-forward 1 0))))))
+      (setq rlt (evilmi-sdk-raw-scan-sexps is-forward character t)))
+
+     ;; just use raw algorithm to match characters
+     ((and (memq major-mode evilmi-raw-scan-sexps-major-modes)
+           (or (memq character evilmi-forward-chars)
+               (memq character evilmi-backward-chars)))
+      (setq rlt (evilmi-sdk-raw-scan-sexps is-forward character nil)))
 
      (t
       ;; jump inside code and ignore comments
@@ -206,7 +233,7 @@ If IS-FORWARD is t, jump forward; or else jump backward."
         (setq rlt (scan-sexps start-pos arg)))))
 
     (when evilmi-debug
-      (message "evilmi-sdk-scan-sexps => rlt=%s lvl=%s is-forward=%s" rlt lvl is-forward))
+      (message "evilmi-sdk-scan-sexps => rlt=%s is-forward=%s" rlt is-forward))
     rlt))
 
 (defmacro evilmi-sdk-visual-state-p ()
