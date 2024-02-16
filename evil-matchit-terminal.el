@@ -1,4 +1,4 @@
-;;; evil-matchit-terminal.el --- terminal plugin of evil-matchit
+;;; evil-matchit-terminal.el --- terminal plugin of evil-matchit -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2020 Chen Bin
 

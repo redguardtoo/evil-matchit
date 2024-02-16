@@ -1,4 +1,4 @@
-;;; evil-matchit-sh.el --- sh (bash/zsh) plugin of evil-matchit
+;;; evil-matchit-sh.el --- sh (bash/zsh) plugin of evil-matchit -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2014-2020 Chen Bin
 

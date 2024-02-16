@@ -1,4 +1,4 @@
-;;; evil-matchit-verilog.el --- verilog plugin of evil-matchit
+;;; evil-matchit-verilog.el --- verilog plugin of evil-matchit -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2014-2020 Chen Bin
 
@@ -133,7 +133,8 @@
   "Use INFO returned by `evilmi-verilog-get-tag' and NUM to jump to matched tag."
   (when info
     (let* ((orig-keyword (evilmi-sdk-keyword (cadr info))))
-      (if evilmi-debug (message "evilmi-verilog-jump called => %s" info))
+      (when evilmi-debug
+        (message "evilmi-verilog-jump called => %s %s" info orig-keyword))
       (evilmi-sdk-jump info
                        num
                        evilmi-verilog-match-tags

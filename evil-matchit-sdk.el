@@ -1,4 +1,4 @@
-;;; evil-matchit-sd.el --- evil-matchit SDK
+;;; evil-matchit-sd.el --- evil-matchit SDK -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2014-2022 Chen Bin
 
@@ -437,6 +437,7 @@ Rule is looked up in HOWTOS."
   "Use RLT, NUM, MATCH-TAGS and HOWTOS to jump.
 Return nil if no matching tag found.  Please note (point) is changed
 after calling this function."
+  (ignore num)
   (let* ((orig-tag-info (nth 1 rlt))
          (orig-tag-type (nth 1 orig-tag-info))
          cur-tag-type

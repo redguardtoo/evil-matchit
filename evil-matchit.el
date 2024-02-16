@@ -1,4 +1,4 @@
-;;; evil-matchit.el --- Vim matchit ported to Evil
+;;; evil-matchit.el --- Vim matchit ported to Evil -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2014-2020 Chen Bin
 

@@ -1,4 +1,4 @@
-;;; evil-matchit-org.el --- org-mode plugin of evil-matchit
+;;; evil-matchit-org.el --- org-mode plugin of evil-matchit -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2014-2021 Chen Bin
 
@@ -86,8 +86,7 @@ Sub-match is the match defined between '\\(' and '\\)' in regular expression.")
   "Jump to the matching tag using INFO and NUM."
   (cond
    ((< (car info) 0)
-    (let* (ideal-dest
-           jumped
+    (let* (jumped
            info
            (lang-f (evilmi--get-embedded-language-major-mode))
            (plugin (and lang-f (plist-get evilmi-plugins lang-f))))
@@ -96,8 +95,6 @@ Sub-match is the match defined between '\\(' and '\\)' in regular expression.")
          (lambda (elem)
            (setq info (funcall (nth 0 elem)))
            (when (and info (not jumped))
-             ;; before jump, we may need some operation
-             (setq ideal-dest (funcall (nth 1 elem) info num))
              ;; jump only once if the jump is successful
              (setq jumped t)))
          plugin))))

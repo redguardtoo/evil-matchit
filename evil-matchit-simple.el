@@ -1,4 +1,4 @@
-;;; evil-matchit-simple.el --- simple match plugin of evil-matchit
+;;; evil-matchit-simple.el --- simple match plugin of evil-matchit -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2014-2021 Chen Bin
 
@@ -70,8 +70,7 @@ If it's t, use simple jump.")
    ((and (apply 'derived-mode-p evilmi-simple-supported-major-modes)
          (evilmi-sdk-defun-p))
     (let* ((tokens (evilmi-sdk-tokens 5))
-           tag
-           info)
+           tag)
       (when (and tokens
                  (> (length tokens) 1)
                  (setq tag
@@ -142,8 +141,7 @@ If it's t, use simple jump.")
 ;;;###autoload
 (defun evilmi-simple-get-tag ()
   "Get current tag in simple language."
-  (let* (forward-line-num
-         (ch (evilmi-simple-following-char))
+  (let* ((ch (evilmi-simple-following-char))
          rlt)
 
     (cond

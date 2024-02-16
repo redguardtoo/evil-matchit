@@ -1,4 +1,4 @@
-;;; evil-matchit-script.el --- script (vimrc/lua) plugin of evil-matchit
+;;; evil-matchit-script.el --- script (vimrc/lua) plugin of evil-matchit -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2014-2020 Chen Bin
 

@@ -1,4 +1,4 @@
-;;; evil-matchit-c.el -- C like language (c/c++/perl/java/javascript) plugin of evil-matchit
+;;; evil-matchit-c.el -- C like language (c/c++/perl/java/javascript) plugin of evil-matchit -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2014-2020 Chen Bin
 

@@ -1,4 +1,4 @@
-;;; evil-matchit-prog.el --- all programming languages plugin of evil-matchit
+;;; evil-matchit-prog.el --- all programming languages plugin of evil-matchit -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2021 Chen Bin
 

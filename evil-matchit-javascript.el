@@ -1,4 +1,4 @@
-;;; evil-matchit-javascript.el --- simple match plugin of evil-matchit
+;;; evil-matchit-javascript.el --- simple match plugin of evil-matchit -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2014-2020 Chen Bin
 
