@@ -221,7 +221,7 @@ Some modes can be toggle on/off in the hook"
   (evilmi-load-plugin-rules '(markdown-mode) '(markdown))
 
   ;; Latex
-  (evilmi-load-plugin-rules '(latex-mode) '(latex simple))
+  (evilmi-load-plugin-rules '(latex-mode LaTeX-mode) '(latex simple))
 
   ;; Ocaml
   (evilmi-load-plugin-rules '(tuareg-mode) '(simple ocaml))
