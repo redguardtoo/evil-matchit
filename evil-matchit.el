@@ -195,11 +195,13 @@ Some modes can be toggle on/off in the hook"
                               js2-mode
                               js3-mode
                               javascript-mode
+                              js-ts-mode
                               rjsx-mode
                               js2-jsx-mode
                               react-mode
                               typescript-mode
                               typescript-tsx-mode
+                              typescript-ts-mode
                               tsx-ts-mode)
                             '(simple javascript html))
 
