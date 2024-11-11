@@ -6,7 +6,7 @@
 ;; URL: http://github.com/redguardtoo/evil-matchit
 ;; Version: 3.0.4
 ;; Keywords: matchit vim evil
-;; Package-Requires: ((emacs "25.1"))
+;; Package-Requires: ((emacs "27.1"))
 ;;
 ;; This file is not part of GNU Emacs.
 
@@ -81,7 +81,7 @@
   "Hook run before&after jump to the matched tag.
 If the parameter of hook is t, the hook runs before jump.
 Or else, the hook runs after jump.
-Some modes can be toggle on/off in the hook"
+Some modes can be toggle on/off in the hook."
   :group 'evil-matchit
   :type 'hook)
 

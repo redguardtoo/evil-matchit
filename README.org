@@ -44,7 +44,7 @@ If [[https://www.emacswiki.org/emacs/Evil][EVIL]] is installed, this package use
 
 If EVIL is not installed, most commands still work. So *EVIL is only optional dependency*.
 
-Tested on Emacs 25, 26, 27, 28
+Tested on Emacs 27, 28, 29
 
 * Why use evil-matchit
 - Support any modern languages (html/java/c/c++/python/latex/javascript ...)
