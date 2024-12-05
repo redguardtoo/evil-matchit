@@ -4,7 +4,7 @@
 
 ;; Author: Chen Bin <chenbin.sh@gmail.com>
 ;; URL: http://github.com/redguardtoo/evil-matchit
-;; Version: 4.0.0
+;; Version: 4.0.1
 ;; Keywords: matchit vim evil
 ;; Package-Requires: ((emacs "27.1"))
 ;;
@@ -143,7 +143,7 @@ Some modes can be toggle on/off in the hook."
                ((eq point-before-jump point-after-jump)
                 (setq jumped nil))
                (t
-                (setq idea-dest point-after-jump)
+                (setq ideal-dest point-after-jump)
                 (setq jumped t)))))))
 
         (when (and evilmi-debug rlt)
@@ -193,12 +193,12 @@ Some modes can be toggle on/off in the hook."
     (nreverse rlt)))
 
 ;;;###autoload
-(defun evilmi-add-one-plugin-rule (major-mode jump-tag-fn &optional get-tag-fn append-p)
-  "Add one new plugin rule for specific MAJOR-MODE.
+(defun evilmi-add-one-plugin-rule (mode jump-tag-fn &optional get-tag-fn append-p)
+  "Add one new plugin rule for specific jor MODE.
 A rule has a non-nil function JUMP-TAG-FN and could-be nil function GET-TAG-FN.
 If APPEND-P is t, new plugin rule is appended into existing rules."
 
-  (let ((rules (plist-get evilmi-plugins major-mode))
+  (let ((rules (plist-get evilmi-plugins mode))
         (new-rule (list get-tag-fn jump-tag-fn)))
 
     ;; delete old rule with same jump tag function
@@ -214,7 +214,7 @@ If APPEND-P is t, new plugin rule is appended into existing rules."
      (t
       (setq rules (push new-rule rules))))
 
-    (setq evilmi-plugins (plist-put evilmi-plugins major-mode rules))))
+    (setq evilmi-plugins (plist-put evilmi-plugins mode rules))))
 
 ;;;###autoload
 (defun evilmi-load-plugin-rules(modes rules)
@@ -374,7 +374,7 @@ If IS-INNER is t, the region is inner text object."
 (defun evilmi-version()
   "Print version."
   (interactive)
-  (message "4.0.0"))
+  (message "4.0.1"))
 
 ;; initialize evilmi-plugins only once
 (evilmi-init-plugins)
