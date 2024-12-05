@@ -263,7 +263,7 @@ Use =evilmi-add-one-plugin-rule= to add one new plugin rule for specific MAJOR-M
 
 For example, to integrate =rjsx-jump-tag= into this package is as simple as,
 #+begin_src elisp
-(evilmi-add-one-plugin-rule #'rjsx-mode #'my-rjsx-jump-tag)
+(evilmi-add-one-plugin-rule 'rjsx-mode #'my-rjsx-jump-tag)
 #+end_src
 
 Or,
@@ -271,7 +271,7 @@ Or,
 (defun my-rjsx-jump-tag ()
   (when (string-match "</?>" (string-trim (evilmi-sdk-curline)))
     (rjsx-jump-tag)))
-(evilmi-add-one-plugin-rule #'rjsx-mode #'my-rjsx-jump-tag)
+(evilmi-add-one-plugin-rule 'rjsx-mode #'my-rjsx-jump-tag)
 #+end_src
 
 Or,
@@ -283,7 +283,7 @@ Or,
   (rjsx-jump-tag)
   (point))
 (defvar append-p t)
-(evilmi-add-one-plugin-rule #'rjsx-mode #'my-rjsx-jump-tag #'my-rjsx-get-tag append-p)
+(evilmi-add-one-plugin-rule 'rjsx-mode #'my-rjsx-jump-tag #'my-rjsx-get-tag append-p)
 #+end_src
 
 *** Support languages using indentation to identify a block of code
