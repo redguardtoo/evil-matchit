@@ -4,7 +4,7 @@
 
 ;; Author: Chen Bin <chenbin.sh@gmail.com>
 ;; URL: http://github.com/redguardtoo/evil-matchit
-;; Version: 3.0.4
+;; Version: 4.0.0
 ;; Keywords: matchit vim evil
 ;; Package-Requires: ((emacs "27.1"))
 ;;
@@ -99,7 +99,9 @@ Some modes can be toggle on/off in the hook."
   (let* ((jump-rules (plist-get evilmi-plugins major-mode))
          rlt
          jumped
-         ideal-dest)
+         ideal-dest
+         get-tag-fn
+         jump-tag-fn)
 
     (unless num (setq num 1))
 
@@ -112,17 +114,38 @@ Some modes can be toggle on/off in the hook."
 
     (when jump-rules
       (dolist (rule jump-rules)
-        ;; execute evilmi-xxxx-get-tag
+        ;; execute evilmi-xxxx-get-tag if it's not nil
         ;; every rule should be executed.
         ;; the simple rule might just forward a word
-        (setq rlt (funcall (nth 0 rule)))
-        (when (and rlt (not jumped))
+        (when (setq get-tag-fn (nth 0 rule))
+          (setq rlt (funcall get-tag-fn)))
+
+        (when (and (or rlt (not get-tag-fn)) (not jumped))
           ;; before jump, we may need some operation
           (if func (funcall func rlt))
           ;; jump now, execute evilmi-xxxx-jump
-          (setq ideal-dest (funcall (nth 1 rule) rlt num))
-          ;; jump only once if the jump is successful
-          (setq jumped t))
+          (setq jump-tag-fn (nth 1 rule))
+          (cond
+           (get-tag-fn
+            ;; pass the result of non-nil get-tag-fn into jump-tag-fn
+            (setq ideal-dest (funcall jump-tag-fn rlt num))
+            ;; jump only once if the jump is successful
+            (setq jumped t))
+           (t
+            ;; if get-tag-fn is nil, assume jump-tag-fn is from third parties.
+            ;; So it need NO arguments and returns nil.
+            ;; Also need double check if the cursor is moved.
+            (let ((point-before-jump (point))
+                  point-after-jump)
+              (funcall jump-tag-fn)
+              (setq point-after-jump (point))
+              (cond
+               ((eq point-before-jump point-after-jump)
+                (setq jumped nil))
+               (t
+                (setq idea-dest point-after-jump)
+                (setq jumped t)))))))
+
         (when (and evilmi-debug rlt)
           (message "rlt=%s rule=%s p=%s jumped=%s idea-dest=%s"
                    rlt
@@ -168,6 +191,30 @@ Some modes can be toggle on/off in the hook."
         (push (list get-tag-function jump-function) rlt)))
 
     (nreverse rlt)))
+
+;;;###autoload
+(defun evilmi-add-one-plugin-rule (major-mode jump-tag-fn &optional get-tag-fn append-p)
+  "Add one new plugin rule for specific MAJOR-MODE.
+A rule has a non-nil function JUMP-TAG-FN and could-be nil function GET-TAG-FN.
+If APPEND-P is t, new plugin rule is appended into existing rules."
+
+  (let ((rules (plist-get evilmi-plugins major-mode))
+        (new-rule (list get-tag-fn jump-tag-fn)))
+
+    ;; delete old rule with same jump tag function
+    (setq rules (cl-remove-if (lambda (pair) (eq jump-tag-fn (nth 1 pair)))
+                              rules))
+
+    (cond
+     (append-p
+      ;; append the new rule
+      (setq rules (nreverse rules))
+      (push new-rule rules)
+      (setq rules (nreverse rules)))
+     (t
+      (setq rules (push new-rule rules))))
+
+    (setq evilmi-plugins (plist-put evilmi-plugins major-mode rules))))
 
 ;;;###autoload
 (defun evilmi-load-plugin-rules(modes rules)
@@ -327,7 +374,7 @@ If IS-INNER is t, the region is inner text object."
 (defun evilmi-version()
   "Print version."
   (interactive)
-  (message "3.0.4"))
+  (message "4.0.0"))
 
 ;; initialize evilmi-plugins only once
 (evilmi-init-plugins)

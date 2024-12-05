@@ -258,6 +258,34 @@ Step 3, add below code to =~/.emacs.=,
 #+BEGIN_SRC lisp
 (evilmi-load-plugin-rules '(ruby-mode lua-mode) '(script))
 #+END_SRC
+*** Integrate third party jump tag function
+Use =evilmi-add-one-plugin-rule= to add one new plugin rule for specific MAJOR-MODE.
+
+For example, to integrate =rjsx-jump-tag= into this package is as simple as,
+#+begin_src elisp
+(evilmi-add-one-plugin-rule #'rjsx-mode #'my-rjsx-jump-tag)
+#+end_src
+
+Or,
+#+begin_src elisp
+(defun my-rjsx-jump-tag ()
+  (when (string-match "</?>" (string-trim (evilmi-sdk-curline)))
+    (rjsx-jump-tag)))
+(evilmi-add-one-plugin-rule #'rjsx-mode #'my-rjsx-jump-tag)
+#+end_src
+
+Or,
+#+begin_src elisp
+(defun my-rjsx-get-tag()
+  (let ((info ("some info")))
+    info))
+(defun my-rjsx-jump-tag (info num)
+  (rjsx-jump-tag)
+  (point))
+(defvar append-p t)
+(evilmi-add-one-plugin-rule #'rjsx-mode #'my-rjsx-jump-tag #'my-rjsx-get-tag append-p)
+#+end_src
+
 *** Support languages using indentation to identify a block of code
 It's easy to support such language (Python, Yaml, ...).
 
