@@ -263,7 +263,7 @@ Use =evilmi-add-one-plugin-rule= to add one new plugin rule for specific MAJOR-M
 
 For example, to integrate =rjsx-jump-tag= into this package is as simple as,
 #+begin_src elisp
-(evilmi-add-one-plugin-rule 'rjsx-mode #'my-rjsx-jump-tag)
+(evilmi-add-one-plugin-rule 'rjsx-mode #'rjsx-jump-tag)
 #+end_src
 
 Or,
