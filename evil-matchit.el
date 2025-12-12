@@ -161,6 +161,7 @@ Some modes can be toggle on/off in the hook."
       (setq ideal-dest (point)))
 
     (if evilmi-debug (message "evilmi-jump-items-internal returned: %s" ideal-dest))
+    (run-hook-with-args 'evilmi-jump-hook nil)
     ideal-dest))
 
 ;;;###autoload
