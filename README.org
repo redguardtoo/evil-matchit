@@ -237,17 +237,26 @@ The third column contains the closed tags(s).
 The forth *optional* column defines the relationship between open and close tags. It could be MONOGAMY
 ")
 
+;; `evilmi-script-ignore-pattern' is OPTIONAL
+(defvar evilmi-script-ignore-pattern
+  "^[ \t\]*if .* end[ \t]*$"
+  "Ignore the lines matching this pattern.")
+
 ;;;###autoload
 (defun evilmi-script-get-tag ()
+  ;; `evilmi-script-ignore-pattern` is the optional parameter
   (evilmi-sdk-get-tag evilmi-script-match-tags
-                      evilmi-sdk-extract-keyword-howtos))
+                      evilmi-sdk-extract-keyword-howtos
+                      evilmi-script-ignore-pattern))
 
 ;;;###autoload
 (defun evilmi-script-jump (rlt num)
+  ;; `evilmi-script-ignore-pattern` is the optional parameter
   (evilmi-sdk-jump rlt
                    num
                    evilmi-script-match-tags
-                   evilmi-sdk-extract-keyword-howtos))
+                   evilmi-sdk-extract-keyword-howtos
+                   evilmi-script-ignore-pattern))
 
 (provide 'evil-matchit-script)
 #+END_SRC
