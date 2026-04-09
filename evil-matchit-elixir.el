@@ -1,6 +1,6 @@
 ;;; evil-matchit-elixir.el --- elixir plugin of evil-matchit -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2018-2020 Chen Bin
+;; Copyright (C) 2018-2026 Chen Bin
 
 ;; Author: Chen Bin
 

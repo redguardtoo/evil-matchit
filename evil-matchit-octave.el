@@ -1,6 +1,6 @@
 ;;; evil-matchit-octave.el --- octave plugin of evil-matchit -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2020 Chen Bin
+;; Copyright (C) 2026 Chen Bin
 
 ;; Author: Chen Bin
 

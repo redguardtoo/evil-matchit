@@ -1,6 +1,6 @@
 ;;; evil-matchit.el --- Vim matchit ported to Evil -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2014-2020 Chen Bin
+;; Copyright (C) 2014-2026 Chen Bin
 
 ;; Author: Chen Bin <chenbin.sh@gmail.com>
 ;; URL: http://github.com/redguardtoo/evil-matchit
