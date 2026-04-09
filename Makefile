@@ -9,6 +9,8 @@ EMACS_BATCH_OPTS=--batch -Q \
 -L deps/evil-1.14.2 \
 -l deps/yaml-mode.el \
 -l deps/lua-mode.el \
+-l deps/julia-mode-latexsubs.el \
+-l deps/julia-mode.el \
 -l deps/markdown-mode.el \
 -L deps/tuareg-3.0.1 \
 -l evil-matchit.el
@@ -25,6 +27,8 @@ deps:
 	@mkdir -p deps;
 	@if [ ! -f deps/evil-1.14.2/evil.el ]; then curl -L https://stable.melpa.org/packages/evil-1.14.2.tar | tar x -C deps/; fi;
 	@if [ ! -f deps/lua-mode.el ]; then curl -L https://raw.githubusercontent.com/immerrr/lua-mode/master/lua-mode.el > deps/lua-mode.el; fi;
+	@if [ ! -f deps/julia-mode-latexsubs.el.el ]; then curl -L https://raw.githubusercontent.com/JuliaEditorSupport/julia-emacs/refs/heads/master/julia-mode-latexsubs.el > deps/julia-mode-latexsubs.el; fi;
+	@if [ ! -f deps/julia-mode.el ]; then curl -L https://github.com/JuliaEditorSupport/julia-emacs/raw/refs/heads/master/julia-mode.el > deps/julia-mode.el; fi;
 	@if [ ! -f deps/markdown-mode.el ]; then curl -L https://raw.githubusercontent.com/jrblevin/markdown-mode/master/markdown-mode.el > deps/markdown-mode.el; fi;
 	@if [ ! -f deps/tuareg-3.0.1/tuareg.el ]; then curl -L https://stable.melpa.org/packages/tuareg-3.0.1.tar | tar x -C deps/; fi;
 	@if [ ! -f deps/yaml-mode.el ]; then curl -L https://raw.githubusercontent.com/yoshiki/yaml-mode/master/yaml-mode.el > deps/yaml-mode.el; fi;

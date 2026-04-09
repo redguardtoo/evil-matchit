@@ -631,5 +631,32 @@
 
     (should (eq major-mode 'yaml-mode))))
 
-(ert-run-tests-batch-and-exit)
+(ert-deftest evilmi-test-julia ()
+  (with-temp-buffer
+    (evilmi-test-read-file "test-julia.jl")
+    (julia-mode)
+
+    ;; jump from start
+    (goto-char (point-min))
+
+    ;; test function..end statement
+    (evilmi-jump-items)
+    (should (string= "end" (thing-at-point 'symbol)))
+    (evilmi-jump-items)
+    (should (string= "function" (thing-at-point 'symbol)))
+
+    ;; test if..else..end statement
+    (re-search-forward "if")
+    (evilmi-jump-items)
+    (should (string= "elseif" (thing-at-point 'symbol)))
+    (evilmi-jump-items)
+    (should (string= "else" (thing-at-point 'symbol)))
+    (evilmi-jump-items)
+    (should (string= "end" (thing-at-point 'symbol)))
+    (evilmi-jump-items)
+    (should (string= "if" (thing-at-point 'symbol)))
+
+    (should (eq major-mode 'julia-mode))))
+;; (ert-run-tests-batch-and-exit)
+(ert-run-tests-batch-and-exit 'evilmi-test-julia)
 ;;; evil-matchit-tests.el ends here

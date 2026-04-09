@@ -308,6 +308,9 @@ If APPEND-P is t, new plugin rule is appended into existing rules."
   ;; verilog-mode
   (evilmi-load-plugin-rules '(verilog-mode) '(verilog))
 
+  ;; Julia
+  (evilmi-load-plugin-rules '(julia-mode julia-ts-mode) '(simple julia))
+
   ;; Lua or script
   (evilmi-load-plugin-rules '(lua-mode vimrc-mode) '(simple script))
 
