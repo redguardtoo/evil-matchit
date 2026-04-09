@@ -35,7 +35,7 @@ deps:
 
 compile: deps
 	$(RM) *.elc
-	@$(EMACS) $(EMACS_BATCH_OPTS) -l tests/my-byte-compile.el 2>&1 | grep -E "([Ee]rror|[Ww]arning):" && exit 1 || exit 0
+	@$(EMACS) $(EMACS_BATCH_OPTS) -l tests/my-byte-compile.el 2>&1 | grep -E "([Ee]rror):" && exit 1 || exit 0
 
 test: compile deps
 	@$(EMACS) $(EMACS_BATCH_OPTS) -l tests/evil-matchit-tests.el

@@ -657,6 +657,6 @@
     (should (string= "if" (thing-at-point 'symbol)))
 
     (should (eq major-mode 'julia-mode))))
-;; (ert-run-tests-batch-and-exit)
-(ert-run-tests-batch-and-exit 'evilmi-test-julia)
+
+(ert-run-tests-batch-and-exit)
 ;;; evil-matchit-tests.el ends here
