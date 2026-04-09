@@ -48,15 +48,25 @@
     ("^[ \t]*\\([a-z]+!?\\)[)]?\\([ \t].*\\| *\\)$" 1)
     ("^.*[ \t]\\(do\\)[ \t]|[a-z0-9A-Z,|]+|$" 1)))
 
+(defvar evilmi-script-ignore-pattern
+  "^[ \t\]*if .* end[ \t]*$"
+  "Ignore the lines matching this pattern.")
+
 ;;;###autoload
 (defun evilmi-script-get-tag ()
   "Get tag at point."
-  (evilmi-sdk-get-tag evilmi-script-match-tags evilmi-script-extract-keyword-howtos))
+  (evilmi-sdk-get-tag evilmi-script-match-tags
+                      evilmi-script-extract-keyword-howtos
+                      evilmi-script-ignore-pattern))
 
 ;;;###autoload
 (defun evilmi-script-jump (info num)
   "Use INFO returned by `evilmi-script-get-tag' and NUM to jump to matched tag."
-  (evilmi-sdk-jump info num evilmi-script-match-tags evilmi-script-extract-keyword-howtos))
+  (evilmi-sdk-jump info
+                   num
+                   evilmi-script-match-tags
+                   evilmi-script-extract-keyword-howtos
+                   evilmi-script-ignore-pattern))
 
 (provide 'evil-matchit-script)
 ;;; evil-matchit-script.el ends here

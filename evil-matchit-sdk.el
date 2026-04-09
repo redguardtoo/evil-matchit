@@ -373,7 +373,7 @@ If IS-FORWARD is t, jump forward; or else jump backward."
 (defun evilmi-sdk-get-tag-info (keyword match-tags)
   "Return (row column is-function-exit-point keyword).
 The row and column mark the position in `evilmi-mylang-match-tags'
-is-function-exit-point could be unknown status"
+is-function-exit-point could be unknown status."
   (let* (rlt
          items
          item
@@ -449,28 +449,32 @@ Rule is looked up in HOWTOS."
 
 ;;;###autoload
 ;; Return '(start-point (row column is-function-exit-point keyword))
-(defun evilmi-sdk-get-tag (match-tags howtos)
-  "Use MATCH-TAGS and HOWTOS to return information for jump."
+(defun evilmi-sdk-get-tag (match-tags howtos &optional ignore-pattern)
+  "Use MATCH-TAGS and HOWTOS to return information for jump.
+Lines matching IGNORE-PATTERN will be ignored."
   (let* ((cur-line (evilmi-sdk-curline))
-         (keyword (evilmi--sdk-extract-keyword cur-line match-tags howtos))
-         (tag-info (if keyword (evilmi-sdk-get-tag-info keyword match-tags))))
-
-    ;; since we mixed ruby and lua mode here
-    ;; maybe we should be strict at the keyword
-    (and tag-info
-      ;; 0 - open tag; 1 - middle tag; 2 - close tag;
-         (list (if (= 2 (nth 1 tag-info))
-                   (line-end-position)
-                 (line-beginning-position))
-               tag-info))))
+         keyword
+         tag-info)
+    (unless (and ignore-pattern (string-match ignore-pattern cur-line))
+      (setq keyword (evilmi--sdk-extract-keyword cur-line match-tags howtos))
+      (setq tag-info (if keyword (evilmi-sdk-get-tag-info keyword match-tags)))
+      ;; since we mixed ruby and lua mode here
+      ;; maybe we should be strict at the keyword
+      (and tag-info
+           ;; 0 - open tag; 1 - middle tag; 2 - close tag;
+           (list (if (= 2 (nth 1 tag-info))
+                     (line-end-position)
+                   (line-beginning-position))
+                 tag-info)))))
 
 ;;;###autoload
-(defun evilmi-sdk-jump (rlt num match-tags howtos)
-  "Use RLT, NUM, MATCH-TAGS and HOWTOS to jump.
+(defun evilmi-sdk-jump (info num match-tags howtos &optional ignore-pattern)
+  "Use INFO, NUM, MATCH-TAGS and HOWTOS to jump.
+Lines matching IGNORE-PATTERN will be ignored.
 Return nil if no matching tag found.  Please note (point) is changed
 after calling this function."
   (ignore num)
-  (let* ((orig-tag-info (nth 1 rlt))
+  (let* ((orig-tag-info (nth 1 info))
          (orig-tag-type (nth 1 orig-tag-info))
          cur-tag-type
          cur-tag-info
@@ -479,13 +483,18 @@ after calling this function."
          keyword
          found
          ideal-dest)
-    (if evilmi-debug (message "evilmi-sdk-jump called => rlt=%s (point)=%s" rlt (point)))
+
+    (if evilmi-debug (message "evilmi-sdk-jump called => info=%s (point)=%s" info (point)))
 
     (while (not found)
       (forward-line (if (= orig-tag-type 2) -1 1))
       (setq cur-line (evilmi-sdk-curline))
-      (setq keyword (evilmi--sdk-extract-keyword cur-line match-tags howtos))
-      (if evilmi-debug (message "keyword=%s cur-line=%s" keyword cur-line))
+      (cond
+       ((and ignore-pattern (string-match ignore-pattern cur-line))
+        (setq keyword nil))
+       (t
+        (setq keyword (evilmi--sdk-extract-keyword cur-line match-tags howtos))
+        (if evilmi-debug (message "keyword=%s cur-line=%s" keyword cur-line))))
 
       (when keyword
         (setq cur-tag-info (evilmi-sdk-get-tag-info keyword match-tags))
@@ -558,15 +567,14 @@ after calling this function."
            (t (message "why here?")))))
 
       ;; we will stop at end or beginning of buffer anyway
-      (if (or (= (line-end-position) (point-max))
-              (= (line-beginning-position) (point-min)))
-          (setq found t)))
+      (when (or (= (line-end-position) (point-max))
+                (= (line-beginning-position) (point-min)))
+        (setq found t)))
 
     (when evilmi-debug
       (message "evilmi-sdk-jump was called. ideal-dest=%s" ideal-dest))
 
     ideal-dest))
-
 
 ;;;###autoload
 (defun evilmi-sdk-font-p (pos fonts)
