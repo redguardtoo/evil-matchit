@@ -35,6 +35,7 @@ Built-in supported languages and documents:
 - Laravel Blade Templating
 - Vim script
 - Verilog
+- Julia
 - Diff/Patch
 - Shell/Terminal bundled in Emacs
 - Emacs email (message-mode)
