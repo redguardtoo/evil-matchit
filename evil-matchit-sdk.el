@@ -70,25 +70,30 @@ Sub-match is defined between '\\(' and '\\)' in regular expression.")
   "Get character at POSITION."
   (char-after position))
 
+(defun evilmi-sdk-character-count-even-p (ch str)
+  "Count if character ch in STR."
+  (let* ((i 0)
+         (cnt 0)
+         (len (length str)))
+    (while (< i len)
+      (when (eq ch (aref str i))
+        (setq cnt (1+ cnt)))
+      (setq i (1+ i)))
+    (eq (% cnt 2) 0)))
+
 (defun evilmi-sdk-guess-jump-direction-of-quote (ch ff)
   "Guess jump direction by quote character CH and font face FF.
 Return t if jump forward."
   (cond
+   ;; In comments, determine direction by counting quotes on this line.
+   ((evilmi-sdk-comment-p (point))
+    (evilmi-sdk-character-count-even-p ch (buffer-substring (line-beginning-position) (point))))
+
    (ff
     (eq ff (get-text-property (+ 1 (point)) 'face)))
 
    (t
-    (let* ((i 0)
-           (cnt 0)
-           (str (buffer-substring (point-min) (point)))
-           (len (length str)))
-      ;; count quote character
-      (while (< i len)
-        ;; `seq-elt' is from emacs27+
-        (when (eq ch (aref str i))
-          (setq cnt (1+ cnt)))
-        (setq i (1+ i)))
-      (eq (% cnt 2) 0)))))
+    (evilmi-sdk-character-count-even-p ch (buffer-substring (point-min) (point))))))
 
 (defun evilmi-sdk-jump-forward-p ()
   "Return: (forward-direction font-face-under-cursor character-under-cursor).
@@ -108,19 +113,33 @@ If font-face-under-cursor is NOT nil, the quoted string is being processed."
     (list rlt ff ch)))
 
 (defun evilmi-sdk-the-other-quote-char (font-face is-forward char)
-  "The end character under cursor has different font from FONT-FACE."
+  "Find the matching quote character CHAR with FONT-FACE and IS-FORWARD."
   (let* (rlt
-         got
+         out-of-loop
+         found
          (delta (if is-forward 1 -1))
          (pos (+ delta (point)))
-         (end (if is-forward (point-max) (point-min))))
-    (while (not got)
+         (end (cond
+               (is-forward
+                (cond
+                 ((evilmi-sdk-comment-p (point))
+                  (line-end-position))
+                 (t
+                  (point-max))))
+               (t
+                (cond
+                 ((evilmi-sdk-comment-p (point))
+                  (line-beginning-position))
+                 (t
+                  (point-min)))))))
+    (while (not out-of-loop)
       (cond
        ((or (= pos end)
-            (and (= char (evilmi-sdk-get-char (- pos delta)))
-                 (not (eq font-face (get-text-property pos 'face)))))
-        (setq rlt (if is-forward pos (+ 1 pos)))
-        (setq got t))
+            (setq found (and (= char (evilmi-sdk-get-char pos))
+                             (eq font-face (get-text-property pos 'face)))))
+        (when found
+          (setq rlt (if is-forward (+ delta pos) pos)))
+        (setq out-of-loop t))
        (t
         (setq pos (+ delta pos)))))
     (if evilmi-debug (message "evilmi-sdk-the-other-quote-char called Return: %s" rlt))
