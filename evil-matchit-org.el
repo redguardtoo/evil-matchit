@@ -75,7 +75,7 @@ Sub-match is the match defined between '\\(' and '\\)' in regular expression.")
   (let* ((rlt (evilmi-sdk-get-tag evilmi-org-match-tags
                                   evilmi-org-extract-keyword-howtos)))
     ;; evilmi-org-jump knows what -1 means
-    (unless rlt (setq rlt '(-1)))
+    (unless rlt (setq rlt 'code-snippet))
     rlt))
 
 (defvar evilmi-plugins)
@@ -84,18 +84,21 @@ Sub-match is the match defined between '\\(' and '\\)' in regular expression.")
 (defun evilmi-org-jump (info num)
   "Jump to the matching tag using INFO and NUM."
   (cond
-   ((< (car info) 0)
-    (let* (jumped
-           info
+   ((eq info 'code-snippet)
+    (let* (idea-dest
+           jumped
+           code-snippet-info
            (lang-f (evilmi--get-embedded-language-major-mode))
            (plugin (and lang-f (plist-get evilmi-plugins lang-f))))
       (when plugin
         (mapc
          (lambda (elem)
-           (setq info (funcall (nth 0 elem)))
-           (when (and info (not jumped))
-             ;; jump only once if the jump is successful
-             (setq jumped t)))
+           (setq code-snippet-info (funcall (nth 0 elem)))
+           (when (and code-snippet-info (not jumped))
+             (when (setq ideal-dest (funcall (nth 1 elem) code-snippet-info num))
+               ;; jump only once if the jump is successful
+               (setq jumped t)))
+           idea-dest)
          plugin))))
    (t
     (evilmi-sdk-jump info
