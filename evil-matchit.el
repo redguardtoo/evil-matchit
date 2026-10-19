@@ -234,12 +234,14 @@ If APPEND-P is t, new plugin rule is appended into existing rules."
   (evilmi-load-plugin-rules '(prog-mode) '(prog))
 
   ;; simple matching for languages containing brackets
-  (evilmi-load-plugin-rules '(java-mode perl-mode cperl-mode go-mode)
+  (evilmi-load-plugin-rules '(java-mode java-ts-mode perl-mode cperl-mode go-mode go-ts-mode)
                             '(simple))
 
   ;; Javascript/Typescript
   (evilmi-load-plugin-rules '(js-mode
+                              js-ts-mode
                               json-mode
+                              json-ts-mode
                               js2-mode
                               js3-mode
                               javascript-mode
@@ -260,6 +262,7 @@ If APPEND-P is t, new plugin rule is appended into existing rules."
                               nxhtml-mode
                               sgml-mode
                               php-mode
+                              php-ts-mode
                               message-mode
                               mhtml-mode)
                             '(template simple html))
@@ -268,7 +271,7 @@ If APPEND-P is t, new plugin rule is appended into existing rules."
   (evilmi-load-plugin-rules '(org-mode) '(simple org))
 
   ;; Markdown
-  (evilmi-load-plugin-rules '(markdown-mode) '(markdown))
+  (evilmi-load-plugin-rules '(markdown-mode markdown-ts-mode) '(markdown))
 
   ;; Latex
   (evilmi-load-plugin-rules '(latex-mode LaTeX-mode) '(latex simple))
@@ -281,16 +284,16 @@ If APPEND-P is t, new plugin rule is appended into existing rules."
   (evilmi-load-plugin-rules '(matlab-mode) '(simple octave))
 
   ;; Python
-  (evilmi-load-plugin-rules '(python-mode) '(simple python))
+  (evilmi-load-plugin-rules '(python-mode python-ts-mode jupyter-python-mode) '(simple python))
 
   ;; Yaml
-  (evilmi-load-plugin-rules '(yaml-mode) '(simple yaml))
+  (evilmi-load-plugin-rules '(yaml-mode yaml-ts-mode) '(simple yaml))
 
   ;; SQL
-  (evilmi-load-plugin-rules '(sql-mode) '(simple sql))
+  (evilmi-load-plugin-rules '(sql-mode sql-ts-mode) '(simple sql))
 
   ;; C/C++
-  (evilmi-load-plugin-rules '(c-mode c++-mode) '(c simple))
+  (evilmi-load-plugin-rules '(c-mode c-ts-mode c++-mode c++-ts-mode) '(c simple))
 
   ;; Diff/Patch
   (evilmi-load-plugin-rules '(diff-mode ffip-diff-mode magit-diff-mode)
@@ -315,7 +318,7 @@ If APPEND-P is t, new plugin rule is appended into existing rules."
   (evilmi-load-plugin-rules '(lua-mode vimrc-mode) '(simple script))
 
   ;; css/scss/less
-  (evilmi-load-plugin-rules '(css-mode less-mode scss-mode) '(simple))
+  (evilmi-load-plugin-rules '(css-mode css-ts-mode less-mode scss-mode) '(simple))
 
   ;; Ruby
   (evilmi-load-plugin-rules '(ruby-mode enh-ruby-mode) '(simple ruby))
