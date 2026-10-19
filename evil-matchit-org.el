@@ -1,6 +1,6 @@
 ;;; evil-matchit-org.el --- org-mode plugin of evil-matchit -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2014-2021 Chen Bin
+;; Copyright (C) 2014-2026 Chen Bin
 
 ;; Author: Chen Bin
 
@@ -26,7 +26,7 @@
 
 
 ;;; Commentary:
-;; 
+;;
 
 ;;; Code:
 
@@ -59,16 +59,9 @@ Sub-match is the match defined between '\\(' and '\\)' in regular expression.")
     (("results") () ("end") "MONOGAMY"))
   "Match tags in org file.")
 
-(defun evilmi--element-property (property element)
-  "Extract the value from the PROPERTY of an ELEMENT."
-  (unless (stringp element)
-    ;; `org-element-property' is not used because it's
-    ;; available only in 24.4+
-    (plist-get (nth 1 element) property)))
-
 (defun evilmi--get-embedded-language-major-mode ()
   "Get major of embedded snippet."
-  (let* ((lang (evilmi--element-property :language (org-element-at-point))))
+  (let* ((lang (org-element-property :language (org-element-at-point))))
     (when lang
       (cond
        ((string= lang "elisp")

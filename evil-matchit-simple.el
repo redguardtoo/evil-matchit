@@ -1,6 +1,6 @@
 ;;; evil-matchit-simple.el --- simple match plugin of evil-matchit -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2014-2021 Chen Bin
+;; Copyright (C) 2014-2026 Chen Bin
 
 
 ;; Author: Chen Bin

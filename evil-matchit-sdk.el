@@ -1,6 +1,6 @@
 ;;; evil-matchit-sd.el --- evil-matchit SDK -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2014-2022 Chen Bin
+;; Copyright (C) 2014-2026 Chen Bin
 
 ;; Author: Chen Bin
 
